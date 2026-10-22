@@ -71,6 +71,11 @@ cd report && latexmk -pdf -outdir=build main.tex
 
 **Replay without API access.** If `results/llm_cache/` is present (it is not committed, but can be shared), add `--offline` to any `run`: stored responses are replayed and the API is never called. A cache miss is an error, not a silent network call. Without the cache, re-running calls the model again. The service models may have changed since 22 October 2026, so expect small differences. The frozen responses that produced the reported numbers are stored inside each `results/runs/<run>/decisions_{L,E}.jsonl`.
 
+**Verified reproduction (2026-10-22).** A fresh clone of this repository on the same Mac (no `.env`, only the copied response cache) was set up exactly as above:
+- all 50 tests passed;
+- `--offline` replays of `test-diag-qcn` and `test-owasp-qcn` reproduced every per-arm decision and every score exactly, with 0 API calls;
+- the report built (7 pages).
+
 **Development runs**, used before the freeze and not reported as test results: `dev-offline-D`, `dev-smoke` (prompts p1), `dev-p2`, `dev-final-owasp`, `dev-final-diag`.
 
 ## Models
