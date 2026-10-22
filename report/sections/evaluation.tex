@@ -47,7 +47,7 @@ The last group is safe because of routing, which no request-data threat model ca
 
 \paragraph{Diagnostic pairs.} The held-out pairs are built to contain non-standard guards. D removes 13 of 19 false positives (0.684) with full retention. L removes 15 (0.789) but loses 7 of 23 real vulnerabilities (TP retention 0.696). E and EC remove the same 15 while losing 2 (0.913).
 
-\paragraph{Uncertainty.} The intervals are wide; for example D's FP removal on OWASP is [0.00, 0.67]. Differences of one or two cases between arms are therefore not evidence of a difference in general.
+\paragraph{Uncertainty.} The intervals are wide; for example D's FP removal on OWASP is [0.00, 0.67]. Differences of one or two cases between arms are therefore not evidence of a difference in general. We also bootstrap paired differences between arms on the same resamples. On the held-out pairs, structured evidence reduces wrongful suppressions relative to ordinary prompting: E$-$L is $-5$ [$-10$, $-1$] with \texttt{qwen3-coder-next} and $-8$ [$-14$, $-3$] with \texttt{qwen3.5:9b}. On OWASP, every paired difference between arms has an interval that includes zero.
 
 \begin{table*}[t]
 \caption{Held-out results (unit level). TP ret.\ = share of baseline true positives kept; FP rem.\ = share of baseline false positives removed. 95\% family-bootstrap intervals are in the artifact tables.}

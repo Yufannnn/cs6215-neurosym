@@ -183,4 +183,70 @@ def main():
     diagnostic_table()
     gate_table()
     resources_table()
+    differences_table()
     print(f"tables written to {OUT_TEX} and {OUT_MD}")
+
+
+PAIRS = (("E", "L"), ("EC", "E"), ("E", "D"), ("L", "D"))
+
+
+def paired_differences(run, resamples=2000, seed=6215):
+    """95% family-bootstrap CIs for differences between arms, using the same resamples for both arms."""
+    import random
+    from . import scoring
+    r = _run(run)
+    if r is None:
+        return None
+    s = json.loads((RUNS / run / "scores.json").read_text())
+    kept = {arm: set(units) for arm, units in s["retained_units"].items()}
+    corpus = "owasp" if "owasp" in run else "diag"
+    if corpus == "owasp":
+        units = [{"unit": c.name, "gold": c.vulnerable, "family": c.family} for c in owasp.load("test")]
+    else:
+        units = [{"unit": u.unit, "gold": u.gold, "family": u.family} for u in diagnostics.subjects("test")]
+    reported = {a["unit"] for a in r["alerts"]}
+    fams = {}
+    for u in units:
+        fams.setdefault(u["family"], []).append(u)
+    keys = sorted(fams)
+    rng = random.Random(seed)
+    diffs = {p: {"fp_removal": [], "tp_retention": [], "wrongful_suppressions": []} for p in PAIRS}
+    for _ in range(resamples):
+        sample, rep, ret = [], set(), {a: set() for a in kept}
+        for i, k in enumerate(rng.choice(keys) for _ in keys):
+            for u in fams[k]:
+                name = f"{u['unit']}#{i}"
+                sample.append({**u, "unit": name})
+                if u["unit"] in reported:
+                    rep.add(name)
+                for a in kept:
+                    if u["unit"] in kept[a]:
+                        ret[a].add(name)
+        m = {a: scoring.metrics(sample, rep, ret[a]) for a in kept}
+        for a, b in PAIRS:
+            for k in diffs[(a, b)]:
+                if m[a][k] is not None and m[b][k] is not None:
+                    diffs[(a, b)][k].append(m[a][k] - m[b][k])
+    point = {a: scoring.metrics(units, reported, kept[a]) for a in kept}
+    out = {}
+    for (a, b), per in diffs.items():
+        out[f"{a}-{b}"] = {k: {"point": round(point[a][k] - point[b][k], 4),
+                               "ci95": [round(sorted(v)[int(.025 * len(v))], 4), round(sorted(v)[int(.975 * len(v)) - 1], 4)] if len(v) >= 20 else None}
+                           for k, v in per.items()}
+    return out
+
+
+def differences_table():
+    md = ["| Run | Comparison | Δ FP removal [95% CI] | Δ TP retention [95% CI] | Δ wrongful suppressions [95% CI] |",
+          "|---|---|---|---|---|"]
+    for label, run, model in MAIN:
+        d = paired_differences(run)
+        if d is None:
+            continue
+        for comp, v in d.items():
+            cells = []
+            for k in ("fp_removal", "tp_retention", "wrongful_suppressions"):
+                c = v[k]["ci95"]
+                cells.append(f"{v[k]['point']:+.3f}" + (f" [{c[0]:+.3f}, {c[1]:+.3f}]" if c else ""))
+            md.append(f"| {run} | {comp} | " + " | ".join(cells) + " |")
+    (OUT_MD / "differences.md").write_text("\n".join(md) + "\n")
