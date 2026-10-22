@@ -1,0 +1,1 @@
+{"time": "2026-10-22T07:09:42+00:00", "tag": "smoke", "cache_key": "5f982e19b2413c47801e6b5bdd05f5fe08170c00055ac0129fa27459e828f831", "cached": false, "requested_model": "default", "served_model": "qwen3.6:35b", "prompt_tokens": 17, "completion_tokens": 2, "latency_s": 0.635}
