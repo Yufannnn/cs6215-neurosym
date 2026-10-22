@@ -1,0 +1,106 @@
+{
+ "file_sha256": "e306654d2f7c0be6b68e1200244e1574544f395fa851f1e4928ee8da0d65ffdb",
+ "function": "handler",
+ "sink": {
+  "statement": "s4",
+  "line": 17,
+  "api": "open",
+  "argument": "target",
+  "reads": {
+   "target": [
+    "s1:target"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "target = os.path.realpath(os.path.join(ROOT, request.args.get('f', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if os.path.commonpath([ROOT, target]) != ROOT:"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Expr",
+   "code": "abort(404)"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Return",
+   "code": "return open(target).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:target",
+   "var": "target",
+   "line": 14,
+   "code": "target = os.path.realpath(os.path.join(ROOT, request.args.get('f', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "os.path.commonpath([ROOT, target]) != ROOT",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "os.path.commonpath([ROOT, target]) != ROOT",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "target": [
+     "s1:target"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join",
+  "flask.request.args.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:target"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [
+   {
+    "guard": "s2",
+    "condition": "os.path.commonpath([ROOT, target]) != ROOT",
+    "recognizer": "commonpath([root, v]) == root"
+   }
+  ],
+  "safe_api": []
+ }
+}

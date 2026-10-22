@@ -1,0 +1,340 @@
+{
+ "file_sha256": "9b9fccb8bcc532fbfac2ae326052601a7ac254aa18593061f48288de83785815",
+ "function": "handler",
+ "sink": {
+  "statement": "s16",
+  "line": 50,
+  "api": "open",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s15:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s4",
+   "line": 34,
+   "kind": "For",
+   "code": "for name in request.headers.keys():"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "If",
+   "code": "if name.lower() in helpers.utils.commonHeaderNames:"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Continue",
+   "code": "continue"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "If",
+   "code": "if request.headers.get_all(name):"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Assign",
+   "code": "param = name"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "Break",
+   "code": "break"
+  },
+  {
+   "id": "s10",
+   "line": 42,
+   "kind": "Import",
+   "code": "import base64"
+  },
+  {
+   "id": "s11",
+   "line": 43,
+   "kind": "Assign",
+   "code": "tmp = base64.b64encode(param.encode('utf-8'))"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "Assign",
+   "code": "bar = base64.b64decode(tmp).decode('utf-8')"
+  },
+  {
+   "id": "s13",
+   "line": 46,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s14",
+   "line": 48,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s15",
+   "line": 49,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s16",
+   "line": 50,
+   "kind": "With",
+   "code": "with open(fileName, 'wb') as fd:"
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f'Now ready to write to file: {escape_for_html(fileName)}'"
+  },
+  {
+   "id": "s18",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Problem reading from file '{escape_for_html(fileName)}': {escape_for_html(e.strerror)}\""
+  },
+  {
+   "id": "s19",
+   "line": 60,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 32,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:name",
+   "var": "name",
+   "line": 34,
+   "code": "for name in request.headers.keys():",
+   "kind": "loop_target",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": true,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:param",
+   "var": "param",
+   "line": 39,
+   "code": "param = name",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s4:name"
+   ],
+   "in_loop": true,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:tmp",
+   "var": "tmp",
+   "line": 43,
+   "code": "tmp = base64.b64encode(param.encode('utf-8'))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param",
+    "s8:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 44,
+   "code": "bar = base64.b64decode(tmp).decode('utf-8')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:tmp"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:fileName",
+   "var": "fileName",
+   "line": 49,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s16:fd",
+   "var": "fd",
+   "line": 50,
+   "code": "with open(fileName, 'wb') as fd:",
+   "kind": "with_target",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s15:fileName"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s17:RESPONSE",
+   "var": "RESPONSE",
+   "line": 51,
+   "code": "RESPONSE += f'Now ready to write to file: {escape_for_html(fileName)}'",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s15:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 55,
+   "code": "RESPONSE += f\"Problem reading from file '{escape_for_html(fileName)}': {escape_for_html(e.strerror)}\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s15:fileName",
+    "s17:RESPONSE",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s5",
+   "line": 35,
+   "condition": "name.lower() in helpers.utils.commonHeaderNames",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "condition": "request.headers.get_all(name)",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "condition": "name.lower() in helpers.utils.commonHeaderNames",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "condition": "request.headers.get_all(name)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s4:name",
+   "s8:param",
+   "s11:tmp",
+   "s12:bar",
+   "s15:fileName"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

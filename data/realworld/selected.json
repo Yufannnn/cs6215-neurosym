@@ -1,0 +1,62 @@
+[
+ {
+  "commit": "https://github.com/benbusby/whoogle-search/commit/3a2e0b262e4a076a20416b45e6b6f23fd265aeda",
+  "repo": "benbusby/whoogle-search",
+  "decision": "selected",
+  "reason": "",
+  "files": "app/routes.py",
+  "targets": "config;element;window",
+  "parent": "8830615abcf17e0cd3991fbf963debfb161784cd",
+  "fix": "3a2e0b262e4a076a20416b45e6b6f23fd265aeda"
+ },
+ {
+  "commit": "https://github.com/cmusatyalab/opendiamond/commit/398049c187ee644beabab44d6fece82251c1ea56",
+  "repo": "cmusatyalab/opendiamond",
+  "decision": "selected",
+  "reason": "",
+  "files": "opendiamond/dataretriever/video_store.py",
+  "targets": "_get_index_absolute_path;_get_obj_abosolute_path;_get_obj_absolute_path;_get_object_element;get_object_src_http",
+  "parent": "d2f20ffff793f88335f2c0244679d7193295abe2",
+  "fix": "398049c187ee644beabab44d6fece82251c1ea56"
+ },
+ {
+  "commit": "https://github.com/corydolphin/flask-cors/commit/67c4b2cc98ae87cf1fa7df4f97fd81b40c79b895",
+  "repo": "corydolphin/flask-cors",
+  "decision": "selected",
+  "reason": "",
+  "files": "examples/app_based_example.py;flask_cors/extension.py",
+  "targets": "make_after_request_function;make_after_request_function.cors_after_request",
+  "parent": "5c6e05e996f10be1df1f2ad178560e54a2f82f1b",
+  "fix": "67c4b2cc98ae87cf1fa7df4f97fd81b40c79b895"
+ },
+ {
+  "commit": "https://github.com/mlflow/mlflow/commit/ac4b697bb0bb8a331944dca63f4235b4bf602ab8",
+  "repo": "mlflow/mlflow",
+  "decision": "selected",
+  "reason": "",
+  "files": "mlflow/server/handlers.py",
+  "targets": "_list_artifacts;get_artifact_handler;get_model_version_artifact_handler",
+  "parent": "d1c7621940fabb7fd3895699f5d16d0799f5d121",
+  "fix": "ac4b697bb0bb8a331944dca63f4235b4bf602ab8"
+ },
+ {
+  "commit": "https://github.com/mlflow/mlflow/commit/5044878da0c1851ccfdd5c0a867157ed9a502fbc",
+  "repo": "mlflow/mlflow",
+  "decision": "selected",
+  "reason": "",
+  "files": "mlflow/server/handlers.py",
+  "targets": "_abort_multipart_upload_artifact;_complete_multipart_upload_artifact;_create_multipart_upload_artifact;_delete_artifact_mlflow_artifacts;_download_artifact;_list_artifacts;_list_artifacts_mlflow_artifacts;_upload_artifact;get_artifact_handler;get_model_version_artifact_handler;list_artifacts;upload_artifact_handler;validate_path_is_safe",
+  "parent": "a98a341a7222f894b7735db575ad9311ecaba4e3",
+  "fix": "5044878da0c1851ccfdd5c0a867157ed9a502fbc"
+ },
+ {
+  "commit": "https://github.com/mlflow/mlflow/commit/cf83dad4df26dd4a850622fe8a51ccab1471a5e7",
+  "repo": "mlflow/mlflow",
+  "decision": "selected",
+  "reason": "",
+  "files": "mlflow/server/handlers.py",
+  "targets": "validate_path_is_safe",
+  "parent": "e8c003aff4d9abbdfb169c49b779fe55bfc3d500",
+  "fix": "cf83dad4df26dd4a850622fe8a51ccab1471a5e7"
+ }
+]

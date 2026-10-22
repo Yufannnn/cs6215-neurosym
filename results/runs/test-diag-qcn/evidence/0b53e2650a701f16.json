@@ -1,0 +1,83 @@
+{
+ "file_sha256": "668acbc58da0804d74fda131107ee24c3d204da7d38d4da61ecd10647a998efd",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "os.path.exists",
+  "argument": "f'{ROOT}/{report}'",
+  "reads": {
+   "report": [
+    "s2:report"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "report = 'summary.txt'"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "report = request.cookies.get('report', report)"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return os.path.exists(f'{ROOT}/{report}')"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:report",
+   "var": "report",
+   "line": 14,
+   "code": "report = 'summary.txt'",
+   "kind": "assign",
+   "value": "'summary.txt'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:report",
+   "var": "report",
+   "line": 15,
+   "code": "report = request.cookies.get('report', report)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:report"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:report"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

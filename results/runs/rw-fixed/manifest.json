@@ -1,0 +1,60 @@
+{
+ "name": "rw-fixed",
+ "arms": [
+  "S",
+  "D",
+  "L",
+  "E",
+  "EC"
+ ],
+ "model": "qwen3-coder-next",
+ "model_config": {
+  "role": "primary",
+  "extra_body": {}
+ },
+ "replicate": 0,
+ "prompt_version": "p2",
+ "offline_replay": false,
+ "git": {
+  "commit": "1d65f8d88cb7c821288cda9c2e2cddd305486d88",
+  "dirty": false,
+  "freeze_tag": "e75213b653515aaa683c57d93f84fbbf2a58846e"
+ },
+ "baseline": {
+  "semgrep": "1.182.1",
+  "rule": "baseline/rules/cwe22-taint.yaml",
+  "rule_sha256": "9afd5c32c7431a84e8dba575946d7e9066621c6dbfc26778f340d35d0e18535f",
+  "python": "3.14.0",
+  "platform": "Darwin arm64"
+ },
+ "subjects": 7,
+ "corpora": [
+  "realworld"
+ ],
+ "splits": [
+  "fixed"
+ ],
+ "alerts": 8,
+ "extraction": {
+  "ok": 8,
+  "unsupported": 0
+ },
+ "timing_s": {
+  "baseline": 0.84,
+  "extraction": 0.06,
+  "llm_L": 22.24,
+  "llm_E": 22.68
+ },
+ "llm": {
+  "calls": 16,
+  "uncached_calls": 16,
+  "prompt_tokens": 47149,
+  "completion_tokens": 3371,
+  "served_models": [
+   "qwen3-coder-next"
+  ],
+  "fingerprints": [
+   "vllm-0.26.0-1cf708c9"
+  ]
+ }
+}

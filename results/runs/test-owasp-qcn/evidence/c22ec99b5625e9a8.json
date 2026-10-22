@@ -1,0 +1,396 @@
+{
+ "file_sha256": "6689c1211f76ee6e7626fd344ef6c9ac9ee8920f6e5b2a70305df021aa5b8fb5",
+ "function": "handler",
+ "sink": {
+  "statement": "s17",
+  "line": 51,
+  "api": "open",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s16:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.args.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Import",
+   "code": "import configparser"
+  },
+  {
+   "id": "s6",
+   "line": 37,
+   "kind": "Assign",
+   "code": "bar = 'safe!'"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "conf85641 = configparser.ConfigParser()"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Expr",
+   "code": "conf85641.add_section('section85641')"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "Expr",
+   "code": "conf85641.set('section85641', 'keyA-85641', 'a_Value')"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "Expr",
+   "code": "conf85641.set('section85641', 'keyB-85641', param)"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "Assign",
+   "code": "bar = conf85641.get('section85641', 'keyA-85641')"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s13",
+   "line": 46,
+   "kind": "Assign",
+   "code": "fileName = None"
+  },
+  {
+   "id": "s14",
+   "line": 47,
+   "kind": "Assign",
+   "code": "fd = None"
+  },
+  {
+   "id": "s15",
+   "line": 49,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s16",
+   "line": 50,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "kind": "Assign",
+   "code": "fd = open(fileName, 'rb')"
+  },
+  {
+   "id": "s18",
+   "line": 52,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"The beginning of file: '{escape_for_html(fileName)}' is:\\n\\n{escape_for_html(fd.read(1000).decode('utf-8'))}\""
+  },
+  {
+   "id": "s19",
+   "line": 57,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Problem reading from file '{{escape_for_html(fileName)}}': {escape_for_html(e.strerror)}\""
+  },
+  {
+   "id": "s20",
+   "line": 62,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s21",
+   "line": 63,
+   "kind": "If",
+   "code": "if fd is not None:"
+  },
+  {
+   "id": "s22",
+   "line": 64,
+   "kind": "Expr",
+   "code": "fd.close()"
+  },
+  {
+   "id": "s23",
+   "line": 66,
+   "kind": "Pass",
+   "code": "pass"
+  },
+  {
+   "id": "s24",
+   "line": 68,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = request.args.get('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 33,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:bar",
+   "var": "bar",
+   "line": 37,
+   "code": "bar = 'safe!'",
+   "kind": "assign",
+   "value": "'safe!'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:conf85641",
+   "var": "conf85641",
+   "line": 38,
+   "code": "conf85641 = configparser.ConfigParser()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:conf85641",
+   "var": "conf85641",
+   "line": 41,
+   "code": "conf85641.set('section85641', 'keyB-85641', param)",
+   "kind": "mutation",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s4:param",
+    "s7:conf85641"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:bar",
+   "var": "bar",
+   "line": 42,
+   "code": "bar = conf85641.get('section85641', 'keyA-85641')",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s10:conf85641"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s13:fileName",
+   "var": "fileName",
+   "line": 46,
+   "code": "fileName = None",
+   "kind": "assign",
+   "value": "None",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s14:fd",
+   "var": "fd",
+   "line": 47,
+   "code": "fd = None",
+   "kind": "assign",
+   "value": "None",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:fileName",
+   "var": "fileName",
+   "line": 50,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s17:fd",
+   "var": "fd",
+   "line": 51,
+   "code": "fd = open(fileName, 'rb')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:fileName"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 52,
+   "code": "RESPONSE += f\"The beginning of file: '{escape_for_html(fileName)}' is:\\n\\n{escape_for_html(fd.read(1000).decode('utf-8'))}\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:fileName",
+    "s17:fd",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s19:RESPONSE",
+   "var": "RESPONSE",
+   "line": 57,
+   "code": "RESPONSE += f\"Problem reading from file '{{escape_for_html(fileName)}}': {escape_for_html(e.strerror)}\"",
+   "kind": "augassign",
+   "value": "<tainted> | <unknown>",
+   "tainted": true,
+   "depends_on": [
+    "s18:RESPONSE",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s21",
+   "line": 63,
+   "condition": "fd is not None",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:param",
+   "s10:conf85641",
+   "s11:bar",
+   "s16:fileName"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

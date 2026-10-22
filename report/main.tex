@@ -4,10 +4,12 @@
 \setcopyright{none}
 \renewcommand\footnotetextcopyrightpermission[1]{}
 \acmConference[CS6215 Fall 2026]{CS6215 Advanced Topics in Program Analysis}{Fall 2026}{National University of Singapore}
+\usepackage{multirow}
+\usepackage{booktabs}
 
 \begin{document}
 
-\title{TBD: Symbolic vs Neuro-symbolic Static Analysis}
+\title{Evidence-Checked LLM Triage for Python Path-Traversal Warnings: A Comparative Static-Analysis Study}
 
 \author{Yufan}
 \affiliation{%
@@ -16,40 +18,21 @@
   \country{Singapore}}
 
 \begin{abstract}
-TBD: the analysis problem, the static-analysis baseline, the neuro-symbolic solution, the evaluation subjects and the main findings.
+\input{sections/abstract}
 \end{abstract}
 
 \maketitle
 
-\noindent Artifact: \url{TBD}
+\noindent\textbf{Artifact:} \url{ARTIFACT_URL}
 
-\section{Introduction}
-TBD
+\input{sections/introduction}
+\input{sections/preliminaries}
+\input{sections/approach}
+\input{sections/evaluation}
+\input{sections/related}
+\input{sections/conclusion}
+\input{sections/ai_usage}
 
-\section{Preliminaries}
-% The analysis problem, and the baseline in our own words.
-TBD
-
-\section{Approach}
-% Our design; which parts we designed; inspirations and differences; iterations and abandoned versions.
-TBD
-
-\section{Evaluation}
-% Subjects, criteria, setup, resource budget; aggregate results; representative successes and failures, FPs and FNs.
-TBD
-
-\section{Extensions}
-% Optional hybrid or improved solution.
-TBD
-
-\section{Conclusion}
-TBD
-
-\section*{AI Usage Statement}
-% Which parts used AI, how, and the decisions made by the student.
-TBD
-
-\nocite{*} % TODO: remove once the text cites these
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
 

@@ -1,0 +1,379 @@
+{
+ "file_sha256": "9277e9855b7813b7041cde6364c1348685ac4a612aadee00a8a3504371d7f666",
+ "function": "handler",
+ "sink": {
+  "statement": "s20",
+  "line": 452,
+  "api": "open",
+  "argument": "os.path.join(app.config['CONFIG_PATH'], name)",
+  "reads": {
+   "name": [
+    "s2:name",
+    "s4:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 422,
+   "kind": "Assign",
+   "code": "config_disabled = app.config['CONFIG_DISABLE'] or not valid_user_session(session)"
+  },
+  {
+   "id": "s2",
+   "line": 426,
+   "kind": "Assign",
+   "code": "name = ''"
+  },
+  {
+   "id": "s3",
+   "line": 427,
+   "kind": "If",
+   "code": "if 'name' in request.args:"
+  },
+  {
+   "id": "s4",
+   "line": 428,
+   "kind": "Assign",
+   "code": "name = os.path.normpath(request.args.get('name'))"
+  },
+  {
+   "id": "s5",
+   "line": 429,
+   "kind": "If",
+   "code": "if not re.match('^[A-Za-z0-9_.+-]+$', name):"
+  },
+  {
+   "id": "s6",
+   "line": 430,
+   "kind": "Return",
+   "code": "return make_response('Invalid config name', 400)"
+  },
+  {
+   "id": "s7",
+   "line": 432,
+   "kind": "If",
+   "code": "if request.method == 'GET':"
+  },
+  {
+   "id": "s8",
+   "line": 433,
+   "kind": "Return",
+   "code": "return json.dumps(g.user_config.__dict__)"
+  },
+  {
+   "id": "s9",
+   "line": 434,
+   "kind": "If",
+   "code": "if request.method == 'PUT' and (not config_disabled):"
+  },
+  {
+   "id": "s10",
+   "line": 435,
+   "kind": "If",
+   "code": "if name:"
+  },
+  {
+   "id": "s11",
+   "line": 436,
+   "kind": "Assign",
+   "code": "config_pkl = os.path.join(app.config['CONFIG_PATH'], name)"
+  },
+  {
+   "id": "s12",
+   "line": 437,
+   "kind": "Assign",
+   "code": "session['config'] = pickle.load(open(config_pkl, 'rb')) if os.path.exists(config_pkl) else session['config']"
+  },
+  {
+   "id": "s13",
+   "line": 440,
+   "kind": "Return",
+   "code": "return json.dumps(session['config'])"
+  },
+  {
+   "id": "s14",
+   "line": 442,
+   "kind": "Return",
+   "code": "return json.dumps({})"
+  },
+  {
+   "id": "s15",
+   "line": 443,
+   "kind": "If",
+   "code": "if not config_disabled:"
+  },
+  {
+   "id": "s16",
+   "line": 444,
+   "kind": "Assign",
+   "code": "config_data = request.form.to_dict()"
+  },
+  {
+   "id": "s17",
+   "line": 445,
+   "kind": "If",
+   "code": "if 'url' not in config_data or not config_data['url']:"
+  },
+  {
+   "id": "s18",
+   "line": 446,
+   "kind": "Assign",
+   "code": "config_data['url'] = g.user_config.url"
+  },
+  {
+   "id": "s19",
+   "line": 449,
+   "kind": "If",
+   "code": "if 'name' in request.args:"
+  },
+  {
+   "id": "s20",
+   "line": 450,
+   "kind": "Expr",
+   "code": "pickle.dump(config_data, open(os.path.join(app.config['CONFIG_PATH'], name), 'wb'))"
+  },
+  {
+   "id": "s21",
+   "line": 456,
+   "kind": "Assign",
+   "code": "session['config'] = config_data"
+  },
+  {
+   "id": "s22",
+   "line": 457,
+   "kind": "Return",
+   "code": "return redirect(config_data['url'])"
+  },
+  {
+   "id": "s23",
+   "line": 459,
+   "kind": "Return",
+   "code": "return redirect(url_for('.index'), code=403)"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:config_disabled",
+   "var": "config_disabled",
+   "line": 422,
+   "code": "config_disabled = app.config['CONFIG_DISABLE'] or not valid_user_session(session)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:name",
+   "var": "name",
+   "line": 426,
+   "code": "name = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:name",
+   "var": "name",
+   "line": 428,
+   "code": "name = os.path.normpath(request.args.get('name'))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:config_pkl",
+   "var": "config_pkl",
+   "line": 436,
+   "code": "config_pkl = os.path.join(app.config['CONFIG_PATH'], name)",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:name",
+    "s4:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:config_data",
+   "var": "config_data",
+   "line": 444,
+   "code": "config_data = request.form.to_dict()",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:config_data",
+   "var": "config_data",
+   "line": 446,
+   "code": "config_data['url'] = g.user_config.url",
+   "kind": "mutation",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:config_data"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 427,
+   "condition": "'name' in request.args",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s5",
+   "line": 429,
+   "condition": "not re.match('^[A-Za-z0-9_.+-]+$', name)",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s7",
+   "line": 432,
+   "condition": "request.method == 'GET'",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s9",
+   "line": 434,
+   "condition": "request.method == 'PUT' and (not config_disabled)",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s10",
+   "line": 435,
+   "condition": "name",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s15",
+   "line": 443,
+   "condition": "not config_disabled",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s17",
+   "line": 445,
+   "condition": "'url' not in config_data or not config_data['url']",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s19",
+   "line": 449,
+   "condition": "'name' in request.args",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s7",
+   "condition": "request.method == 'GET'",
+   "polarity_to_reach_sink": false,
+   "kind": "enclosing",
+   "reads": {},
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s4:name"
+   ]
+  },
+  {
+   "id": "s9",
+   "condition": "request.method == 'PUT' and (not config_disabled)",
+   "polarity_to_reach_sink": false,
+   "kind": "enclosing",
+   "reads": {
+    "config_disabled": [
+     "s1:config_disabled"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s4:name"
+   ]
+  },
+  {
+   "id": "s15",
+   "condition": "not config_disabled",
+   "polarity_to_reach_sink": true,
+   "kind": "enclosing",
+   "reads": {
+    "config_disabled": [
+     "s1:config_disabled"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s4:name"
+   ]
+  },
+  {
+   "id": "s19",
+   "condition": "'name' in request.args",
+   "polarity_to_reach_sink": true,
+   "kind": "enclosing",
+   "reads": {},
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s4:name"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s4:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

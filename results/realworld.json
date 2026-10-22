@@ -1,0 +1,179 @@
+{
+ "targets": [
+  {
+   "target": "benbusby/whoogle-search@3a2e0b262e",
+   "repo": "benbusby/whoogle-search",
+   "functions": [
+    "config",
+    "element",
+    "window"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": true,
+   "s_reports_fixed": true,
+   "vulnerable_alerts": 4,
+   "fixed_alerts": 4,
+   "S_retains_vulnerable": true,
+   "S_retains_fixed": true,
+   "D_retains_vulnerable": true,
+   "D_retains_fixed": true,
+   "L_retains_vulnerable": true,
+   "L_retains_fixed": true,
+   "E_retains_vulnerable": true,
+   "E_retains_fixed": true,
+   "EC_retains_vulnerable": true,
+   "EC_retains_fixed": true
+  },
+  {
+   "target": "cmusatyalab/opendiamond@398049c187",
+   "repo": "cmusatyalab/opendiamond",
+   "functions": [
+    "_get_index_absolute_path",
+    "_get_obj_abosolute_path",
+    "_get_obj_absolute_path",
+    "_get_object_element",
+    "get_object_src_http"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": false,
+   "s_reports_fixed": false,
+   "vulnerable_alerts": 0,
+   "fixed_alerts": 0,
+   "S_retains_vulnerable": null,
+   "S_retains_fixed": null,
+   "D_retains_vulnerable": null,
+   "D_retains_fixed": null,
+   "L_retains_vulnerable": null,
+   "L_retains_fixed": null,
+   "E_retains_vulnerable": null,
+   "E_retains_fixed": null,
+   "EC_retains_vulnerable": null,
+   "EC_retains_fixed": null
+  },
+  {
+   "target": "corydolphin/flask-cors@67c4b2cc98",
+   "repo": "corydolphin/flask-cors",
+   "functions": [
+    "make_after_request_function",
+    "make_after_request_function.cors_after_request"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": false,
+   "s_reports_fixed": false,
+   "vulnerable_alerts": 0,
+   "fixed_alerts": 0,
+   "S_retains_vulnerable": null,
+   "S_retains_fixed": null,
+   "D_retains_vulnerable": null,
+   "D_retains_fixed": null,
+   "L_retains_vulnerable": null,
+   "L_retains_fixed": null,
+   "E_retains_vulnerable": null,
+   "E_retains_fixed": null,
+   "EC_retains_vulnerable": null,
+   "EC_retains_fixed": null
+  },
+  {
+   "target": "mlflow/mlflow@ac4b697bb0",
+   "repo": "mlflow/mlflow",
+   "functions": [
+    "_list_artifacts",
+    "get_artifact_handler",
+    "get_model_version_artifact_handler"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": false,
+   "s_reports_fixed": false,
+   "vulnerable_alerts": 0,
+   "fixed_alerts": 0,
+   "S_retains_vulnerable": null,
+   "S_retains_fixed": null,
+   "D_retains_vulnerable": null,
+   "D_retains_fixed": null,
+   "L_retains_vulnerable": null,
+   "L_retains_fixed": null,
+   "E_retains_vulnerable": null,
+   "E_retains_fixed": null,
+   "EC_retains_vulnerable": null,
+   "EC_retains_fixed": null
+  },
+  {
+   "target": "mlflow/mlflow@5044878da0",
+   "repo": "mlflow/mlflow",
+   "functions": [
+    "_abort_multipart_upload_artifact",
+    "_complete_multipart_upload_artifact",
+    "_create_multipart_upload_artifact",
+    "_delete_artifact_mlflow_artifacts",
+    "_download_artifact",
+    "_list_artifacts",
+    "_list_artifacts_mlflow_artifacts",
+    "_upload_artifact",
+    "get_artifact_handler",
+    "get_model_version_artifact_handler",
+    "list_artifacts",
+    "upload_artifact_handler",
+    "validate_path_is_safe"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": true,
+   "s_reports_fixed": true,
+   "vulnerable_alerts": 2,
+   "fixed_alerts": 2,
+   "S_retains_vulnerable": true,
+   "S_retains_fixed": true,
+   "D_retains_vulnerable": true,
+   "D_retains_fixed": true,
+   "L_retains_vulnerable": false,
+   "L_retains_fixed": false,
+   "E_retains_vulnerable": true,
+   "E_retains_fixed": true,
+   "EC_retains_vulnerable": true,
+   "EC_retains_fixed": true
+  },
+  {
+   "target": "mlflow/mlflow@cf83dad4df",
+   "repo": "mlflow/mlflow",
+   "functions": [
+    "validate_path_is_safe"
+   ],
+   "target_source": "pyvul",
+   "s_reports_vulnerable": false,
+   "s_reports_fixed": false,
+   "vulnerable_alerts": 0,
+   "fixed_alerts": 0,
+   "S_retains_vulnerable": null,
+   "S_retains_fixed": null,
+   "D_retains_vulnerable": null,
+   "D_retains_fixed": null,
+   "L_retains_vulnerable": null,
+   "L_retains_fixed": null,
+   "E_retains_vulnerable": null,
+   "E_retains_fixed": null,
+   "EC_retains_vulnerable": null,
+   "EC_retains_fixed": null
+  }
+ ],
+ "unlabeled": {
+  "vulnerable": {
+   "unlabeled_alerts": 2,
+   "S_retained": 2,
+   "D_retained": 2,
+   "L_retained": 1,
+   "E_retained": 2,
+   "EC_retained": 2
+  },
+  "fixed": {
+   "unlabeled_alerts": 2,
+   "S_retained": 2,
+   "D_retained": 2,
+   "L_retained": 1,
+   "E_retained": 2,
+   "EC_retained": 2
+  }
+ },
+ "coverage": {
+  "targets": 6,
+  "s_reports_vulnerable": 2
+ }
+}

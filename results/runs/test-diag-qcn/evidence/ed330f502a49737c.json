@@ -1,0 +1,128 @@
+{
+ "file_sha256": "139a7f7610e072d080ff692ffbb0b41811e2cba31e10e4327a0aa75e86dfc2a8",
+ "function": "handler",
+ "sink": {
+  "statement": "s5",
+  "line": 18,
+  "api": "open",
+  "argument": "checked",
+  "reads": {
+   "checked": [
+    "s2:checked"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "checked = os.path.realpath(os.path.join(ROOT, name))"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "If",
+   "code": "if os.path.commonpath([ROOT, checked]) != ROOT:"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Return",
+   "code": "return open(checked).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:checked",
+   "var": "checked",
+   "line": 15,
+   "code": "checked = os.path.realpath(os.path.join(ROOT, name))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "os.path.commonpath([ROOT, checked]) != ROOT",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s3",
+   "condition": "os.path.commonpath([ROOT, checked]) != ROOT",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "checked": [
+     "s2:checked"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name",
+   "s2:checked"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [
+   {
+    "guard": "s3",
+    "condition": "os.path.commonpath([ROOT, checked]) != ROOT",
+    "recognizer": "commonpath([root, v]) == root"
+   }
+  ],
+  "safe_api": []
+ }
+}

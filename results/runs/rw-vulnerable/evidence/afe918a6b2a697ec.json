@@ -1,0 +1,288 @@
+{
+ "file_sha256": "261925d13a023e76fd2decd5a6bbc0c62b09544e14bcae7bb35a175cb260f08a",
+ "function": "handler",
+ "sink": {
+  "statement": "s7",
+  "line": 431,
+  "api": "os.path.exists",
+  "argument": "config_pkl",
+  "reads": {
+   "config_pkl": [
+    "s6:config_pkl"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 420,
+   "kind": "Assign",
+   "code": "config_disabled = app.config['CONFIG_DISABLE'] or not valid_user_session(session)"
+  },
+  {
+   "id": "s2",
+   "line": 423,
+   "kind": "If",
+   "code": "if request.method == 'GET':"
+  },
+  {
+   "id": "s3",
+   "line": 424,
+   "kind": "Return",
+   "code": "return json.dumps(g.user_config.__dict__)"
+  },
+  {
+   "id": "s4",
+   "line": 425,
+   "kind": "If",
+   "code": "if request.method == 'PUT' and (not config_disabled):"
+  },
+  {
+   "id": "s5",
+   "line": 426,
+   "kind": "If",
+   "code": "if 'name' in request.args:"
+  },
+  {
+   "id": "s6",
+   "line": 427,
+   "kind": "Assign",
+   "code": "config_pkl = os.path.join(app.config['CONFIG_PATH'], request.args.get('name'))"
+  },
+  {
+   "id": "s7",
+   "line": 430,
+   "kind": "Assign",
+   "code": "session['config'] = pickle.load(open(config_pkl, 'rb')) if os.path.exists(config_pkl) else session['config']"
+  },
+  {
+   "id": "s8",
+   "line": 433,
+   "kind": "Return",
+   "code": "return json.dumps(session['config'])"
+  },
+  {
+   "id": "s9",
+   "line": 435,
+   "kind": "Return",
+   "code": "return json.dumps({})"
+  },
+  {
+   "id": "s10",
+   "line": 436,
+   "kind": "If",
+   "code": "if not config_disabled:"
+  },
+  {
+   "id": "s11",
+   "line": 437,
+   "kind": "Assign",
+   "code": "config_data = request.form.to_dict()"
+  },
+  {
+   "id": "s12",
+   "line": 438,
+   "kind": "If",
+   "code": "if 'url' not in config_data or not config_data['url']:"
+  },
+  {
+   "id": "s13",
+   "line": 439,
+   "kind": "Assign",
+   "code": "config_data['url'] = g.user_config.url"
+  },
+  {
+   "id": "s14",
+   "line": 442,
+   "kind": "If",
+   "code": "if 'name' in request.args:"
+  },
+  {
+   "id": "s15",
+   "line": 443,
+   "kind": "Expr",
+   "code": "pickle.dump(config_data, open(os.path.join(app.config['CONFIG_PATH'], request.args.get('name')), 'wb'))"
+  },
+  {
+   "id": "s16",
+   "line": 449,
+   "kind": "Assign",
+   "code": "session['config'] = config_data"
+  },
+  {
+   "id": "s17",
+   "line": 450,
+   "kind": "Return",
+   "code": "return redirect(config_data['url'])"
+  },
+  {
+   "id": "s18",
+   "line": 452,
+   "kind": "Return",
+   "code": "return redirect(url_for('.index'), code=403)"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:config_disabled",
+   "var": "config_disabled",
+   "line": 420,
+   "code": "config_disabled = app.config['CONFIG_DISABLE'] or not valid_user_session(session)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s6:config_pkl",
+   "var": "config_pkl",
+   "line": 427,
+   "code": "config_pkl = os.path.join(app.config['CONFIG_PATH'], request.args.get('name'))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:config_data",
+   "var": "config_data",
+   "line": 437,
+   "code": "config_data = request.form.to_dict()",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s13:config_data",
+   "var": "config_data",
+   "line": 439,
+   "code": "config_data['url'] = g.user_config.url",
+   "kind": "mutation",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:config_data"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 423,
+   "condition": "request.method == 'GET'",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s4",
+   "line": 425,
+   "condition": "request.method == 'PUT' and (not config_disabled)",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s5",
+   "line": 426,
+   "condition": "'name' in request.args",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s10",
+   "line": 436,
+   "condition": "not config_disabled",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s12",
+   "line": 438,
+   "condition": "'url' not in config_data or not config_data['url']",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s14",
+   "line": 442,
+   "condition": "'name' in request.args",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "request.method == 'GET'",
+   "polarity_to_reach_sink": false,
+   "kind": "enclosing",
+   "reads": {},
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s6:config_pkl"
+   ]
+  },
+  {
+   "id": "s4",
+   "condition": "request.method == 'PUT' and (not config_disabled)",
+   "polarity_to_reach_sink": true,
+   "kind": "enclosing",
+   "reads": {
+    "config_disabled": [
+     "s1:config_disabled"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s6:config_pkl"
+   ]
+  },
+  {
+   "id": "s5",
+   "condition": "'name' in request.args",
+   "polarity_to_reach_sink": true,
+   "kind": "enclosing",
+   "reads": {},
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s6:config_pkl"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.join",
+  "flask.request.args.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s6:config_pkl"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

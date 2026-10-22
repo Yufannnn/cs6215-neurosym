@@ -1,0 +1,97 @@
+\section{Approach: Evidence-Checked Triage}
+\label{sec:approach}
+
+Figure~\ref{fig:pipeline} summarizes the pipeline. All components after the baseline are our own design and implementation, about 1{,}900 lines of Python. The model is reached through the NUS SoCLaaS service; no existing neuro-symbolic analyzer, released tool or prebuilt workflow is used.
+
+\begin{figure}[t]
+\centering\small
+\begin{tabular}{@{}c@{}}
+Semgrep CE taint rule $\rightarrow$ alerts $A$ $\rightarrow$ evidence extractor $\rightarrow$ EvidenceRecord\\[2pt]
+$\swarrow$ \hspace{3em} $\downarrow$ \hspace{3em} $\searrow$\\
+\textbf{D}: recognizers \quad \textbf{L}: code-only LLM \quad \textbf{E}: evidence LLM $\rightarrow$ \textbf{EC}: gate\\
+\end{tabular}
+\caption{Every arm keeps or drops alerts in $A$; E and EC share the same model responses.}
+\label{fig:pipeline}
+\end{figure}
+
+\subsection{Evidence extraction}
+For each alert we parse the enclosing function and run an intraprocedural abstract interpretation over its statements.
+
+\paragraph{Values.}
+Abstract values are finite sets of concrete Python constants, including small lists, dicts and paths whose elements may themselves be abstract, plus three abstract elements ordered by severity:
+\begin{itemize}
+\item \textsc{trusted}: an untainted configuration value, such as a module constant;
+\item \textsc{unknown}: unmodelled, and might hide anything;
+\item \textsc{tainted}: attacker-controlled under the policy.
+\end{itemize}
+
+\paragraph{Statements.}
+Statements are walked in order:
+\begin{itemize}
+\item Expressions are constant-folded. String operations, \texttt{os.path} and \texttt{pathlib} functions, subscripts and slices, and local list and dict mutation are interpreted element by element. This lets \texttt{lst.append(param); lst.pop(0); bar = lst[1]} evaluate to a constant when the selected element is one.
+\item \texttt{if} and \texttt{match} statements whose condition or subject folds to a constant prune the infeasible branch. Definitions made there are recorded as \emph{on an infeasible path}.
+\item Loops are iterated to a fixpoint (at most five rounds; otherwise values are widened and the record is marked incomplete). States leaving through \texttt{break} or \texttt{continue} are joined after the loop. An exception handler starts from the join of every prefix state of its \texttt{try} body.
+\item Non-returning calls (\texttt{flask.abort}, \texttt{sys.exit}) end a path.
+\item Unmodelled functions propagate their inputs, matching Semgrep's default.
+\end{itemize}
+
+\paragraph{Guards.}
+An \texttt{if} whose one branch always exits makes its condition a \emph{dominating guard} for the statements after it. Enclosing conditions are recorded with the polarity required to reach the sink.
+
+\paragraph{The record.}
+The \emph{EvidenceRecord} lists every statement with a stable ID, and every definition with its value, its dependencies (reaching definitions of the variables it reads) and its flags. It also lists branch feasibility, the dominating guards, and a few facts: the abstract value at the sink, whether the analysis is complete, and the tainted definitions pruned as infeasible.
+
+\paragraph{Completeness.}
+The record is marked incomplete when a construct the analysis cannot treat soundly affects the result. Examples are a loop that does not converge, \texttt{global}/\texttt{nonlocal}/\texttt{exec}/\texttt{getattr}, comprehensions, and assigning a container to a second name (two names, one mutable object). Incomplete records can never justify a suppression.
+
+\paragraph{Guard coverage.}
+We do not compare variable names. A guard \emph{constrains the sink value} if the definitions it reads are in the sink's dependency slice. It \emph{covers every attacker flow} if no taint origin can be reached backwards from the sink without crossing those guarded definitions. A taint origin is a definition that reads a source directly. This distinguishes a check on \texttt{candidate} followed by \texttt{open(name)} from \texttt{open(candidate)}, and a guard in one branch from a guard that dominates both.
+
+\subsection{The four arms after the baseline}
+\paragraph{D: closed-set recognizers.}
+D suppresses an alert only if the record is complete and one of these holds:
+\begin{enumerate}
+\item the sink is unreachable;
+\item the sink value is constant or trusted on every feasible path (an overwrite or an infeasible branch);
+\item a documented safe API applies with its preconditions;
+\item \emph{sound containment}: the sink value is a single definition produced by \texttt{os.path.realpath}, \texttt{os.path.abspath} or \texttt{Path.resolve()}, and a dominating guard on that same definition requires \texttt{startswith(root + os.sep)}, \texttt{commonpath([root, v]) == root} or \texttt{is\_relative\_to(root)}.
+\end{enumerate}
+String-prefix checks without a separator, containment on an unnormalized path, and block-lists (\texttt{'../' in name}) are deliberately \emph{not} recognized.
+
+\paragraph{L: ordinary triage.}
+The model receives the threat model, the warning (sink API, argument, line), and the line-numbered source of the enclosing function. It returns JSON with a decision (\texttt{retain}, \texttt{suppress} or \texttt{unknown}), one of five reason kinds, supporting lines and a short rationale.
+
+\paragraph{E: evidence triage.}
+The model receives the same source and warning, followed by a plain-language digest of the facts and then the full EvidenceRecord. It must assess four obligations, each with a status and cited IDs: \emph{control} (is the value attacker-controlled?), \emph{flow} (does it reach this argument?), \emph{confinement} (does a check or safe API confine the value actually used?) and \emph{coverage} (does the argument hold on every path?). It may suppress only if control or flow is refuted, or if confinement and coverage both hold.
+
+\paragraph{EC: the evidence gate.}
+EC replays E's responses unchanged and applies a deterministic gate. A suppression is accepted only if all of the following hold:
+\begin{itemize}
+\item the reply is valid and every cited ID exists in the record;
+\item the record is complete and was computed for the same file hash;
+\item the claim matches the facts:
+  \begin{itemize}
+  \item a constant or unreachable claim requires an untainted sink value;
+  \item a safe-API claim requires a matched contract;
+  \item a guard claim requires a cited guard that dominates the sink, constrains the sink value and covers every attacker flow.
+  \end{itemize}
+\end{itemize}
+If such a guard also matches a sound-containment recognizer, the gate logs \texttt{trusted\_contract\_matched}. Otherwise it logs \texttt{semantic\_judgment\_remaining}: the guard is structurally right, but whether its predicate actually confines the path is the model's judgment. We keep this category visible because it is exactly where the LLM can add something D cannot, and exactly where it can be wrong.
+
+The boundary between D and EC was fixed before any test data was seen. D has no recognizer that the gate lacks. EC can differ from D only where the model asserts confinement by a non-standard guard, or where it misses a suppression D would make.
+
+\subsection{Engineering for a fair comparison}
+\begin{itemize}
+\item \textbf{Same inputs.} L and E see the same function source and token budget (12k input, 2k output tokens). Benchmark identifiers and category routes are masked in everything a model sees.
+\item \textbf{Fixed retries.} Each alert gets one logical call per arm, plus a single fixed schema-repair retry. Transport errors are retried with backoff and logged; answers are never re-sampled.
+\item \textbf{Replayable responses.} Responses are cached under a key that includes prompt version and replicate ID. Fresh-generation experiments use new replicate IDs and never overwrite the frozen responses.
+\item \textbf{Freeze enforcement.} The rule, split, prompts and analyzer were tagged \texttt{protocol-freeze} before any test data was opened, and the pipeline refuses test subjects if any frozen file differs from the tag.
+\end{itemize}
+
+\subsection{Design iterations}
+All changes were made on development data before the freeze; the full log is in the artifact.
+\begin{itemize}
+\item \textbf{Prompts p1 to p2.} With p1, E ignored the facts buried in the evidence JSON and misused reason kinds. Its false-positive removal on OWASP development cases was 0.29, and EC's 0.10. Version p2 puts a fact digest first, defines the reason kinds precisely (in the system prompt shared with L) and lists every definition. It reached 0.86 for both.
+\item \textbf{Three soundness bugs found by development data and regression tests:} states leaving loops through \texttt{break} were dropped, which made a vulnerable case look constant; \texttt{abort()} was not treated as an exit; and container aliasing was not detected.
+\item \textbf{Four wrong diagnostic labels.} The label validator (Section~\ref{sec:eval}) rejected four of our own intended labels, which we then fixed.
+\end{itemize}

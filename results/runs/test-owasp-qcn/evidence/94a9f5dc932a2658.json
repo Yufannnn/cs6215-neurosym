@@ -1,0 +1,420 @@
+{
+ "file_sha256": "f3614cacedb02999c240c1a4c17dd5404a365977192d25b1fbb3d85bae96a9cb",
+ "function": "handler",
+ "sink": {
+  "statement": "s20",
+  "line": 57,
+  "api": "<path>.exists()",
+  "argument": "p",
+  "reads": {
+   "p": [
+    "s16:p"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "parts = request.path.split('/')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "param = parts[1]"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s5",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Import",
+   "code": "import configparser"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "bar = 'safe!'"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Assign",
+   "code": "conf4176 = configparser.ConfigParser()"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "Expr",
+   "code": "conf4176.add_section('section4176')"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "Expr",
+   "code": "conf4176.set('section4176', 'keyA-4176', 'a_Value')"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "Expr",
+   "code": "conf4176.set('section4176', 'keyB-4176', param)"
+  },
+  {
+   "id": "s12",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = conf4176.get('section4176', 'keyA-4176')"
+  },
+  {
+   "id": "s13",
+   "line": 45,
+   "kind": "Import",
+   "code": "import pathlib"
+  },
+  {
+   "id": "s14",
+   "line": 46,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s15",
+   "line": 48,
+   "kind": "Assign",
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)"
+  },
+  {
+   "id": "s16",
+   "line": 49,
+   "kind": "Assign",
+   "code": "p = (testfiles / bar).resolve()"
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "kind": "If",
+   "code": "if not str(p).startswith(str(testfiles)):"
+  },
+  {
+   "id": "s18",
+   "line": 52,
+   "kind": "AugAssign",
+   "code": "RESPONSE += 'Invalid Path.'"
+  },
+  {
+   "id": "s19",
+   "line": 55,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  },
+  {
+   "id": "s20",
+   "line": 57,
+   "kind": "If",
+   "code": "if p.exists():"
+  },
+  {
+   "id": "s21",
+   "line": 58,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\""
+  },
+  {
+   "id": "s22",
+   "line": 60,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\""
+  },
+  {
+   "id": "s23",
+   "line": 62,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:parts",
+   "var": "parts",
+   "line": 31,
+   "code": "parts = request.path.split('/')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 32,
+   "code": "param = parts[1]",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:parts"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:param",
+   "var": "param",
+   "line": 34,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s7:bar",
+   "var": "bar",
+   "line": 38,
+   "code": "bar = 'safe!'",
+   "kind": "assign",
+   "value": "'safe!'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s8:conf4176",
+   "var": "conf4176",
+   "line": 39,
+   "code": "conf4176 = configparser.ConfigParser()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:conf4176",
+   "var": "conf4176",
+   "line": 42,
+   "code": "conf4176.set('section4176', 'keyB-4176', param)",
+   "kind": "mutation",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param",
+    "s5:param",
+    "s8:conf4176"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 43,
+   "code": "bar = conf4176.get('section4176', 'keyA-4176')",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:conf4176"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:testfiles",
+   "var": "testfiles",
+   "line": 48,
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s16:p",
+   "var": "p",
+   "line": 49,
+   "code": "p = (testfiles / bar).resolve()",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:bar",
+    "s15:testfiles"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 52,
+   "code": "RESPONSE += 'Invalid Path.'",
+   "kind": "augassign",
+   "value": "'Invalid Path.'",
+   "tainted": false,
+   "depends_on": [
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s21:RESPONSE",
+   "var": "RESPONSE",
+   "line": 58,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s22:RESPONSE",
+   "var": "RESPONSE",
+   "line": 60,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 33,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "condition": "not str(p).startswith(str(testfiles))",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s20",
+   "line": 57,
+   "condition": "p.exists()",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s17",
+   "condition": "not str(p).startswith(str(testfiles))",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "testfiles": [
+     "s15:testfiles"
+    ],
+    "p": [
+     "s16:p"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "(testfiles / bar).resolve"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:parts",
+   "s3:param",
+   "s11:conf4176",
+   "s12:bar",
+   "s16:p"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -1,0 +1,312 @@
+{
+ "file_sha256": "67b3dc005a3e79cf8826ce5e698fc4a04a47a48fc119fc9cf9ea84b01ef1f5ea",
+ "function": "handler",
+ "sink": {
+  "statement": "s14",
+  "line": 49,
+  "api": "os.path.exists",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s13:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Import",
+   "code": "import helpers.separate_request"
+  },
+  {
+   "id": "s3",
+   "line": 33,
+   "kind": "Assign",
+   "code": "wrapped = helpers.separate_request.request_wrapper(request)"
+  },
+  {
+   "id": "s4",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = wrapped.get_form_parameter('Handler')"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "num = 86"
+  },
+  {
+   "id": "s8",
+   "line": 40,
+   "kind": "If",
+   "code": "if 7 * 42 - num > 200:"
+  },
+  {
+   "id": "s9",
+   "line": 41,
+   "kind": "Assign",
+   "code": "bar = 'This_should_always_happen'"
+  },
+  {
+   "id": "s10",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s11",
+   "line": 45,
+   "kind": "Import",
+   "code": "import os"
+  },
+  {
+   "id": "s12",
+   "line": 46,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s13",
+   "line": 48,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s14",
+   "line": 49,
+   "kind": "If",
+   "code": "if os.path.exists(fileName):"
+  },
+  {
+   "id": "s15",
+   "line": 50,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\""
+  },
+  {
+   "id": "s16",
+   "line": 52,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\""
+  },
+  {
+   "id": "s17",
+   "line": 54,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s3:wrapped",
+   "var": "wrapped",
+   "line": 33,
+   "code": "wrapped = helpers.separate_request.request_wrapper(request)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 34,
+   "code": "param = wrapped.get_form_parameter('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:wrapped"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s6:param",
+   "var": "param",
+   "line": 36,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:num",
+   "var": "num",
+   "line": 38,
+   "code": "num = 86",
+   "kind": "assign",
+   "value": "86",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s9:bar",
+   "var": "bar",
+   "line": 41,
+   "code": "bar = 'This_should_always_happen'",
+   "kind": "assign",
+   "value": "'This_should_always_happen'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:bar",
+   "var": "bar",
+   "line": 43,
+   "code": "bar = param",
+   "kind": "assign",
+   "value": "'' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s4:param",
+    "s6:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s13:fileName",
+   "var": "fileName",
+   "line": 48,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s9:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:RESPONSE",
+   "var": "RESPONSE",
+   "line": 50,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s13:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:RESPONSE",
+   "var": "RESPONSE",
+   "line": 52,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s13:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s5",
+   "line": 35,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s8",
+   "line": 40,
+   "condition": "7 * 42 - num > 200",
+   "feasible_true": true,
+   "feasible_false": false
+  },
+  {
+   "id": "s14",
+   "line": 49,
+   "condition": "os.path.exists(fileName)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [
+   "s10:bar"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}
