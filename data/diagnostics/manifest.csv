@@ -1,0 +1,73 @@
+unit,split,family,pair,member,intended_vulnerable,reference,path
+checked_vs_original1_vuln,test,checked_vs_original,checked_vs_original1,vuln,True,os.path.realpath/commonpath + urllib.parse.unquote docs,test/checked_vs_original1_vuln.py
+checked_vs_original1_safe,test,checked_vs_original,checked_vs_original1,safe,False,os.path.realpath/commonpath + urllib.parse.unquote docs,test/checked_vs_original1_safe.py
+checked_vs_original2_vuln,test,checked_vs_original,checked_vs_original2,vuln,True,pathlib Path.resolve/is_relative_to + urllib.parse.unquote docs,test/checked_vs_original2_vuln.py
+checked_vs_original2_safe,test,checked_vs_original,checked_vs_original2,safe,False,pathlib Path.resolve/is_relative_to + urllib.parse.unquote docs,test/checked_vs_original2_safe.py
+overwrite1_vuln,test,overwrite,overwrite1,vuln,True,OWASP Path Traversal (use server-chosen names),test/overwrite1_vuln.py
+overwrite1_safe,test,overwrite,overwrite1,safe,False,OWASP Path Traversal (use server-chosen names),test/overwrite1_safe.py
+overwrite2_vuln,test,overwrite,overwrite2,vuln,True,OWASP Path Traversal (use server-chosen names),test/overwrite2_vuln.py
+overwrite2_safe,test,overwrite,overwrite2,safe,False,OWASP Path Traversal (use server-chosen names),test/overwrite2_safe.py
+guard_other_value1_vuln,test,guard_other_value,guard_other_value1,vuln,True,os.path.commonpath docs,test/guard_other_value1_vuln.py
+guard_other_value1_safe,test,guard_other_value,guard_other_value1,safe,False,os.path.commonpath docs,test/guard_other_value1_safe.py
+guard_other_value2_vuln,test,guard_other_value,guard_other_value2,vuln,True,os.path.realpath docs,test/guard_other_value2_vuln.py
+guard_other_value2_safe,test,guard_other_value,guard_other_value2,safe,False,os.path.realpath docs,test/guard_other_value2_safe.py
+reject_exits1_vuln,test,reject_exits,reject_exits1,vuln,True,"OWASP Path Traversal (reject, do not continue)",test/reject_exits1_vuln.py
+reject_exits1_safe,test,reject_exits,reject_exits1,safe,False,"OWASP Path Traversal (reject, do not continue)",test/reject_exits1_safe.py
+reject_exits2_vuln,test,reject_exits,reject_exits2,vuln,True,"OWASP Path Traversal (reject, do not continue)",test/reject_exits2_vuln.py
+reject_exits2_safe,test,reject_exits,reject_exits2,safe,False,"OWASP Path Traversal (reject, do not continue)",test/reject_exits2_safe.py
+send_from_directory_base1_vuln,test,send_from_directory_base,send_from_directory_base1,vuln,True,Flask send_from_directory docs (directory must be trusted),test/send_from_directory_base1_vuln.py
+send_from_directory_base1_safe,test,send_from_directory_base,send_from_directory_base1,safe,False,Flask send_from_directory docs (directory must be trusted),test/send_from_directory_base1_safe.py
+send_from_directory_base2_vuln,test,send_from_directory_base,send_from_directory_base2,vuln,True,Flask send_from_directory / send_file docs,test/send_from_directory_base2_vuln.py
+send_from_directory_base2_safe,test,send_from_directory_base,send_from_directory_base2,safe,False,Flask send_from_directory / send_file docs,test/send_from_directory_base2_safe.py
+prefix_confusion1_vuln,test,prefix_confusion,prefix_confusion1,vuln,True,os.path.commonpath docs (string prefix is not containment),test/prefix_confusion1_vuln.py
+prefix_confusion1_safe,test,prefix_confusion,prefix_confusion1,safe,False,os.path.commonpath docs (string prefix is not containment),test/prefix_confusion1_safe.py
+prefix_confusion2_vuln,test,prefix_confusion,prefix_confusion2,vuln,True,os.path.commonpath docs (string prefix is not containment),test/prefix_confusion2_vuln.py
+prefix_confusion2_safe,test,prefix_confusion,prefix_confusion2,safe,False,os.path.commonpath docs (string prefix is not containment),test/prefix_confusion2_safe.py
+canonicalize_only1_vuln,test,canonicalize_only,canonicalize_only1,vuln,True,os.path.realpath docs,test/canonicalize_only1_vuln.py
+canonicalize_only1_safe,test,canonicalize_only,canonicalize_only1,safe,False,os.path.realpath docs,test/canonicalize_only1_safe.py
+canonicalize_only2_vuln,test,canonicalize_only,canonicalize_only2,vuln,True,os.path.normpath docs,test/canonicalize_only2_vuln.py
+canonicalize_only2_safe,test,canonicalize_only,canonicalize_only2,safe,False,os.path.normpath docs,test/canonicalize_only2_safe.py
+absolute_join1_vuln,test,absolute_join,absolute_join1,vuln,True,os.path.join docs (absolute component discards the prefix),test/absolute_join1_vuln.py
+absolute_join1_safe,test,absolute_join,absolute_join1,safe,False,os.path.join docs (absolute component discards the prefix),test/absolute_join1_safe.py
+absolute_join2_vuln,test,absolute_join,absolute_join2,vuln,True,os.path.join docs (absolute component discards the prefix),test/absolute_join2_vuln.py
+absolute_join2_safe,test,absolute_join,absolute_join2,safe,False,os.path.join docs (absolute component discards the prefix),test/absolute_join2_safe.py
+alternate_branch1_vuln,test,alternate_branch,alternate_branch1,vuln,True,OWASP Path Traversal (validate every input path),test/alternate_branch1_vuln.py
+alternate_branch1_safe,test,alternate_branch,alternate_branch1,safe,False,OWASP Path Traversal (validate every input path),test/alternate_branch1_safe.py
+alternate_branch2_vuln,test,alternate_branch,alternate_branch2,vuln,True,OWASP Path Traversal (validate every input path),test/alternate_branch2_vuln.py
+alternate_branch2_safe,test,alternate_branch,alternate_branch2,safe,False,OWASP Path Traversal (validate every input path),test/alternate_branch2_safe.py
+named_sanitizer1_vuln,test,named_sanitizer,named_sanitizer1,vuln,True,OWASP Path Traversal (filtering '../' is bypassable),test/named_sanitizer1_vuln.py
+named_sanitizer1_safe,test,named_sanitizer,named_sanitizer1,safe,False,OWASP Path Traversal (filtering '../' is bypassable),test/named_sanitizer1_safe.py
+named_sanitizer2_vuln,test,named_sanitizer,named_sanitizer2,vuln,True,OWASP Path Traversal (filtering '../' is bypassable),test/named_sanitizer2_vuln.py
+named_sanitizer2_safe,test,named_sanitizer,named_sanitizer2,safe,False,OWASP Path Traversal (filtering '../' is bypassable),test/named_sanitizer2_safe.py
+unreachable_flow1_vuln,test,unreachable_flow,unreachable_flow1,vuln,True,Python language reference (constant conditions),test/unreachable_flow1_vuln.py
+unreachable_flow1_safe,test,unreachable_flow,unreachable_flow1,safe,False,Python language reference (constant conditions),test/unreachable_flow1_safe.py
+unreachable_flow2_vuln,test,unreachable_flow,unreachable_flow2,vuln,True,Python language reference (match statement),test/unreachable_flow2_vuln.py
+unreachable_flow2_safe,test,unreachable_flow,unreachable_flow2,safe,False,Python language reference (match statement),test/unreachable_flow2_safe.py
+container_alias1_vuln,test,container_alias,container_alias1,vuln,True,Python data model (mutation through aliases),test/container_alias1_vuln.py
+container_alias1_safe,test,container_alias,container_alias1,safe,False,Python data model (mutation through aliases),test/container_alias1_safe.py
+container_alias2_vuln,test,container_alias,container_alias2,vuln,True,Python data model (dict update),test/container_alias2_vuln.py
+container_alias2_safe,test,container_alias,container_alias2,safe,False,Python data model (dict update),test/container_alias2_safe.py
+allowlist1_vuln,dev,allowlist,allowlist1,vuln,True,OWASP Path Traversal (allow-list input),dev/allowlist1_vuln.py
+allowlist1_safe,dev,allowlist,allowlist1,safe,False,OWASP Path Traversal (allow-list input),dev/allowlist1_safe.py
+dict_lookup1_vuln,dev,dict_lookup,dict_lookup1,vuln,True,OWASP Path Traversal (map input to server-side names),dev/dict_lookup1_vuln.py
+dict_lookup1_safe,dev,dict_lookup,dict_lookup1,safe,False,OWASP Path Traversal (map input to server-side names),dev/dict_lookup1_safe.py
+ternary1_vuln,dev,ternary,ternary1,vuln,True,Python language reference (conditional expressions),dev/ternary1_vuln.py
+ternary1_safe,dev,ternary,ternary1,safe,False,Python language reference (conditional expressions),dev/ternary1_safe.py
+basename1_vuln,dev,basename,basename1,vuln,True,os.path.basename docs,dev/basename1_vuln.py
+basename1_safe,dev,basename,basename1,safe,False,os.path.basename docs,dev/basename1_safe.py
+decode_order1_vuln,dev,decode_order,decode_order1,vuln,True,urllib.parse.unquote docs,dev/decode_order1_vuln.py
+decode_order1_safe,dev,decode_order,decode_order1,safe,False,urllib.parse.unquote docs,dev/decode_order1_safe.py
+exception_flow1_vuln,dev,exception_flow,exception_flow1,vuln,True,Python language reference (try statement),dev/exception_flow1_vuln.py
+exception_flow1_safe,dev,exception_flow,exception_flow1,safe,False,Python language reference (try statement),dev/exception_flow1_safe.py
+resolve_order1_vuln,dev,resolve_order,resolve_order1,vuln,True,pathlib PurePath.is_relative_to docs (lexical),dev/resolve_order1_vuln.py
+resolve_order1_safe,dev,resolve_order,resolve_order1,safe,False,pathlib PurePath.is_relative_to docs (lexical),dev/resolve_order1_safe.py
+loop_source1_vuln,dev,loop_source,loop_source1,vuln,True,OWASP Benchmark header-name idiom,dev/loop_source1_vuln.py
+loop_source1_safe,dev,loop_source,loop_source1,safe,False,OWASP Benchmark header-name idiom,dev/loop_source1_safe.py
+lstrip_join1_vuln,dev,lstrip_join,lstrip_join1,vuln,True,os.path.join docs,dev/lstrip_join1_vuln.py
+lstrip_join1_safe,dev,lstrip_join,lstrip_join1,safe,False,os.path.join docs,dev/lstrip_join1_safe.py
+numeric_id1_vuln,dev,numeric_id,numeric_id1,vuln,True,OWASP Path Traversal (use indirect identifiers),dev/numeric_id1_vuln.py
+numeric_id1_safe,dev,numeric_id,numeric_id1,safe,False,OWASP Path Traversal (use indirect identifiers),dev/numeric_id1_safe.py
+hashed_name1_vuln,dev,hashed_name,hashed_name1,vuln,True,OWASP Path Traversal (server-generated names),dev/hashed_name1_vuln.py
+hashed_name1_safe,dev,hashed_name,hashed_name1,safe,False,OWASP Path Traversal (server-generated names),dev/hashed_name1_safe.py
+regex_anchor1_vuln,dev,regex_anchor,regex_anchor1,vuln,True,re.match / re.fullmatch docs,dev/regex_anchor1_vuln.py
+regex_anchor1_safe,dev,regex_anchor,regex_anchor1,safe,False,re.match / re.fullmatch docs,dev/regex_anchor1_safe.py

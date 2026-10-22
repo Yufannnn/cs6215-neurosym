@@ -1,0 +1,60 @@
+{
+ "name": "dev-final-diag",
+ "arms": [
+  "S",
+  "D",
+  "L",
+  "E",
+  "EC"
+ ],
+ "model": "qwen3-coder-next",
+ "model_config": {
+  "role": "primary",
+  "extra_body": {}
+ },
+ "replicate": 0,
+ "prompt_version": "p2",
+ "offline_replay": false,
+ "git": {
+  "commit": "4202f9bb838032b21afb77fef21d26821fb28810",
+  "dirty": true,
+  "freeze_tag": null
+ },
+ "baseline": {
+  "semgrep": "1.182.1",
+  "rule": "baseline/rules/cwe22-taint.yaml",
+  "rule_sha256": "9afd5c32c7431a84e8dba575946d7e9066621c6dbfc26778f340d35d0e18535f",
+  "python": "3.14.0",
+  "platform": "Darwin arm64"
+ },
+ "subjects": 24,
+ "corpora": [
+  "diag"
+ ],
+ "splits": [
+  "dev"
+ ],
+ "alerts": 22,
+ "extraction": {
+  "ok": 22,
+  "unsupported": 0
+ },
+ "timing_s": {
+  "baseline": 0.71,
+  "extraction": 0.01,
+  "llm_L": 160.79,
+  "llm_E": 58.64
+ },
+ "llm": {
+  "calls": 46,
+  "uncached_calls": 46,
+  "prompt_tokens": 51943,
+  "completion_tokens": 12907,
+  "served_models": [
+   "qwen3-coder-next"
+  ],
+  "fingerprints": [
+   "vllm-0.26.0-1cf708c9"
+  ]
+ }
+}

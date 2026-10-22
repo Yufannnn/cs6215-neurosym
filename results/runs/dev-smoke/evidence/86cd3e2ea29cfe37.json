@@ -1,0 +1,295 @@
+{
+ "file_sha256": "5ffd8967c4b0a2c9684d96c2a8170b3209230c9ee3fec9a8f25333dcdfa7c5c2",
+ "function": "handler",
+ "sink": {
+  "statement": "s18",
+  "line": 52,
+  "api": "<path>.exists()",
+  "argument": "p",
+  "reads": {
+   "p": [
+    "s17:p"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Import",
+   "code": "import helpers.separate_request"
+  },
+  {
+   "id": "s3",
+   "line": 33,
+   "kind": "Assign",
+   "code": "wrapped = helpers.separate_request.request_wrapper(request)"
+  },
+  {
+   "id": "s4",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = wrapped.get_query_parameter('Handler')"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Import",
+   "code": "import configparser"
+  },
+  {
+   "id": "s8",
+   "line": 40,
+   "kind": "Assign",
+   "code": "bar = 'safe!'"
+  },
+  {
+   "id": "s9",
+   "line": 41,
+   "kind": "Assign",
+   "code": "conf39726 = configparser.ConfigParser()"
+  },
+  {
+   "id": "s10",
+   "line": 42,
+   "kind": "Expr",
+   "code": "conf39726.add_section('section39726')"
+  },
+  {
+   "id": "s11",
+   "line": 43,
+   "kind": "Expr",
+   "code": "conf39726.set('section39726', 'keyA-39726', 'a-Value')"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "Expr",
+   "code": "conf39726.set('section39726', 'keyB-39726', param)"
+  },
+  {
+   "id": "s13",
+   "line": 45,
+   "kind": "Assign",
+   "code": "bar = conf39726.get('section39726', 'keyB-39726')"
+  },
+  {
+   "id": "s14",
+   "line": 47,
+   "kind": "Import",
+   "code": "import pathlib"
+  },
+  {
+   "id": "s15",
+   "line": 48,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s16",
+   "line": 50,
+   "kind": "Assign",
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)"
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "kind": "Assign",
+   "code": "p = testfiles / bar"
+  },
+  {
+   "id": "s18",
+   "line": 52,
+   "kind": "If",
+   "code": "if p.exists():"
+  },
+  {
+   "id": "s19",
+   "line": 53,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\""
+  },
+  {
+   "id": "s20",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\""
+  },
+  {
+   "id": "s21",
+   "line": 57,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s3:wrapped",
+   "var": "wrapped",
+   "line": 33,
+   "code": "wrapped = helpers.separate_request.request_wrapper(request)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 34,
+   "code": "param = wrapped.get_query_parameter('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:wrapped"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s6:param",
+   "var": "param",
+   "line": 36,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s9:conf39726",
+   "var": "conf39726",
+   "line": 41,
+   "code": "conf39726 = configparser.ConfigParser()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s12:conf39726",
+   "var": "conf39726",
+   "line": 44,
+   "code": "conf39726.set('section39726', 'keyB-39726', param)",
+   "kind": "mutation",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s4:param",
+    "s6:param",
+    "s9:conf39726"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s13:bar",
+   "var": "bar",
+   "line": 45,
+   "code": "bar = conf39726.get('section39726', 'keyB-39726')",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:conf39726"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s16:testfiles",
+   "var": "testfiles",
+   "line": 50,
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s17:p",
+   "var": "p",
+   "line": 51,
+   "code": "p = testfiles / bar",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s13:bar",
+    "s16:testfiles"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s5",
+   "line": 35,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s18",
+   "line": 52,
+   "condition": "p.exists()",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s3:wrapped",
+   "s4:param",
+   "s12:conf39726",
+   "s13:bar",
+   "s17:p"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

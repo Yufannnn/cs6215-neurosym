@@ -1,0 +1,5 @@
+{
+  "qwen3-coder-next": {"role": "primary", "extra_body": {}},
+  "qwen3.5:9b": {"role": "small-model check", "extra_body": {"reasoning_effort": "none"}},
+  "qwen3.6:35b": {"role": "availability fallback only", "extra_body": {}}
+}

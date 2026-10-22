@@ -1,0 +1,275 @@
+{
+ "file_sha256": "e4e5a97ab9f163c18f613c9d26681bbedfedb1bd9355ad03500bb26b5b5ef53f",
+ "function": "handler",
+ "sink": {
+  "statement": "s21",
+  "line": 55,
+  "api": "open",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s20:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Import",
+   "code": "import helpers.separate_request"
+  },
+  {
+   "id": "s3",
+   "line": 33,
+   "kind": "Assign",
+   "code": "wrapped = helpers.separate_request.request_wrapper(request)"
+  },
+  {
+   "id": "s4",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = wrapped.get_query_parameter('Handler')"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "possible = 'ABC'"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Assign",
+   "code": "guess = possible[1]"
+  },
+  {
+   "id": "s9",
+   "line": 41,
+   "kind": "Match",
+   "code": "match guess:"
+  },
+  {
+   "id": "s10",
+   "line": 42,
+   "kind": "case",
+   "code": "case 'A':"
+  },
+  {
+   "id": "s11",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "case",
+   "code": "case 'B':"
+  },
+  {
+   "id": "s13",
+   "line": 45,
+   "kind": "Assign",
+   "code": "bar = 'bob'"
+  },
+  {
+   "id": "s14",
+   "line": 46,
+   "kind": "case",
+   "code": "case 'C' | 'D':"
+  },
+  {
+   "id": "s15",
+   "line": 47,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "kind": "case",
+   "code": "case _:"
+  },
+  {
+   "id": "s17",
+   "line": 49,
+   "kind": "Assign",
+   "code": "bar = \"bob's your uncle\""
+  },
+  {
+   "id": "s18",
+   "line": 51,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s19",
+   "line": 53,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s20",
+   "line": 54,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s21",
+   "line": 55,
+   "kind": "Assign",
+   "code": "fd = open(fileName, 'wb')"
+  },
+  {
+   "id": "s22",
+   "line": 56,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f'Now ready to write to file: {escape_for_html(fileName)}'"
+  },
+  {
+   "id": "s23",
+   "line": 60,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Problem reading from file '{escape_for_html(fileName)}': {escape_for_html(e.strerror)}\""
+  },
+  {
+   "id": "s24",
+   "line": 65,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s25",
+   "line": 66,
+   "kind": "If",
+   "code": "if fd is not None:"
+  },
+  {
+   "id": "s26",
+   "line": 67,
+   "kind": "Expr",
+   "code": "fd.close()"
+  },
+  {
+   "id": "s27",
+   "line": 69,
+   "kind": "Pass",
+   "code": "pass"
+  },
+  {
+   "id": "s28",
+   "line": 71,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s13:bar",
+   "var": "bar",
+   "line": 45,
+   "code": "bar = 'bob'",
+   "kind": "assign",
+   "value": "'bob'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s20:fileName",
+   "var": "fileName",
+   "line": 54,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s13:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s5",
+   "line": 35,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s10",
+   "line": 42,
+   "condition": "match guess: case 'A'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "condition": "match guess: case 'B'",
+   "feasible_true": true,
+   "feasible_false": null
+  },
+  {
+   "id": "s14",
+   "line": 46,
+   "condition": "match guess: case 'C' | 'D'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "condition": "match guess: case _",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s25",
+   "line": 66,
+   "condition": "fd is not None",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [
+   "s11:bar",
+   "s15:bar"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -88,3 +88,24 @@ Caps: 1,500 uncached requests and 12M tokens. Stability: 30 development and test
 
 - Model inputs never contain labels, expected-result files, test IDs, advisory text or commit messages. Files are shown as `case.py`.
 - OWASP test cases are not opened, run or scored until the protocol, policy, prompts and code are committed and frozen with the tag `protocol-freeze`.
+
+## Freeze record (tag `protocol-freeze`)
+
+Implementation details fixed during development, before any test-split data was opened:
+
+- **Frozen artifacts:**
+  - Semgrep rule `baseline/rules/cwe22-taint.yaml`, SHA-256 `9afd5c32…535f`, Semgrep CE 1.182.1.
+  - OWASP split `data/owasp_split.csv` `3e28943b…0053`: development 34 cases / 7 families, test 134 / 61.
+  - Diagnostic manifest `30c50165…ab41`: development 12 pairs / 12 families, held-out 24 pairs / 12 families, all labels mechanically validated (`data/diagnostics/label_validation.csv`).
+  - Prompts version `p2`, concatenated SHA-256 `5d54c4d1…0d00`.
+- **Known baseline limitation:** Semgrep CE 1.182.1 does not propagate taint through Python slices (`s[a:b]`). Propagators, rule options and taint labels did not change this. All 3 development false negatives have this cause. It is reported as an engine limitation; the rule is not altered for it.
+- **Extractor scope:**
+  - Assignments, augmented assignment, `if`/`match` with constant folding.
+  - Loops iterated to a fixpoint (≤ 5 rounds, otherwise widened and marked incomplete); `break`/`continue` exits joined.
+  - `try`: handler entry is the join of all prefix states.
+  - `with`; non-returning calls (`flask.abort`, `sys.exit`).
+  - Local lists and dicts with element-level values. Assigning a container to a second name marks the analysis incomplete.
+  - Unmodelled functions propagate their inputs, as Semgrep's default does.
+- **EC suppression rule** (as above): structural checks plus, for non-standard guards, the model's confinement claim citing the guard. Such cases are reported as `semantic_judgment_remaining`.
+- **Bootstrap clusters:** OWASP flow-template family; diagnostics semantic family (both pairs of a family together).
+- **Transport:** SoCLaaS rate-limits bursts of long prompts (`RateLimitError` seen at concurrency 3). The client retries transport errors with exponential backoff (honouring `Retry-After`) up to 7 attempts, and logs the retry count. Model answers are never retried except for the single schema-repair retry.

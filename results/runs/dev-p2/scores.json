@@ -1,0 +1,269 @@
+{
+ "metrics": {
+  "S": {
+   "units": 34,
+   "positives": 7,
+   "tp": 4,
+   "fp": 21,
+   "fn": 3,
+   "tn": 6,
+   "precision": 0.16,
+   "recall": 0.5714285714285714,
+   "f1": 0.25,
+   "tp_retention": 1.0,
+   "fp_removal": 0.0,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.5714285714285714
+  },
+  "D": {
+   "units": 34,
+   "positives": 7,
+   "tp": 4,
+   "fp": 2,
+   "fn": 3,
+   "tn": 25,
+   "precision": 0.6666666666666666,
+   "recall": 0.5714285714285714,
+   "f1": 0.6153846153846153,
+   "tp_retention": 1.0,
+   "fp_removal": 0.9047619047619048,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.5714285714285714
+  },
+  "L": {
+   "units": 34,
+   "positives": 7,
+   "tp": 4,
+   "fp": 17,
+   "fn": 3,
+   "tn": 10,
+   "precision": 0.19047619047619047,
+   "recall": 0.5714285714285714,
+   "f1": 0.2857142857142857,
+   "tp_retention": 1.0,
+   "fp_removal": 0.19047619047619047,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.5714285714285714
+  },
+  "E": {
+   "units": 34,
+   "positives": 7,
+   "tp": 4,
+   "fp": 3,
+   "fn": 3,
+   "tn": 24,
+   "precision": 0.5714285714285714,
+   "recall": 0.5714285714285714,
+   "f1": 0.5714285714285714,
+   "tp_retention": 1.0,
+   "fp_removal": 0.8571428571428571,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.5714285714285714
+  },
+  "EC": {
+   "units": 34,
+   "positives": 7,
+   "tp": 4,
+   "fp": 3,
+   "fn": 3,
+   "tn": 24,
+   "precision": 0.5714285714285714,
+   "recall": 0.5714285714285714,
+   "f1": 0.5714285714285714,
+   "tp_retention": 1.0,
+   "fp_removal": 0.8571428571428571,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.5714285714285714
+  }
+ },
+ "ci95": {
+  "S": {
+   "precision": [
+    0.0238,
+    0.75
+   ],
+   "recall": [
+    0.2,
+    0.8571
+   ],
+   "f1": [
+    0.0444,
+    0.6957
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    0.0
+   ]
+  },
+  "D": {
+   "precision": [
+    0.5,
+    1.0
+   ],
+   "recall": [
+    0.2,
+    0.8571
+   ],
+   "f1": [
+    0.3333,
+    0.8889
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    1.0
+   ]
+  },
+  "L": {
+   "precision": [
+    0.0278,
+    0.8571
+   ],
+   "recall": [
+    0.2,
+    0.8571
+   ],
+   "f1": [
+    0.0526,
+    0.7273
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.125,
+    0.5
+   ]
+  },
+  "E": {
+   "precision": [
+    0.25,
+    1.0
+   ],
+   "recall": [
+    0.2,
+    0.8571
+   ],
+   "f1": [
+    0.25,
+    0.8333
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    1.0
+   ]
+  },
+  "EC": {
+   "precision": [
+    0.25,
+    1.0
+   ],
+   "recall": [
+    0.2,
+    0.8571
+   ],
+   "f1": [
+    0.25,
+    0.8333
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    1.0
+   ]
+  }
+ },
+ "retained_units": {
+  "S": [
+   "BenchmarkTest00008",
+   "BenchmarkTest00085",
+   "BenchmarkTest00088",
+   "BenchmarkTest00090",
+   "BenchmarkTest00176",
+   "BenchmarkTest00179",
+   "BenchmarkTest00181",
+   "BenchmarkTest00184",
+   "BenchmarkTest00356",
+   "BenchmarkTest00359",
+   "BenchmarkTest00442",
+   "BenchmarkTest00443",
+   "BenchmarkTest00519",
+   "BenchmarkTest00521",
+   "BenchmarkTest00530",
+   "BenchmarkTest00614",
+   "BenchmarkTest00618",
+   "BenchmarkTest00666",
+   "BenchmarkTest00738",
+   "BenchmarkTest00743",
+   "BenchmarkTest00832",
+   "BenchmarkTest00835",
+   "BenchmarkTest00836",
+   "BenchmarkTest00837",
+   "BenchmarkTest00838"
+  ],
+  "D": [
+   "BenchmarkTest00008",
+   "BenchmarkTest00085",
+   "BenchmarkTest00356",
+   "BenchmarkTest00442",
+   "BenchmarkTest00618",
+   "BenchmarkTest00835"
+  ],
+  "L": [
+   "BenchmarkTest00008",
+   "BenchmarkTest00085",
+   "BenchmarkTest00088",
+   "BenchmarkTest00176",
+   "BenchmarkTest00179",
+   "BenchmarkTest00184",
+   "BenchmarkTest00356",
+   "BenchmarkTest00359",
+   "BenchmarkTest00443",
+   "BenchmarkTest00519",
+   "BenchmarkTest00521",
+   "BenchmarkTest00530",
+   "BenchmarkTest00614",
+   "BenchmarkTest00618",
+   "BenchmarkTest00666",
+   "BenchmarkTest00738",
+   "BenchmarkTest00743",
+   "BenchmarkTest00832",
+   "BenchmarkTest00835",
+   "BenchmarkTest00837",
+   "BenchmarkTest00838"
+  ],
+  "E": [
+   "BenchmarkTest00008",
+   "BenchmarkTest00085",
+   "BenchmarkTest00356",
+   "BenchmarkTest00442",
+   "BenchmarkTest00618",
+   "BenchmarkTest00743",
+   "BenchmarkTest00835"
+  ],
+  "EC": [
+   "BenchmarkTest00008",
+   "BenchmarkTest00085",
+   "BenchmarkTest00356",
+   "BenchmarkTest00442",
+   "BenchmarkTest00618",
+   "BenchmarkTest00743",
+   "BenchmarkTest00835"
+  ]
+ }
+}

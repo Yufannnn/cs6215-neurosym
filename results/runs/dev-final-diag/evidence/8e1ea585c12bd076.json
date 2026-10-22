@@ -1,0 +1,119 @@
+{
+ "file_sha256": "e2badbb81a106312f1683fc8a4a45599ad9d07c5f0f4922d4914d7bde9186af5",
+ "function": "handler",
+ "sink": {
+  "statement": "s5",
+  "line": 18,
+  "api": "open",
+  "argument": "f'{ROOT}/{name}'",
+  "reads": {
+   "name": [
+    "s4:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "raw = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if '..' in raw:"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Expr",
+   "code": "abort(400)"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Assign",
+   "code": "name = urllib.parse.unquote(raw)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Return",
+   "code": "return open(f'{ROOT}/{name}').read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:raw",
+   "var": "raw",
+   "line": 14,
+   "code": "raw = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:name",
+   "var": "name",
+   "line": 17,
+   "code": "name = urllib.parse.unquote(raw)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:raw"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "'..' in raw",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "'..' in raw",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "raw": [
+     "s1:raw"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:raw",
+   "s4:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

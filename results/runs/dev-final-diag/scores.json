@@ -1,0 +1,279 @@
+{
+ "metrics": {
+  "S": {
+   "units": 24,
+   "positives": 12,
+   "tp": 12,
+   "fp": 10,
+   "fn": 0,
+   "tn": 2,
+   "precision": 0.5454545454545454,
+   "recall": 1.0,
+   "f1": 0.7058823529411764,
+   "tp_retention": 1.0,
+   "fp_removal": 0.0,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 1.0
+  },
+  "D": {
+   "units": 24,
+   "positives": 12,
+   "tp": 12,
+   "fp": 5,
+   "fn": 0,
+   "tn": 7,
+   "precision": 0.7058823529411765,
+   "recall": 1.0,
+   "f1": 0.8275862068965517,
+   "tp_retention": 1.0,
+   "fp_removal": 0.5,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 1.0
+  },
+  "L": {
+   "units": 24,
+   "positives": 12,
+   "tp": 9,
+   "fp": 1,
+   "fn": 3,
+   "tn": 11,
+   "precision": 0.9,
+   "recall": 0.75,
+   "f1": 0.8181818181818182,
+   "tp_retention": 0.75,
+   "fp_removal": 0.9,
+   "wrongful_suppressions": 3,
+   "baseline_recall": 1.0
+  },
+  "E": {
+   "units": 24,
+   "positives": 12,
+   "tp": 11,
+   "fp": 2,
+   "fn": 1,
+   "tn": 10,
+   "precision": 0.8461538461538461,
+   "recall": 0.9166666666666666,
+   "f1": 0.8799999999999999,
+   "tp_retention": 0.9166666666666666,
+   "fp_removal": 0.8,
+   "wrongful_suppressions": 1,
+   "baseline_recall": 1.0
+  },
+  "EC": {
+   "units": 24,
+   "positives": 12,
+   "tp": 11,
+   "fp": 3,
+   "fn": 1,
+   "tn": 9,
+   "precision": 0.7857142857142857,
+   "recall": 0.9166666666666666,
+   "f1": 0.8461538461538461,
+   "tp_retention": 0.9166666666666666,
+   "fp_removal": 0.7,
+   "wrongful_suppressions": 1,
+   "baseline_recall": 1.0
+  }
+ },
+ "ci95": {
+  "S": {
+   "precision": [
+    0.5,
+    0.6316
+   ],
+   "recall": [
+    1.0,
+    1.0
+   ],
+   "f1": [
+    0.6667,
+    0.7742
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    0.0
+   ]
+  },
+  "D": {
+   "precision": [
+    0.6,
+    0.8571
+   ],
+   "recall": [
+    1.0,
+    1.0
+   ],
+   "f1": [
+    0.75,
+    0.9231
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.2,
+    0.8
+   ]
+  },
+  "L": {
+   "precision": [
+    0.7333,
+    1.0
+   ],
+   "recall": [
+    0.5,
+    1.0
+   ],
+   "f1": [
+    0.6316,
+    0.9565
+   ],
+   "tp_retention": [
+    0.5,
+    1.0
+   ],
+   "fp_removal": [
+    0.7,
+    1.0
+   ]
+  },
+  "E": {
+   "precision": [
+    0.6875,
+    1.0
+   ],
+   "recall": [
+    0.75,
+    1.0
+   ],
+   "f1": [
+    0.75,
+    1.0
+   ],
+   "tp_retention": [
+    0.75,
+    1.0
+   ],
+   "fp_removal": [
+    0.5,
+    1.0
+   ]
+  },
+  "EC": {
+   "precision": [
+    0.6316,
+    1.0
+   ],
+   "recall": [
+    0.75,
+    1.0
+   ],
+   "f1": [
+    0.72,
+    0.96
+   ],
+   "tp_retention": [
+    0.75,
+    1.0
+   ],
+   "fp_removal": [
+    0.4,
+    1.0
+   ]
+  }
+ },
+ "retained_units": {
+  "S": [
+   "allowlist1_safe",
+   "allowlist1_vuln",
+   "basename1_safe",
+   "basename1_vuln",
+   "decode_order1_safe",
+   "decode_order1_vuln",
+   "dict_lookup1_safe",
+   "dict_lookup1_vuln",
+   "exception_flow1_vuln",
+   "hashed_name1_safe",
+   "hashed_name1_vuln",
+   "loop_source1_vuln",
+   "lstrip_join1_safe",
+   "lstrip_join1_vuln",
+   "numeric_id1_safe",
+   "numeric_id1_vuln",
+   "regex_anchor1_safe",
+   "regex_anchor1_vuln",
+   "resolve_order1_safe",
+   "resolve_order1_vuln",
+   "ternary1_safe",
+   "ternary1_vuln"
+  ],
+  "D": [
+   "allowlist1_safe",
+   "allowlist1_vuln",
+   "basename1_safe",
+   "basename1_vuln",
+   "decode_order1_vuln",
+   "dict_lookup1_vuln",
+   "exception_flow1_vuln",
+   "hashed_name1_safe",
+   "hashed_name1_vuln",
+   "loop_source1_vuln",
+   "lstrip_join1_vuln",
+   "numeric_id1_safe",
+   "numeric_id1_vuln",
+   "regex_anchor1_safe",
+   "regex_anchor1_vuln",
+   "resolve_order1_vuln",
+   "ternary1_vuln"
+  ],
+  "L": [
+   "allowlist1_vuln",
+   "decode_order1_vuln",
+   "dict_lookup1_safe",
+   "dict_lookup1_vuln",
+   "exception_flow1_vuln",
+   "hashed_name1_vuln",
+   "loop_source1_vuln",
+   "lstrip_join1_vuln",
+   "numeric_id1_vuln",
+   "ternary1_vuln"
+  ],
+  "E": [
+   "allowlist1_vuln",
+   "basename1_vuln",
+   "decode_order1_vuln",
+   "dict_lookup1_vuln",
+   "exception_flow1_vuln",
+   "hashed_name1_safe",
+   "hashed_name1_vuln",
+   "loop_source1_vuln",
+   "lstrip_join1_vuln",
+   "numeric_id1_safe",
+   "numeric_id1_vuln",
+   "resolve_order1_vuln",
+   "ternary1_vuln"
+  ],
+  "EC": [
+   "allowlist1_vuln",
+   "basename1_vuln",
+   "decode_order1_vuln",
+   "dict_lookup1_safe",
+   "dict_lookup1_vuln",
+   "exception_flow1_vuln",
+   "hashed_name1_safe",
+   "hashed_name1_vuln",
+   "loop_source1_vuln",
+   "lstrip_join1_vuln",
+   "numeric_id1_safe",
+   "numeric_id1_vuln",
+   "resolve_order1_vuln",
+   "ternary1_vuln"
+  ]
+ }
+}

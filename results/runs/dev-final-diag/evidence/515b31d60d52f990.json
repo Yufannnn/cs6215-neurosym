@@ -1,0 +1,134 @@
+{
+ "file_sha256": "0293c12d2e586b23488c20d82867c8843ba219e8fe142ede166e7f715590280e",
+ "function": "handler",
+ "sink": {
+  "statement": "s6",
+  "line": 19,
+  "api": "open",
+  "argument": "os.path.join(ROOT, name)",
+  "reads": {
+   "name": [
+    "s1:name",
+    "s4:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = 'index.txt'"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "For",
+   "code": "for header in request.headers.keys():"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "If",
+   "code": "if header.lower().startswith('x-file'):"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Assign",
+   "code": "name = header"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Break",
+   "code": "break"
+  },
+  {
+   "id": "s6",
+   "line": 19,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, name)).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = 'index.txt'",
+   "kind": "assign",
+   "value": "'index.txt'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:header",
+   "var": "header",
+   "line": 15,
+   "code": "for header in request.headers.keys():",
+   "kind": "loop_target",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": true,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:name",
+   "var": "name",
+   "line": 17,
+   "code": "name = header",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:header"
+   ],
+   "in_loop": true,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "header.lower().startswith('x-file')",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "header.lower().startswith('x-file')",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:header",
+   "s4:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -1,0 +1,64 @@
+{
+ "file_sha256": "9f9e23192c7d8c165c36d90407db4f7c3f3b66c0115e84a6ad4290a999370c07",
+ "function": "handler",
+ "sink": {
+  "statement": "s2",
+  "line": 18,
+  "api": "open",
+  "argument": "os.path.join(ROOT, FILES.get(key, key))",
+  "reads": {
+   "key": [
+    "s1:key"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 17,
+   "kind": "Assign",
+   "code": "key = request.args.get('k', 'a')"
+  },
+  {
+   "id": "s2",
+   "line": 18,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, FILES.get(key, key))).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:key",
+   "var": "key",
+   "line": 17,
+   "code": "key = request.args.get('k', 'a')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join",
+  "FILES.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:key"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

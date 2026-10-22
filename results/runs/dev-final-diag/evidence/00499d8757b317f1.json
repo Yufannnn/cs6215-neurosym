@@ -1,0 +1,86 @@
+{
+ "file_sha256": "369b3d147cb06c4f940db8cac5b742cf5b201329da3def2dc774d846cdff956d",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "open",
+  "argument": "os.path.join(ROOT, target)",
+  "reads": {
+   "target": [
+    "s2:target"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "target = name if name else 'index.txt'"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, target)).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:target",
+   "var": "target",
+   "line": 15,
+   "code": "target = name if name else 'index.txt'",
+   "kind": "assign",
+   "value": "'index.txt' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name",
+   "s2:target"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

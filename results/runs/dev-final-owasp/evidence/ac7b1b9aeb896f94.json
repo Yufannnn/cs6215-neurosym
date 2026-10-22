@@ -1,0 +1,459 @@
+{
+ "file_sha256": "39af55cc93dfdeb468108abf9635d5a2e66e495c011d4bb5700b3cfc18fd6d4c",
+ "function": "handler",
+ "sink": {
+  "statement": "s20",
+  "line": 56,
+  "api": "<path>.exists()",
+  "argument": "p",
+  "reads": {
+   "p": [
+    "s16:p"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.form.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Assign",
+   "code": "bar = 'alsosafe'"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "If",
+   "code": "if param:"
+  },
+  {
+   "id": "s7",
+   "line": 37,
+   "kind": "Assign",
+   "code": "lst = []"
+  },
+  {
+   "id": "s8",
+   "line": 38,
+   "kind": "Expr",
+   "code": "lst.append('safe')"
+  },
+  {
+   "id": "s9",
+   "line": 39,
+   "kind": "Expr",
+   "code": "lst.append(param)"
+  },
+  {
+   "id": "s10",
+   "line": 40,
+   "kind": "Expr",
+   "code": "lst.append('moresafe')"
+  },
+  {
+   "id": "s11",
+   "line": 41,
+   "kind": "Expr",
+   "code": "lst.pop(0)"
+  },
+  {
+   "id": "s12",
+   "line": 42,
+   "kind": "Assign",
+   "code": "bar = lst[1]"
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "kind": "Import",
+   "code": "import pathlib"
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s15",
+   "line": 47,
+   "kind": "Assign",
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)"
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "kind": "Assign",
+   "code": "p = (testfiles / bar).resolve()"
+  },
+  {
+   "id": "s17",
+   "line": 50,
+   "kind": "If",
+   "code": "if not str(p).startswith(str(testfiles)):"
+  },
+  {
+   "id": "s18",
+   "line": 51,
+   "kind": "AugAssign",
+   "code": "RESPONSE += 'Invalid Path.'"
+  },
+  {
+   "id": "s19",
+   "line": 54,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  },
+  {
+   "id": "s20",
+   "line": 56,
+   "kind": "If",
+   "code": "if p.exists():"
+  },
+  {
+   "id": "s21",
+   "line": 57,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\""
+  },
+  {
+   "id": "s22",
+   "line": 59,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\""
+  },
+  {
+   "id": "s23",
+   "line": 61,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = request.form.get('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 33,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:bar",
+   "var": "bar",
+   "line": 35,
+   "code": "bar = 'alsosafe'",
+   "kind": "assign",
+   "value": "'alsosafe'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s7:lst",
+   "var": "lst",
+   "line": 37,
+   "code": "lst = []",
+   "kind": "assign",
+   "value": "[]",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:lst",
+   "var": "lst",
+   "line": 38,
+   "code": "lst.append('safe')",
+   "kind": "mutation",
+   "value": "['safe']",
+   "tainted": false,
+   "depends_on": [
+    "s7:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s9:lst",
+   "var": "lst",
+   "line": 39,
+   "code": "lst.append(param)",
+   "kind": "mutation",
+   "value": "['safe', ''] | ['safe', <tainted>]",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s4:param",
+    "s8:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:lst",
+   "var": "lst",
+   "line": 40,
+   "code": "lst.append('moresafe')",
+   "kind": "mutation",
+   "value": "['safe', '', 'moresafe'] | ['safe', <tainted>, 'moresafe']",
+   "tainted": true,
+   "depends_on": [
+    "s9:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:lst",
+   "var": "lst",
+   "line": 41,
+   "code": "lst.pop(0)",
+   "kind": "mutation",
+   "value": "['', 'moresafe'] | [<tainted>, 'moresafe']",
+   "tainted": true,
+   "depends_on": [
+    "s10:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 42,
+   "code": "bar = lst[1]",
+   "kind": "assign",
+   "value": "'moresafe'",
+   "tainted": false,
+   "depends_on": [
+    "s11:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:testfiles",
+   "var": "testfiles",
+   "line": 47,
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s16:p",
+   "var": "p",
+   "line": 48,
+   "code": "p = (testfiles / bar).resolve()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s12:bar",
+    "s15:testfiles",
+    "s5:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 51,
+   "code": "RESPONSE += 'Invalid Path.'",
+   "kind": "augassign",
+   "value": "'Invalid Path.'",
+   "tainted": false,
+   "depends_on": [
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s21:RESPONSE",
+   "var": "RESPONSE",
+   "line": 57,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s16:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s22:RESPONSE",
+   "var": "RESPONSE",
+   "line": 59,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s16:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "condition": "param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s17",
+   "line": 50,
+   "condition": "not str(p).startswith(str(testfiles))",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s20",
+   "line": 56,
+   "condition": "p.exists()",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s17",
+   "condition": "not str(p).startswith(str(testfiles))",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "testfiles": [
+     "s15:testfiles"
+    ],
+    "p": [
+     "s16:p"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "(testfiles / bar).resolve"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:param",
+   "s9:lst",
+   "s10:lst",
+   "s11:lst"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

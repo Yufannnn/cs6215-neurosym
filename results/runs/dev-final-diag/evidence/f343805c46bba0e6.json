@@ -1,0 +1,98 @@
+{
+ "file_sha256": "fcdb2ebe6a0b5e4e2e70d49f6699bec6413ae78eb3604bbb977ef4071267a5f1",
+ "function": "handler",
+ "sink": {
+  "statement": "s4",
+  "line": 17,
+  "api": "open",
+  "argument": "os.path.join(ROOT, name)",
+  "reads": {
+   "name": [
+    "s1:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if not re.fullmatch('[A-Za-z0-9_]+', name):"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Expr",
+   "code": "abort(400)"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, name)).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "not re.fullmatch('[A-Za-z0-9_]+', name)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "not re.fullmatch('[A-Za-z0-9_]+', name)",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "name": [
+     "s1:name"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

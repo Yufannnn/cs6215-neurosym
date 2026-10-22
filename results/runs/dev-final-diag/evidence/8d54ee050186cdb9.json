@@ -1,0 +1,87 @@
+{
+ "file_sha256": "8f9680ed1e330c3587eb821dd73cde3f422d01a31933f96d9ac0ebaff1d2b65f",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "open",
+  "argument": "os.path.join(ROOT, files.get(key, 'a.txt'))",
+  "reads": {
+   "files": [
+    "s1:files"
+   ],
+   "key": [
+    "s2:key"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "files = {'a': 'a.txt', 'b': 'b.txt'}"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "key = request.args.get('k', 'a')"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, files.get(key, 'a.txt'))).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:files",
+   "var": "files",
+   "line": 14,
+   "code": "files = {'a': 'a.txt', 'b': 'b.txt'}",
+   "kind": "assign",
+   "value": "{'a': 'a.txt', 'b': 'b.txt'}",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:key",
+   "var": "key",
+   "line": 15,
+   "code": "key = request.args.get('k', 'a')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join",
+  "files.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:key"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

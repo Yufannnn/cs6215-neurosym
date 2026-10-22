@@ -1,0 +1,25 @@
+Warning: attacker-controlled data may reach the path argument `{argument}` of `{api}` at line {line} (statement {sink_statement}).
+
+Function source (line numbers on the left):
+```python
+{source}
+```
+
+Key facts from a deterministic intraprocedural analysis of this function (constant folding, branch feasibility, reaching definitions):
+{summary}
+
+Full program evidence. Statement ids (s1, s2, ...) and definition ids (s5:bar = definition of bar at statement s5) refer to this function. Abstract values: <tainted> = attacker-controlled, <trusted> = trusted configuration value, <unknown> = not modelled.
+```json
+{evidence}
+```
+
+Assess four obligations:
+- control: is the value used at the operation attacker-controlled?
+- flow: can attacker data affect this particular path argument?
+- confinement: does a check or safe API confine the value that is actually used at the operation?
+- coverage: does your justification hold for every path that reaches the operation?
+
+Each obligation has a status ("holds", "refuted" or "unknown") and the ids of the statements or definitions supporting it. Suppress only if control or flow is refuted, or if confinement and coverage both hold. Cite only ids that appear in the evidence.
+
+Reply with JSON:
+{{"decision": "retain" | "suppress" | "unknown", "reason_kind": "<one of the allowed kinds>", "evidence_node_ids": [<ids>], "obligations": {{"control": {{"status": "...", "node_ids": [...]}}, "flow": {{"status": "...", "node_ids": [...]}}, "confinement": {{"status": "...", "node_ids": [...]}}, "coverage": {{"status": "...", "node_ids": [...]}}}}, "assumptions": ["<short>"], "rationale": "<at most 50 words>"}}

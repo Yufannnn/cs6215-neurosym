@@ -1,0 +1,377 @@
+{
+ "file_sha256": "caf0d6222d757144ff8fa34af4bfd695ae9045461c0469b50cbf14c5c40cee0b",
+ "function": "handler",
+ "sink": {
+  "statement": "s16",
+  "line": 48,
+  "api": "os.path.exists",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s15:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.headers.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Assign",
+   "code": "bar = 'alsosafe'"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "If",
+   "code": "if param:"
+  },
+  {
+   "id": "s7",
+   "line": 37,
+   "kind": "Assign",
+   "code": "lst = []"
+  },
+  {
+   "id": "s8",
+   "line": 38,
+   "kind": "Expr",
+   "code": "lst.append('safe')"
+  },
+  {
+   "id": "s9",
+   "line": 39,
+   "kind": "Expr",
+   "code": "lst.append(param)"
+  },
+  {
+   "id": "s10",
+   "line": 40,
+   "kind": "Expr",
+   "code": "lst.append('moresafe')"
+  },
+  {
+   "id": "s11",
+   "line": 41,
+   "kind": "Expr",
+   "code": "lst.pop(0)"
+  },
+  {
+   "id": "s12",
+   "line": 42,
+   "kind": "Assign",
+   "code": "bar = lst[1]"
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "kind": "Import",
+   "code": "import os"
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s15",
+   "line": 47,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "kind": "If",
+   "code": "if os.path.exists(fileName):"
+  },
+  {
+   "id": "s17",
+   "line": 49,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\""
+  },
+  {
+   "id": "s18",
+   "line": 51,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\""
+  },
+  {
+   "id": "s19",
+   "line": 53,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = request.headers.get('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 33,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:bar",
+   "var": "bar",
+   "line": 35,
+   "code": "bar = 'alsosafe'",
+   "kind": "assign",
+   "value": "'alsosafe'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s7:lst",
+   "var": "lst",
+   "line": 37,
+   "code": "lst = []",
+   "kind": "assign",
+   "value": "[]",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:lst",
+   "var": "lst",
+   "line": 38,
+   "code": "lst.append('safe')",
+   "kind": "mutation",
+   "value": "['safe']",
+   "tainted": false,
+   "depends_on": [
+    "s7:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s9:lst",
+   "var": "lst",
+   "line": 39,
+   "code": "lst.append(param)",
+   "kind": "mutation",
+   "value": "['safe', ''] | ['safe', <tainted>]",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s4:param",
+    "s8:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:lst",
+   "var": "lst",
+   "line": 40,
+   "code": "lst.append('moresafe')",
+   "kind": "mutation",
+   "value": "['safe', '', 'moresafe'] | ['safe', <tainted>, 'moresafe']",
+   "tainted": true,
+   "depends_on": [
+    "s9:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:lst",
+   "var": "lst",
+   "line": 41,
+   "code": "lst.pop(0)",
+   "kind": "mutation",
+   "value": "['', 'moresafe'] | [<tainted>, 'moresafe']",
+   "tainted": true,
+   "depends_on": [
+    "s10:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 42,
+   "code": "bar = lst[1]",
+   "kind": "assign",
+   "value": "'moresafe'",
+   "tainted": false,
+   "depends_on": [
+    "s11:lst"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:fileName",
+   "var": "fileName",
+   "line": 47,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s12:bar",
+    "s5:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s17:RESPONSE",
+   "var": "RESPONSE",
+   "line": 49,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s15:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 51,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s15:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "condition": "param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "condition": "os.path.exists(fileName)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:param",
+   "s9:lst",
+   "s10:lst",
+   "s11:lst"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

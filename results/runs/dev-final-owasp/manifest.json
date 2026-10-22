@@ -1,0 +1,60 @@
+{
+ "name": "dev-final-owasp",
+ "arms": [
+  "S",
+  "D",
+  "L",
+  "E",
+  "EC"
+ ],
+ "model": "qwen3-coder-next",
+ "model_config": {
+  "role": "primary",
+  "extra_body": {}
+ },
+ "replicate": 0,
+ "prompt_version": "p2",
+ "offline_replay": false,
+ "git": {
+  "commit": "4202f9bb838032b21afb77fef21d26821fb28810",
+  "dirty": true,
+  "freeze_tag": null
+ },
+ "baseline": {
+  "semgrep": "1.182.1",
+  "rule": "baseline/rules/cwe22-taint.yaml",
+  "rule_sha256": "9afd5c32c7431a84e8dba575946d7e9066621c6dbfc26778f340d35d0e18535f",
+  "python": "3.14.0",
+  "platform": "Darwin arm64"
+ },
+ "subjects": 34,
+ "corpora": [
+  "owasp"
+ ],
+ "splits": [
+  "dev"
+ ],
+ "alerts": 25,
+ "extraction": {
+  "ok": 25,
+  "unsupported": 0
+ },
+ "timing_s": {
+  "baseline": 0.74,
+  "extraction": 0.03,
+  "llm_L": 107.24,
+  "llm_E": 44.7
+ },
+ "llm": {
+  "calls": 50,
+  "uncached_calls": 50,
+  "prompt_tokens": 131965,
+  "completion_tokens": 9258,
+  "served_models": [
+   "qwen3-coder-next"
+  ],
+  "fingerprints": [
+   "vllm-0.26.0-1cf708c9"
+  ]
+ }
+}

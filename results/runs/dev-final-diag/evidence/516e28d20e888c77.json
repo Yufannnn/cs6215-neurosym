@@ -1,0 +1,84 @@
+{
+ "file_sha256": "6e8c6f3c8fffaa99649ba081050b68485991b0d3afaa65db9715a24230d00350",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "open",
+  "argument": "f'{ROOT}/{digest}.cache'",
+  "reads": {
+   "digest": [
+    "s2:digest"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "digest = hashlib.sha256(name.encode()).hexdigest()"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return open(f'{ROOT}/{digest}.cache').read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:digest",
+   "var": "digest",
+   "line": 15,
+   "code": "digest = hashlib.sha256(name.encode()).hexdigest()",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name",
+   "s2:digest"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

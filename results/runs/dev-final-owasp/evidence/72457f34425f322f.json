@@ -1,0 +1,279 @@
+{
+ "file_sha256": "19e6c10cbc7000fd561abe3001401a5b7f61a241115a64a25025966383c10f0b",
+ "function": "handler",
+ "sink": {
+  "statement": "s12",
+  "line": 52,
+  "api": "<path>.exists()",
+  "argument": "p",
+  "reads": {
+   "p": [
+    "s11:p"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 36,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 38,
+   "kind": "Import",
+   "code": "import urllib.parse"
+  },
+  {
+   "id": "s3",
+   "line": 39,
+   "kind": "Assign",
+   "code": "param = urllib.parse.unquote_plus(request.cookies.get('Handler', 'noCookieValueSupplied'))"
+  },
+  {
+   "id": "s4",
+   "line": 41,
+   "kind": "Assign",
+   "code": "TestParam = 'This should never happen'"
+  },
+  {
+   "id": "s5",
+   "line": 42,
+   "kind": "If",
+   "code": "if 'should' not in TestParam:"
+  },
+  {
+   "id": "s6",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = 'Ifnot case passed'"
+  },
+  {
+   "id": "s7",
+   "line": 45,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s8",
+   "line": 47,
+   "kind": "Import",
+   "code": "import pathlib"
+  },
+  {
+   "id": "s9",
+   "line": 48,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s10",
+   "line": 50,
+   "kind": "Assign",
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)"
+  },
+  {
+   "id": "s11",
+   "line": 51,
+   "kind": "Assign",
+   "code": "p = testfiles / bar"
+  },
+  {
+   "id": "s12",
+   "line": 52,
+   "kind": "If",
+   "code": "if p.exists():"
+  },
+  {
+   "id": "s13",
+   "line": 53,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\""
+  },
+  {
+   "id": "s14",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\""
+  },
+  {
+   "id": "s15",
+   "line": 57,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 36,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 39,
+   "code": "param = urllib.parse.unquote_plus(request.cookies.get('Handler', 'noCookieValueSupplied'))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:TestParam",
+   "var": "TestParam",
+   "line": 41,
+   "code": "TestParam = 'This should never happen'",
+   "kind": "assign",
+   "value": "'This should never happen'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s6:bar",
+   "var": "bar",
+   "line": 43,
+   "code": "bar = 'Ifnot case passed'",
+   "kind": "assign",
+   "value": "'Ifnot case passed'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:bar",
+   "var": "bar",
+   "line": 45,
+   "code": "bar = param",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:testfiles",
+   "var": "testfiles",
+   "line": 50,
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:p",
+   "var": "p",
+   "line": 51,
+   "code": "p = testfiles / bar",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s10:testfiles",
+    "s7:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s13:RESPONSE",
+   "var": "RESPONSE",
+   "line": 53,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s14:RESPONSE",
+   "var": "RESPONSE",
+   "line": 55,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s5",
+   "line": 42,
+   "condition": "'should' not in TestParam",
+   "feasible_true": false,
+   "feasible_false": true
+  },
+  {
+   "id": "s12",
+   "line": 52,
+   "condition": "p.exists()",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s3:param",
+   "s7:bar",
+   "s11:p"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

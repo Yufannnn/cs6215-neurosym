@@ -1,0 +1,94 @@
+# CWE-22 path traversal, Python, Semgrep CE taint mode.
+# Project-authored (not an unmodified registry rule). Mirrors configs/policy.yaml.
+# Developed on the OWASP development split and tests/fixtures only; frozen at protocol-freeze.
+rules:
+- id: cwe22-path-traversal
+  mode: taint
+  languages: [python]
+  severity: ERROR
+  message: Attacker-controlled data reaches a filesystem path argument (CWE-22).
+  metadata:
+    cwe: ["CWE-22"]
+    authored_by: cs6215-neurosym
+  pattern-sources:
+    - pattern: flask.request.$ATTR
+    - pattern: $W.get_form_parameter(...)
+    - pattern: $W.get_query_parameter(...)
+    - pattern: $W.get_cookie(...)
+    - pattern: helpers.utils.get_parameter(...)
+    - pattern: helpers.utils.get_parameter_list(...)
+  pattern-propagators:
+    # side-effecting container / config updates taint the receiver
+    - pattern: $C.append($X)
+      from: $X
+      to: $C
+    - pattern: $C.extend($X)
+      from: $X
+      to: $C
+    - pattern: $C.insert($I, $X)
+      from: $X
+      to: $C
+    - pattern: $C.add($X)
+      from: $X
+      to: $C
+    - pattern: $C.update($X)
+      from: $X
+      to: $C
+    - pattern: $C.set(..., $X)
+      from: $X
+      to: $C
+    - pattern: $C.write($X)
+      from: $X
+      to: $C
+  pattern-sanitizers:
+    - pattern: werkzeug.utils.secure_filename(...)
+    - pattern: secure_filename(...)
+    - pattern: $W.get_safe_value(...)
+  pattern-sinks:
+    - patterns:
+        - pattern-either:
+            - pattern: open($P, ...)
+            - pattern: io.open($P, ...)
+            - pattern: codecs.open($P, ...)
+            - pattern: os.open($P, ...)
+            - pattern: os.path.exists($P)
+            - pattern: os.path.lexists($P)
+            - pattern: os.path.isfile($P)
+            - pattern: os.path.isdir($P)
+            - pattern: os.path.getsize($P)
+            - pattern: os.path.getmtime($P)
+            - pattern: os.remove($P, ...)
+            - pattern: os.unlink($P, ...)
+            - pattern: os.rmdir($P, ...)
+            - pattern: os.mkdir($P, ...)
+            - pattern: os.makedirs($P, ...)
+            - pattern: os.listdir($P)
+            - pattern: os.scandir($P)
+            - pattern: os.stat($P, ...)
+            - pattern: shutil.copy($P, ...)
+            - pattern: shutil.copy($S, $P, ...)
+            - pattern: shutil.copyfile($P, ...)
+            - pattern: shutil.copyfile($S, $P, ...)
+            - pattern: shutil.move($P, ...)
+            - pattern: shutil.move($S, $P, ...)
+            - pattern: shutil.rmtree($P, ...)
+            - pattern: flask.send_file($P, ...)
+            - pattern: flask.send_from_directory($P, ...)
+        - focus-metavariable: $P
+    - patterns:
+        - pattern-either:
+            - pattern: $P.open(...)
+            - pattern: $P.read_text(...)
+            - pattern: $P.read_bytes(...)
+            - pattern: $P.write_text(...)
+            - pattern: $P.write_bytes(...)
+            - pattern: $P.exists(...)
+            - pattern: $P.is_file(...)
+            - pattern: $P.is_dir(...)
+            - pattern: $P.stat(...)
+            - pattern: $P.unlink(...)
+            - pattern: $P.rmdir(...)
+            - pattern: $P.mkdir(...)
+            - pattern: $P.touch(...)
+            - pattern: $P.iterdir(...)
+        - focus-metavariable: $P

@@ -26,3 +26,25 @@ Format: date, what changed, why, and evidence (run, commit or result file).
 - **Real-world selection.** TP retention needs targets that S actually reports, so retention is measured only on S-reported targets, and S's coverage of every target is reported. Selection uses feasibility criteria only.
 - **Diagnostic labels validated mechanically.** A stubbed-filesystem harness runs payloads against each fixture. This is an independent check that does not rely on the author's intended label. It is used only for ground truth, never by the analyzer.
 - **Small model:** `qwen3.5:9b` with `reasoning_effort="none"`, the same non-thinking regime as the primary model.
+
+## 2026-10-22: Development iterations (all on development data)
+
+| Iteration | Change | Evidence (development runs in `results/runs/`) |
+|---|---|---|
+| Rule v1 | Taint rule with project sources, helper contracts, container and config propagators | `dev-offline-D`: S TP 4, FP 21, FN 3 on OWASP dev |
+| Slices | Tried slice propagators, rule options and taint labels; none restore taint through `s[a:b]`; kept as a documented engine limitation | Probe files in the session log; all 3 dev FN are slices |
+| Extractor: loop exits | `break`/`continue` states were dropped, so 00618 (vulnerable) looked constant. Fixed: exits rejoin after the loop | Regression test `test_loop_break_carries_taint` |
+| Extractor: loops | Single-pass loops forced "incomplete" on 2 provable dev cases; replaced with fixpoint iteration plus widening | `test_loop_over_constants_reaches_fixpoint`, `test_non_converging_loop_is_incomplete` |
+| Guard coverage | "Same value" was a variable-name test; replaced with a dependency-slice cut (no tainted origin reachable without crossing the guarded definitions) | `test_blocklist_guard_covers_but_is_not_sound`, `test_one_guarded_branch_does_not_cover_alternative` |
+| Prompts p1 → p2 | p1: E ignored deterministic facts and confused reason kinds; the gate rejected 4 of 6 E suppressions, and 2 of them cited real but unlisted definitions. p2: facts digest before the JSON, precise reason-kind definitions (shared system prompt, so L benefits too), every definition listed with `in_sink_slice` | `dev-smoke` (p1): E FP-removal 0.286, EC 0.095. `dev-p2`: E 0.857, EC 0.857 |
+| Rate limits | 17/25 E calls failed with `RateLimitError` at concurrency 3. Added transport backoff | `dev-p2` rerun: 0 failures, 7 retries |
+| Output tolerance | Accept obligations given as bare status strings (1 dev reply) | `test_validate_rejects_malformed` |
+| abort() | `if bad: abort(403)` was not treated as an exit, so no guard was recognised. Non-returning calls now end the path | `test_sound_containment_commonpath` |
+| Identity masking | Route paths leaked the category (`/benchmark/pathtraver-00/`); masked with test IDs | `test_prompts_never_contain_labels_or_case_ids` |
+| Aliasing | `alias = parts; alias.append(x)` would have been treated as not mutating `parts` (D would wrongly suppress); container aliasing now marks the analysis incomplete | `test_container_alias_is_incomplete` |
+| Diagnostic labels | The validator rejected 4 intended labels: both `checked_vs_original` "vulnerable" programs were safe (normalised and raw joins coincide without symlinks), and the `guard_other_value` validator gave both inputs the same payload. Redesigned the first two with decode-after-check; the validator now varies input groups independently | `label_validation.csv`: 72/72 agree |
+
+Final development numbers before freezing (`dev-final-owasp`, `dev-final-diag`):
+
+- **OWASP dev (34 cases):** D, E and EC all remove 19/21 false positives with full TP retention; L removes 4/21.
+- **Diagnostic dev (24 programs):** D removes 5/10 false positives, 0 wrongful; L 9/10 with 3 wrongful; E 8/10 with 1 wrongful; EC 7/10 with 1 wrongful (`semantic_judgment_remaining`: `re.match` taken as a full allow-list).

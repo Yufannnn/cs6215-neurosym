@@ -1,0 +1,98 @@
+{
+ "file_sha256": "cdb3c01a40b1260bb8d6ab5b5ec715ff90a1ae4bbda3add8f186e7849eb7498a",
+ "function": "handler",
+ "sink": {
+  "statement": "s4",
+  "line": 20,
+  "api": "open",
+  "argument": "os.path.join(ROOT, name)",
+  "reads": {
+   "name": [
+    "s1:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 17,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 18,
+   "kind": "If",
+   "code": "if name not in ALLOWED:"
+  },
+  {
+   "id": "s3",
+   "line": 19,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s4",
+   "line": 20,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, name)).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 17,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 18,
+   "condition": "name not in ALLOWED",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "name not in ALLOWED",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "name": [
+     "s1:name"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

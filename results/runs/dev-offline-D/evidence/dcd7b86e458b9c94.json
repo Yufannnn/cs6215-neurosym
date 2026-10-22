@@ -1,0 +1,244 @@
+{
+ "file_sha256": "f82e2475c6fdd028ac28900486b095a3826fa9b40ebb65375a3d924f1b96b294",
+ "function": "handler",
+ "sink": {
+  "statement": "s21",
+  "line": 55,
+  "api": "open",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s20:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.args.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Assign",
+   "code": "possible = 'ABC'"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "guess = possible[1]"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Match",
+   "code": "match guess:"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "case",
+   "code": "case 'A':"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "case",
+   "code": "case 'B':"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "Assign",
+   "code": "bar = 'bob'"
+  },
+  {
+   "id": "s12",
+   "line": 43,
+   "kind": "case",
+   "code": "case 'C' | 'D':"
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "kind": "case",
+   "code": "case _:"
+  },
+  {
+   "id": "s15",
+   "line": 46,
+   "kind": "Assign",
+   "code": "bar = \"bob's your uncle\""
+  },
+  {
+   "id": "s16",
+   "line": 48,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s17",
+   "line": 50,
+   "kind": "Assign",
+   "code": "fileName = None"
+  },
+  {
+   "id": "s18",
+   "line": 51,
+   "kind": "Assign",
+   "code": "fd = None"
+  },
+  {
+   "id": "s19",
+   "line": 53,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s20",
+   "line": 54,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s21",
+   "line": 55,
+   "kind": "With",
+   "code": "with open(fileName, 'rb') as fd:"
+  },
+  {
+   "id": "s22",
+   "line": 56,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"The beginning of file: '{escape_for_html(fileName)}' is:\\n\\n{escape_for_html(fd.read(1000).decode('utf-8'))}\""
+  },
+  {
+   "id": "s23",
+   "line": 61,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Problem reading from file '{{escape_for_html(fileName)}}': {escape_for_html(e.strerror)}\""
+  },
+  {
+   "id": "s24",
+   "line": 66,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s11:bar",
+   "var": "bar",
+   "line": 42,
+   "code": "bar = 'bob'",
+   "kind": "assign",
+   "value": "'bob'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  },
+  {
+   "id": "s20:fileName",
+   "var": "fileName",
+   "line": 54,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [
+    "s11:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "condition": "match guess: case 'A'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "condition": "match guess: case 'B'",
+   "feasible_true": true,
+   "feasible_false": null
+  },
+  {
+   "id": "s12",
+   "line": 43,
+   "condition": "match guess: case 'C' | 'D'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "condition": "match guess: case _",
+   "feasible_true": false,
+   "feasible_false": null
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [
+   "s9:bar",
+   "s13:bar"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

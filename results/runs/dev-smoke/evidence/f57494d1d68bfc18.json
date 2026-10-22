@@ -1,0 +1,229 @@
+{
+ "file_sha256": "ec1b04f143f398d78fffca63731c417d760d281222c8b5389174933fdb39cafa",
+ "function": "handler",
+ "sink": {
+  "statement": "s20",
+  "line": 53,
+  "api": "codecs.open",
+  "argument": "f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+  "reads": {
+   "bar": [
+    "s12:bar"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "values = request.args.getlist('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "If",
+   "code": "if values:"
+  },
+  {
+   "id": "s5",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = values[0]"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "possible = 'ABC'"
+  },
+  {
+   "id": "s7",
+   "line": 37,
+   "kind": "Assign",
+   "code": "guess = possible[1]"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Match",
+   "code": "match guess:"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "case",
+   "code": "case 'A':"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "case",
+   "code": "case 'B':"
+  },
+  {
+   "id": "s12",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = 'bob'"
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "kind": "case",
+   "code": "case 'C' | 'D':"
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s15",
+   "line": 46,
+   "kind": "case",
+   "code": "case _:"
+  },
+  {
+   "id": "s16",
+   "line": 47,
+   "kind": "Assign",
+   "code": "bar = \"bob's your uncle\""
+  },
+  {
+   "id": "s17",
+   "line": 49,
+   "kind": "Import",
+   "code": "import codecs"
+  },
+  {
+   "id": "s18",
+   "line": 50,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s19",
+   "line": 52,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s20",
+   "line": 53,
+   "kind": "Assign",
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')"
+  },
+  {
+   "id": "s21",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\""
+  },
+  {
+   "id": "s22",
+   "line": 59,
+   "kind": "AugAssign",
+   "code": "RESPONSE += ' And file already exists.'"
+  },
+  {
+   "id": "s23",
+   "line": 64,
+   "kind": "AugAssign",
+   "code": "RESPONSE += \" But file doesn't exist yet.\""
+  },
+  {
+   "id": "s24",
+   "line": 68,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 43,
+   "code": "bar = 'bob'",
+   "kind": "assign",
+   "value": "'bob'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 33,
+   "condition": "values",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "condition": "match guess: case 'A'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "condition": "match guess: case 'B'",
+   "feasible_true": true,
+   "feasible_false": null
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "condition": "match guess: case 'C' | 'D'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s15",
+   "line": 46,
+   "condition": "match guess: case _",
+   "feasible_true": false,
+   "feasible_false": null
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [
+   "s10:bar",
+   "s14:bar"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

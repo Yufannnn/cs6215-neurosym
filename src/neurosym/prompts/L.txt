@@ -1,0 +1,9 @@
+Warning: attacker-controlled data may reach the path argument `{argument}` of `{api}` at line {line}.
+
+Function source (line numbers on the left):
+```python
+{source}
+```
+
+Reply with JSON:
+{{"decision": "retain" | "suppress" | "unknown", "reason_kind": "<one of the allowed kinds>", "evidence_lines": [<line numbers supporting your decision>], "rationale": "<at most 50 words>"}}
