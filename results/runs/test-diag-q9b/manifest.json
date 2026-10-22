@@ -1,0 +1,62 @@
+{
+ "name": "test-diag-q9b",
+ "arms": [
+  "S",
+  "D",
+  "L",
+  "E",
+  "EC"
+ ],
+ "model": "qwen3.5:9b",
+ "model_config": {
+  "role": "small-model check",
+  "extra_body": {
+   "reasoning_effort": "none"
+  }
+ },
+ "replicate": 0,
+ "prompt_version": "p2",
+ "offline_replay": false,
+ "git": {
+  "commit": "8168a2f989805ad3b6c6d0b409a7e52454e43631",
+  "dirty": false,
+  "freeze_tag": "e75213b653515aaa683c57d93f84fbbf2a58846e"
+ },
+ "baseline": {
+  "semgrep": "1.182.1",
+  "rule": "baseline/rules/cwe22-taint.yaml",
+  "rule_sha256": "9afd5c32c7431a84e8dba575946d7e9066621c6dbfc26778f340d35d0e18535f",
+  "python": "3.14.0",
+  "platform": "Darwin arm64"
+ },
+ "subjects": 48,
+ "corpora": [
+  "diag"
+ ],
+ "splits": [
+  "test"
+ ],
+ "alerts": 42,
+ "extraction": {
+  "ok": 41,
+  "unsupported": 1
+ },
+ "timing_s": {
+  "baseline": 0.8,
+  "extraction": 0.02,
+  "llm_L": 321.41,
+  "llm_E": 178.76
+ },
+ "llm": {
+  "calls": 84,
+  "uncached_calls": 84,
+  "prompt_tokens": 99690,
+  "completion_tokens": 13835,
+  "served_models": [
+   "qwen3.5:9b"
+  ],
+  "fingerprints": [
+   "fp_ollama"
+  ]
+ }
+}

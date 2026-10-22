@@ -1,0 +1,143 @@
+{
+ "file_sha256": "d0ad6169199bd207d15f9f1ba0856cd9fbe4a774d1a1bbcda98f5272160c989d",
+ "function": "handler",
+ "sink": {
+  "statement": "s6",
+  "line": 19,
+  "api": "open",
+  "argument": "os.path.realpath(os.path.join(ROOT, name))",
+  "reads": {
+   "name": [
+    "s1:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "other = request.args.get('g', '')"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Assign",
+   "code": "checked = os.path.realpath(os.path.join(ROOT, other))"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "If",
+   "code": "if os.path.commonpath([ROOT, checked]) != ROOT:"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s6",
+   "line": 19,
+   "kind": "Return",
+   "code": "return open(os.path.realpath(os.path.join(ROOT, name))).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:other",
+   "var": "other",
+   "line": 15,
+   "code": "other = request.args.get('g', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s3:checked",
+   "var": "checked",
+   "line": 16,
+   "code": "checked = os.path.realpath(os.path.join(ROOT, other))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:other"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 17,
+   "condition": "os.path.commonpath([ROOT, checked]) != ROOT",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s4",
+   "condition": "os.path.commonpath([ROOT, checked]) != ROOT",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "checked": [
+     "s3:checked"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s1:name"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

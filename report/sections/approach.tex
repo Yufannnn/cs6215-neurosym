@@ -1,15 +1,16 @@
 \section{Approach: Evidence-Checked Triage}
 \label{sec:approach}
 
-Figure~\ref{fig:pipeline} summarizes the pipeline. All components after the baseline are our own design and implementation, about 1{,}900 lines of Python. The model is reached through the NUS SoCLaaS service; no existing neuro-symbolic analyzer, released tool or prebuilt workflow is used.
+Figure~\ref{fig:pipeline} summarizes the pipeline. All components after the baseline are our own design and implementation, about 2{,}000 lines of Python. The model is reached through the NUS SoCLaaS service; no existing neuro-symbolic analyzer, released tool or prebuilt workflow is used.
 
 \begin{figure}[t]
-\centering\small
+\centering
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}c@{}}
 Semgrep CE taint rule $\rightarrow$ alerts $A$ $\rightarrow$ evidence extractor $\rightarrow$ EvidenceRecord\\[2pt]
 $\swarrow$ \hspace{3em} $\downarrow$ \hspace{3em} $\searrow$\\
 \textbf{D}: recognizers \quad \textbf{L}: code-only LLM \quad \textbf{E}: evidence LLM $\rightarrow$ \textbf{EC}: gate\\
-\end{tabular}
+\end{tabular}}
 \caption{Every arm keeps or drops alerts in $A$; E and EC share the same model responses.}
 \label{fig:pipeline}
 \end{figure}
@@ -54,7 +55,12 @@ D suppresses an alert only if the record is complete and one of these holds:
 \item the sink is unreachable;
 \item the sink value is constant or trusted on every feasible path (an overwrite or an infeasible branch);
 \item a documented safe API applies with its preconditions;
-\item \emph{sound containment}: the sink value is a single definition produced by \texttt{os.path.realpath}, \texttt{os.path.abspath} or \texttt{Path.resolve()}, and a dominating guard on that same definition requires \texttt{startswith(root + os.sep)}, \texttt{commonpath([root, v]) == root} or \texttt{is\_relative\_to(root)}.
+\item \emph{sound containment}: the sink value is one definition normalized by \texttt{realpath}, \texttt{abspath} or \texttt{resolve()}, and a guard dominating the sink tests that same definition with one of:
+\begin{itemize}
+\item \texttt{v.startswith(root + os.sep)}
+\item \texttt{commonpath([root, v]) == root}
+\item \texttt{v.is\_relative\_to(root)}
+\end{itemize}
 \end{enumerate}
 String-prefix checks without a separator, containment on an unnormalized path, and block-lists (\texttt{'../' in name}) are deliberately \emph{not} recognized.
 

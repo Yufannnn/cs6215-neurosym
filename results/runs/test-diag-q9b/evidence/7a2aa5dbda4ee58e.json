@@ -1,0 +1,136 @@
+{
+ "file_sha256": "a053b6f3d18f8b6990a04bf05ead148b9b8b954be67d8dac2ca8be9ff8c684ad",
+ "function": "handler",
+ "sink": {
+  "statement": "s7",
+  "line": 20,
+  "api": "os.path.exists",
+  "argument": "os.path.join(ROOT, name)",
+  "reads": {
+   "name": [
+    "s4:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "kind = 'a'"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Match",
+   "code": "match kind:"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "case",
+   "code": "case 'a':"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Assign",
+   "code": "name = 'a.txt'"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "case",
+   "code": "case _:"
+  },
+  {
+   "id": "s6",
+   "line": 19,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', 'b.txt')"
+  },
+  {
+   "id": "s7",
+   "line": 20,
+   "kind": "Return",
+   "code": "return os.path.exists(os.path.join(ROOT, name))"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:kind",
+   "var": "kind",
+   "line": 14,
+   "code": "kind = 'a'",
+   "kind": "assign",
+   "value": "'a'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s4:name",
+   "var": "name",
+   "line": 17,
+   "code": "name = 'a.txt'",
+   "kind": "assign",
+   "value": "'a.txt'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:name",
+   "var": "name",
+   "line": 19,
+   "code": "name = request.args.get('f', 'b.txt')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "match kind: case 'a'",
+   "feasible_true": true,
+   "feasible_false": null
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "condition": "match kind: case _",
+   "feasible_true": false,
+   "feasible_false": null
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "trusted",
+  "sink_value": "<trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [
+   "s6:name"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

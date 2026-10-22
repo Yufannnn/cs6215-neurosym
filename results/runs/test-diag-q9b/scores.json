@@ -1,0 +1,353 @@
+{
+ "metrics": {
+  "S": {
+   "units": 48,
+   "positives": 24,
+   "tp": 23,
+   "fp": 19,
+   "fn": 1,
+   "tn": 5,
+   "precision": 0.5476190476190477,
+   "recall": 0.9583333333333334,
+   "f1": 0.696969696969697,
+   "tp_retention": 1.0,
+   "fp_removal": 0.0,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.9583333333333334
+  },
+  "D": {
+   "units": 48,
+   "positives": 24,
+   "tp": 23,
+   "fp": 6,
+   "fn": 1,
+   "tn": 18,
+   "precision": 0.7931034482758621,
+   "recall": 0.9583333333333334,
+   "f1": 0.8679245283018867,
+   "tp_retention": 1.0,
+   "fp_removal": 0.6842105263157895,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.9583333333333334
+  },
+  "L": {
+   "units": 48,
+   "positives": 24,
+   "tp": 15,
+   "fp": 4,
+   "fn": 9,
+   "tn": 20,
+   "precision": 0.7894736842105263,
+   "recall": 0.625,
+   "f1": 0.6976744186046512,
+   "tp_retention": 0.6521739130434783,
+   "fp_removal": 0.7894736842105263,
+   "wrongful_suppressions": 8,
+   "baseline_recall": 0.9583333333333334
+  },
+  "E": {
+   "units": 48,
+   "positives": 24,
+   "tp": 23,
+   "fp": 7,
+   "fn": 1,
+   "tn": 17,
+   "precision": 0.7666666666666667,
+   "recall": 0.9583333333333334,
+   "f1": 0.8518518518518519,
+   "tp_retention": 1.0,
+   "fp_removal": 0.631578947368421,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.9583333333333334
+  },
+  "EC": {
+   "units": 48,
+   "positives": 24,
+   "tp": 23,
+   "fp": 7,
+   "fn": 1,
+   "tn": 17,
+   "precision": 0.7666666666666667,
+   "recall": 0.9583333333333334,
+   "f1": 0.8518518518518519,
+   "tp_retention": 1.0,
+   "fp_removal": 0.631578947368421,
+   "wrongful_suppressions": 0,
+   "baseline_recall": 0.9583333333333334
+  }
+ },
+ "ci95": {
+  "S": {
+   "precision": [
+    0.5,
+    0.6176
+   ],
+   "recall": [
+    0.875,
+    1.0
+   ],
+   "f1": [
+    0.6667,
+    0.75
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.0,
+    0.0
+   ]
+  },
+  "D": {
+   "precision": [
+    0.6667,
+    0.9583
+   ],
+   "recall": [
+    0.875,
+    1.0
+   ],
+   "f1": [
+    0.7797,
+    0.96
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.4118,
+    0.9412
+   ]
+  },
+  "L": {
+   "precision": [
+    0.7083,
+    0.9286
+   ],
+   "recall": [
+    0.375,
+    0.8333
+   ],
+   "f1": [
+    0.5143,
+    0.8182
+   ],
+   "tp_retention": [
+    0.4091,
+    0.875
+   ],
+   "fp_removal": [
+    0.6,
+    0.9474
+   ]
+  },
+  "E": {
+   "precision": [
+    0.6571,
+    0.92
+   ],
+   "recall": [
+    0.875,
+    1.0
+   ],
+   "f1": [
+    0.7742,
+    0.9412
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.3529,
+    0.8889
+   ]
+  },
+  "EC": {
+   "precision": [
+    0.6571,
+    0.92
+   ],
+   "recall": [
+    0.875,
+    1.0
+   ],
+   "f1": [
+    0.7742,
+    0.9412
+   ],
+   "tp_retention": [
+    1.0,
+    1.0
+   ],
+   "fp_removal": [
+    0.3529,
+    0.8889
+   ]
+  }
+ },
+ "retained_units": {
+  "S": [
+   "absolute_join1_safe",
+   "absolute_join1_vuln",
+   "absolute_join2_safe",
+   "absolute_join2_vuln",
+   "alternate_branch1_safe",
+   "alternate_branch1_vuln",
+   "alternate_branch2_safe",
+   "alternate_branch2_vuln",
+   "canonicalize_only1_safe",
+   "canonicalize_only1_vuln",
+   "canonicalize_only2_safe",
+   "canonicalize_only2_vuln",
+   "checked_vs_original1_safe",
+   "checked_vs_original1_vuln",
+   "checked_vs_original2_safe",
+   "checked_vs_original2_vuln",
+   "container_alias2_vuln",
+   "guard_other_value1_safe",
+   "guard_other_value1_vuln",
+   "guard_other_value2_safe",
+   "guard_other_value2_vuln",
+   "named_sanitizer1_safe",
+   "named_sanitizer1_vuln",
+   "named_sanitizer2_safe",
+   "named_sanitizer2_vuln",
+   "overwrite1_safe",
+   "overwrite1_vuln",
+   "overwrite2_vuln",
+   "prefix_confusion1_safe",
+   "prefix_confusion1_vuln",
+   "prefix_confusion2_safe",
+   "prefix_confusion2_vuln",
+   "reject_exits1_safe",
+   "reject_exits1_vuln",
+   "reject_exits2_safe",
+   "reject_exits2_vuln",
+   "send_from_directory_base1_vuln",
+   "send_from_directory_base2_vuln",
+   "unreachable_flow1_safe",
+   "unreachable_flow1_vuln",
+   "unreachable_flow2_safe",
+   "unreachable_flow2_vuln"
+  ],
+  "D": [
+   "absolute_join1_safe",
+   "absolute_join1_vuln",
+   "absolute_join2_safe",
+   "absolute_join2_vuln",
+   "alternate_branch1_safe",
+   "alternate_branch1_vuln",
+   "alternate_branch2_vuln",
+   "canonicalize_only1_vuln",
+   "canonicalize_only2_safe",
+   "canonicalize_only2_vuln",
+   "checked_vs_original1_vuln",
+   "checked_vs_original2_vuln",
+   "container_alias2_vuln",
+   "guard_other_value1_vuln",
+   "guard_other_value2_vuln",
+   "named_sanitizer1_safe",
+   "named_sanitizer1_vuln",
+   "named_sanitizer2_safe",
+   "named_sanitizer2_vuln",
+   "overwrite1_vuln",
+   "overwrite2_vuln",
+   "prefix_confusion1_vuln",
+   "prefix_confusion2_vuln",
+   "reject_exits1_vuln",
+   "reject_exits2_vuln",
+   "send_from_directory_base1_vuln",
+   "send_from_directory_base2_vuln",
+   "unreachable_flow1_vuln",
+   "unreachable_flow2_vuln"
+  ],
+  "L": [
+   "absolute_join1_safe",
+   "absolute_join1_vuln",
+   "absolute_join2_vuln",
+   "canonicalize_only1_vuln",
+   "canonicalize_only2_vuln",
+   "container_alias2_vuln",
+   "guard_other_value2_vuln",
+   "named_sanitizer1_safe",
+   "named_sanitizer1_vuln",
+   "named_sanitizer2_vuln",
+   "overwrite1_safe",
+   "overwrite1_vuln",
+   "overwrite2_vuln",
+   "reject_exits1_vuln",
+   "send_from_directory_base1_vuln",
+   "send_from_directory_base2_vuln",
+   "unreachable_flow1_safe",
+   "unreachable_flow1_vuln",
+   "unreachable_flow2_vuln"
+  ],
+  "E": [
+   "absolute_join1_safe",
+   "absolute_join1_vuln",
+   "absolute_join2_safe",
+   "absolute_join2_vuln",
+   "alternate_branch1_safe",
+   "alternate_branch1_vuln",
+   "alternate_branch2_vuln",
+   "canonicalize_only1_vuln",
+   "canonicalize_only2_safe",
+   "canonicalize_only2_vuln",
+   "checked_vs_original1_vuln",
+   "checked_vs_original2_vuln",
+   "container_alias2_vuln",
+   "guard_other_value1_vuln",
+   "guard_other_value2_vuln",
+   "named_sanitizer1_safe",
+   "named_sanitizer1_vuln",
+   "named_sanitizer2_safe",
+   "named_sanitizer2_vuln",
+   "overwrite1_safe",
+   "overwrite1_vuln",
+   "overwrite2_vuln",
+   "prefix_confusion1_vuln",
+   "prefix_confusion2_vuln",
+   "reject_exits1_vuln",
+   "reject_exits2_vuln",
+   "send_from_directory_base1_vuln",
+   "send_from_directory_base2_vuln",
+   "unreachable_flow1_vuln",
+   "unreachable_flow2_vuln"
+  ],
+  "EC": [
+   "absolute_join1_safe",
+   "absolute_join1_vuln",
+   "absolute_join2_safe",
+   "absolute_join2_vuln",
+   "alternate_branch1_safe",
+   "alternate_branch1_vuln",
+   "alternate_branch2_vuln",
+   "canonicalize_only1_vuln",
+   "canonicalize_only2_safe",
+   "canonicalize_only2_vuln",
+   "checked_vs_original1_vuln",
+   "checked_vs_original2_vuln",
+   "container_alias2_vuln",
+   "guard_other_value1_vuln",
+   "guard_other_value2_vuln",
+   "named_sanitizer1_safe",
+   "named_sanitizer1_vuln",
+   "named_sanitizer2_safe",
+   "named_sanitizer2_vuln",
+   "overwrite1_safe",
+   "overwrite1_vuln",
+   "overwrite2_vuln",
+   "prefix_confusion1_vuln",
+   "prefix_confusion2_vuln",
+   "reject_exits1_vuln",
+   "reject_exits2_vuln",
+   "send_from_directory_base1_vuln",
+   "send_from_directory_base2_vuln",
+   "unreachable_flow1_vuln",
+   "unreachable_flow2_vuln"
+  ]
+ }
+}

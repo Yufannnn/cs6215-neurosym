@@ -1,0 +1,11 @@
+Taint analyzers report path-traversal (CWE-22) warnings that are often false alarms. Using an LLM to dismiss them is attractive, but a wrongly dismissed warning is a missed vulnerability. We compare five configurations on identical warnings from Semgrep Community Edition:
+\begin{itemize}
+\item the symbolic baseline;
+\item deterministic refinement by our own intraprocedural value analysis;
+\item ordinary LLM triage;
+\item LLM triage over structured program evidence with explicit obligations;
+\item the same LLM responses filtered by an evidence gate that checks the model's claims against extracted facts.
+\end{itemize}
+The subjects are 134 held-out OWASP Benchmark for Python cases, 24 held-out diagnostic program pairs with execution-validated labels, and six real-world vulnerability fixes, evaluated with \texttt{qwen3-coder-next} and \texttt{qwen3.5:9b} under a protocol frozen before testing.
+
+Deterministic refinement removed 36\% (OWASP) and 68\% (pairs) of false warnings without losing a real vulnerability. Ordinary LLM triage removed up to 79\% but discarded up to 35\% of real vulnerabilities. With the primary model, structured evidence kept the same removal with far fewer losses (2 instead of 7 on the pairs). With the smaller model it lost none, but also removed no more than deterministic refinement. The gate added nothing measurable: on OWASP it never went beyond the deterministic recognizers, and its only failures were semantic judgments about guards, which it cannot check by design. Most missed vulnerabilities, including 4 of 6 real-world targets, are lost before triage, in the intraprocedural engine and the sink model.

@@ -48,3 +48,16 @@ Final development numbers before freezing (`dev-final-owasp`, `dev-final-diag`):
 
 - **OWASP dev (34 cases):** D, E and EC all remove 19/21 false positives with full TP retention; L removes 4/21.
 - **Diagnostic dev (24 programs):** D removes 5/10 false positives, 0 wrongful; L 9/10 with 3 wrongful; E 8/10 with 1 wrongful; EC 7/10 with 1 wrongful (`semantic_judgment_remaining`: `re.match` taken as a full allow-list).
+
+## 2026-10-22: After protocol-freeze
+
+No frozen file was changed; `git diff protocol-freeze` over the frozen paths is empty.
+
+- **Real-world selection amended before any real-world run.** The screening rule (3 projects) produced 5 target pairs, below the protocol's 6–10. Amended the rule to "at least 3 projects, add projects in the same deterministic order (up to 4) while there are fewer than 6 pairs". This added `corydolphin/flask-cors`, giving 6 pairs in 4 projects. The change was made before S or any arm was run on real-world code, and does not depend on method results. 45 of the 51 screened commits were rejected: 38 not using Flask request APIs in the changed files, 6 by the project cap, 1 inaccessible commit, 1 with no non-test Python change.
+- **Failure analysis on test data** (no tuning):
+  - S's 23 OWASP misses are slices (15, one also a dict store) and dict-store-then-read-by-key (8): Semgrep CE engine limitations.
+  - D's 21 kept false positives are a `'../'` block-list (8), an always-failing relative prefix check (5), ConfigParser key separation (4) and a `request.path` segment fixed by routing (4).
+- **Post-hoc EC+** (`src/neurosym/extension.py`): two extra gate checks, designed *after* seeing the two wrongful EC suppressions on the held-out pairs. It replays the frozen E responses with no new calls and is reported only as exploratory.
+  - Held-out pairs: TP retention 0.913 → 1.000, FP removal 0.789 → 0.737.
+  - OWASP test: unchanged.
+  - OWASP dev: FP removal 0.905 → 0.762. E gave unsound guards as the reason for values that were actually constant.

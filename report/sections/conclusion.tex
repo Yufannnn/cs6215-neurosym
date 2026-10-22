@@ -1,0 +1,12 @@
+\section{Conclusion}
+
+Within a deliberately narrow scope (Python CWE-22, Flask sources, intraprocedural analysis) the comparison supports four conclusions.
+
+\begin{enumerate}
+\item \textbf{A modest deterministic analysis is a strong refinement.} Constant folding, branch pruning, a loop fixpoint and a handful of sound containment patterns removed all the false warnings that were provably harmless, and never removed a real vulnerability.
+\item \textbf{The value of an LLM is in what the analysis cannot prove,} namely the sufficiency of non-standard checks. That is also where it errs. Ordinary prompting judged nearby checks and reassuring names rather than the value actually consumed, and discarded up to a third of real vulnerabilities. Giving the model the extracted facts kept the gains and removed most of those errors. In our data, the representation mattered more than the model.
+\item \textbf{A gate that verifies evidence structurally is necessary but not sufficient.} It guarantees that a suppression rests on the right value and a dominating check. It cannot tell whether the check confines the path, and both of its accepted mistakes were of exactly that kind. A post-hoc refinement that refuses containment-shaped but unsound guards fixed those two cases, but at the cost of correct suppressions on development data.
+\item \textbf{The bottleneck is upstream.} Slices, dict stores, helpers in other functions and non-file sinks account for most missed vulnerabilities, and for four of six real-world targets. No triage stage can recover these.
+\end{enumerate}
+
+The practical lesson is that a triage stage should be measured by false-positive removal and true-positive retention \emph{together}. A deterministic arm should always be the control: here it matched the best LLM configuration on OWASP at zero risk.

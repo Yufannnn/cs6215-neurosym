@@ -134,7 +134,7 @@ def diagnostic_table(run="test-diag-qcn"):
 def gate_table():
     md = ["| Run | E suppressions | EC accepted: structural | EC accepted: trusted contract | EC accepted: semantic judgment | Rejected by gate |",
           "|---|---|---|---|---|---|"]
-    tex = ["\\begin{tabular}{lrrrrr}", "\\toprule", "Run & E supp. & Struct. & Contract & Semantic & Rejected \\\\", "\\midrule"]
+    tex = ["\\begin{tabular}{lrrrrr}", "\\toprule", "Corpus, model & E supp. & Struct. & Contract & Semantic & Rejected \\\\", "\\midrule"]
     for label, run, model in MAIN:
         r = _run(run)
         if r is None or "EC" not in r["decisions"]:
@@ -143,7 +143,8 @@ def gate_table():
         supp = [d for d in ec if d["e_decision"] == "suppress"]
         cnt = collections.Counter(d["gate"]["category"] for d in supp if d["gate"]["suppress"])
         rej = sum(not d["gate"]["suppress"] for d in supp)
-        row = (f"{label}, {model}", len(supp), cnt["structural_check_passed"], cnt["trusted_contract_matched"],
+        short = {"qwen3-coder-next": "coder-next", "qwen3.5:9b": "9b"}[model]
+        row = (f"{label.split()[0]}, {short}", len(supp), cnt["structural_check_passed"], cnt["trusted_contract_matched"],
                cnt["semantic_judgment_remaining"], rej)
         md.append("| " + " | ".join(str(x) for x in row) + " |")
         tex.append(" & ".join(str(x).replace("_", "\\_") for x in row) + " \\\\")

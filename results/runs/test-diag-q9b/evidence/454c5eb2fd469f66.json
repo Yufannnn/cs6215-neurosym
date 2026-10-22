@@ -1,0 +1,123 @@
+{
+ "file_sha256": "370efde6bf120b120c17414fdf40de64a6370fa8e542fb91091dfa04024413a3",
+ "function": "handler",
+ "sink": {
+  "statement": "s5",
+  "line": 18,
+  "api": "open",
+  "argument": "os.path.join(ROOT, urllib.parse.unquote(name))",
+  "reads": {
+   "name": [
+    "s1:name"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.args.get('f', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "candidate = os.path.realpath(os.path.join(ROOT, name))"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "If",
+   "code": "if os.path.commonpath([ROOT, candidate]) != ROOT:"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, urllib.parse.unquote(name))).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.args.get('f', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:candidate",
+   "var": "candidate",
+   "line": 15,
+   "code": "candidate = os.path.realpath(os.path.join(ROOT, name))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "os.path.commonpath([ROOT, candidate]) != ROOT",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s3",
+   "condition": "os.path.commonpath([ROOT, candidate]) != ROOT",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "candidate": [
+     "s2:candidate"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s1:name"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.join",
+  "urllib.parse.unquote"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}
