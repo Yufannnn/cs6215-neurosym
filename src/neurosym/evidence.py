@@ -167,8 +167,14 @@ class Analyzer:
         self.flags: set[str] = set()
         self.snapshot: Snapshot | None = None
         self.loop_exits: list[list] = []
+        self.raise_points: list[list] = []   # per enclosing try: states from which the body may raise
         self.cur_stmt = None
         self.imports = self._module_imports()
+        self.local_funcs = {n.name for n in ast.walk(func) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                            and n is not func}
+        self.module_funcs = {n.name for n in ast.walk(module) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                             and n is not func} - self.local_funcs
+        self.mutated_globals = _mutated_nonlocals(module)
         self._number(func.body)
 
     # --- bookkeeping
@@ -192,6 +198,7 @@ class Analyzer:
                 if isinstance(child, ast.match_case):
                     cid = f"s{len(self.ids) + 1}"
                     self.ids[id(child)] = cid
+                    child.lineno = child.pattern.lineno  # capture definitions are attributed to the case line
                     self.nodes.append({"id": cid, "line": child.pattern.lineno, "kind": "case",
                                        "code": "case " + ast.unparse(child.pattern) + ":"})
                     self._number(child.body)
@@ -216,7 +223,8 @@ class Analyzer:
     def run(self):
         self.local_imports: dict[str, str] = {}
         state: dict[str, Var] = {}
-        for a in self.func.args.args + self.func.args.kwonlyargs:
+        params = self.func.args
+        for a in params.posonlyargs + params.args + params.kwonlyargs + [x for x in (params.vararg, params.kwarg) if x]:
             d = self._def(a.arg, self.func, frozenset({UNKNOWN}), [], kind="parameter", line=self.func.lineno,
                           code=f"parameter {a.arg}", sid="params")
             state[a.arg] = Var(d.values, frozenset({d.id}))
@@ -242,6 +250,10 @@ class Analyzer:
             if state is None:
                 return None
             ctx = (loop, handler, dead)
+            if self.raise_points and not dead:  # any statement may raise into an enclosing try
+                point = copy.deepcopy(state)
+                for col in self.raise_points:
+                    col.append(point)
             if s is self.sink_stmt and (self.snapshot is None or loop):  # in loops: keep the fixpoint pass
                 self.snapshot = Snapshot(copy.deepcopy(state), list(conds), loop, handler, dead)
             state = self.stmt(s, state, conds, ctx)
@@ -260,6 +272,8 @@ class Analyzer:
             return None
         if isinstance(s, ast.Assign):
             vals, reads = self.ev_reads(s.value, state, ctx)
+            if len(s.targets) > 1 and _has_container(vals):
+                self.flags.add("unsupported:container_alias")  # a = b = [...]: two names for one object
             for t in s.targets:
                 self.assign(t, vals, reads, s, state, ctx)
             return state
@@ -300,6 +314,9 @@ class Analyzer:
             return self.try_stmt(s, state, conds, ctx)
         if isinstance(s, ast.With):
             for item in s.items:
+                if isinstance(item.context_expr, ast.Call) and \
+                        self.dotted(item.context_expr.func) in ("contextlib.suppress", "suppress"):
+                    self.flags.add("unsupported:exception_suppressing_with")
                 vals, reads = self.ev_reads(item.context_expr, state, ctx)
                 if item.optional_vars is not None:
                     self.assign(item.optional_vars, frozenset({UNKNOWN}) if worst(vals) is not TAINT else vals,
@@ -322,6 +339,7 @@ class Analyzer:
                 self.assign(elt, frozenset({worst(vals) or UNKNOWN}) if worst(vals) else frozenset({UNKNOWN}),
                             reads, s, state, ctx, kind)
         elif isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name) and target.value.id in state:
+            self._escapes([rhs], state)
             base = target.value.id
             keys = self.ev(target.slice, state, ctx)
             new = set()
@@ -329,6 +347,7 @@ class Analyzer:
                 new.add(_setitem(cur, k, v))
             self._mutate(base, cap(new), reads + [base], s, state, ctx)
         elif isinstance(target, (ast.Subscript, ast.Attribute)):
+            self._escapes([rhs], state)
             base = _base_name(target)
             if base and base in state and worst(vals) is TAINT:
                 self._mutate(base, cap(set(state[base].values) | {TAINT}), reads + [base], s, state, ctx)
@@ -336,6 +355,11 @@ class Analyzer:
                 self._mutate(base, cap(set(state[base].values) | {UNKNOWN}), reads + [base], s, state, ctx)
         else:
             self.flags.add("unsupported:assign_target")
+
+    def _escapes(self, exprs, state):
+        """A local container stored in or passed to something else gets a second, untracked name."""
+        if any(isinstance(x, ast.Name) and x.id in state and _has_container(state[x.id].values) for x in exprs):
+            self.flags.add("unsupported:container_alias")
 
     def _mutate(self, var, values, reads, s, state, ctx):
         deps = [d for r in reads for d in state.get(r, Var(frozenset(), frozenset())).defs]
@@ -385,9 +409,12 @@ class Analyzer:
             else:
                 ok = True
             sub = copy.deepcopy(state)
-            if isinstance(case.pattern, ast.MatchAs) and case.pattern.name:
-                self.assign(ast.Name(id=case.pattern.name, ctx=ast.Store()), subject, [], case, sub, ctx,
-                            kind="match_capture")
+            top = case.pattern.name if isinstance(case.pattern, ast.MatchAs) else None
+            if top:
+                self.assign(ast.Name(id=top, ctx=ast.Store()), subject, [], case, sub, ctx, kind="match_capture")
+            for name in _captures(case.pattern) - {top}:  # a part of the subject: as severe as its worst element
+                self.assign(ast.Name(id=name, ctx=ast.Store()), frozenset({worst(subject) or UNKNOWN}), [], case,
+                            sub, ctx, kind="match_capture")
             self.branches.append({"id": self.sid(case), "line": case.pattern.lineno,
                                   "condition": f"match {ast.unparse(s.subject)}: case {ast.unparse(case.pattern)}",
                                   "feasible_true": ok, "feasible_false": None})
@@ -407,11 +434,14 @@ class Analyzer:
         loop, handler, dead = ctx
         before = copy.deepcopy(state)
         head, exits_all, out = copy.deepcopy(state), [], None
+        converged = False
         for _ in range(max_rounds):
             inner = copy.deepcopy(head)
             if isinstance(s, ast.For):
                 vals, reads = self.ev_reads(s.iter, inner, (True, handler, dead))
                 elem = frozenset({worst(vals)}) if worst(vals) in (TAINT, UNKNOWN) else _iter_elems(vals)
+                if _has_container(elem):
+                    self.flags.add("unsupported:container_alias")  # the loop variable names a nested container
                 self.assign(s.target, elem, reads, s, inner, (True, handler, dead), kind="loop_target")
             else:
                 self.ev(s.test, inner, ctx)
@@ -420,6 +450,7 @@ class Analyzer:
             exits_all = self.loop_exits.pop()
             new_head = _join([head] + ([out] if out is not None else []) + exits_all)
             if _same_values(new_head, head):
+                converged = True
                 break
             head = new_head
         else:
@@ -428,26 +459,31 @@ class Analyzer:
                            x.defs) for v, x in head.items()}
         after = _join([before, head] + ([out] if out is not None else []) + exits_all)
         if s.orelse:
-            after = self.walk(s.orelse, after, conds, loop, handler, dead)
+            # `else` runs only when the loop ends without break; break and continue exits are not told apart,
+            # so every jump state also bypasses it (an over-approximation)
+            bypass = [copy.deepcopy(x) for x in exits_all] + ([] if converged else [copy.deepcopy(head)])
+            normal = self.walk(s.orelse, after, conds, loop, handler, dead)
+            after = _join([normal] + bypass)
         return after
 
     def try_stmt(self, s, state, conds, ctx):
+        """Any statement in the body may raise, so handlers start from every state reached inside it, nested
+        blocks included. A finally block containing the sink also sees abrupt completions (return, raise)."""
         loop, handler, dead = ctx
-        prefix_states = [copy.deepcopy(state)]
-        cur = state
-        for stmt in s.body:
-            if cur is None:
-                break
-            if stmt is self.sink_stmt and (self.snapshot is None or loop):
-                self.snapshot = Snapshot(copy.deepcopy(cur), list(conds), loop, handler, dead)
-            cur = self.stmt(stmt, cur, conds, ctx)
-            if cur is not None:
-                prefix_states.append(copy.deepcopy(cur))
-        outs = [cur] if cur is not None else []
-        if s.orelse and cur is not None:
-            outs = [self.walk(s.orelse, cur, conds, loop, handler, dead)]
-            outs = [o for o in outs if o is not None]
-        entry = _join(prefix_states)
+        if s.finalbody and _jumps_out(s.body + [x for h in s.handlers for x in h.body] + s.orelse):
+            self.flags.add("unsupported:jump_through_finally")
+        self.raise_points.append([copy.deepcopy(state)])
+        body_out = self.walk(s.body, state, conds, loop, handler, dead)
+        body_points = self.raise_points.pop()
+        if body_out is not None:  # also the completed body (an over-approximation kept from the frozen analysis)
+            body_points.append(copy.deepcopy(body_out))
+        self.raise_points.append([])
+        outs = []
+        if body_out is not None:
+            out = self.walk(s.orelse, body_out, conds, loop, handler, dead) if s.orelse else body_out
+            if out is not None:
+                outs.append(out)
+        entry = _join(body_points)
         for h in s.handlers:
             hstate = copy.deepcopy(entry)
             if h.name:
@@ -455,10 +491,18 @@ class Analyzer:
             out = self.walk(h.body, hstate, conds, loop, True, dead)
             if out is not None:
                 outs.append(out)
+        other_points = self.raise_points.pop()
         after = _join(outs) if outs else None
         if s.finalbody:
-            base = after if after is not None else entry
+            abrupt = _join(body_points + other_points)
+            if self.raise_points or _contains(s.finalbody, self.sink_stmt):
+                base = _join([after, abrupt])  # over-approximates the state after the try as well
+            else:
+                base = copy.deepcopy(after) if after is not None else abrupt
             after_f = self.walk(s.finalbody, base, conds, loop, handler, dead)
+            if after_f is not None:
+                for col in self.raise_points:  # a pending exception re-raises after finally
+                    col.append(copy.deepcopy(after_f))
             after = after_f if after is not None else None
         return after
 
@@ -483,7 +527,9 @@ class Analyzer:
             q = self.dotted(e)
             if q == "flask.request":
                 return {TAINT}
-            return {TRUSTED}  # module-level constant, function or module object
+            if e.id in self.mutated_globals or e.id in self.local_funcs or e.id in self.module_funcs:
+                return {UNKNOWN}  # mutated by some function, or a function whose result is not modelled
+            return {TRUSTED}  # module-level constant or module object
         if isinstance(e, ast.Attribute):
             q = self.dotted(e)
             if q and (q == "flask.request" or q.startswith("flask.request.")):
@@ -493,6 +539,8 @@ class Analyzer:
             if w is TAINT:
                 return {TAINT}
             if isinstance(e.value, ast.Name) and e.value.id not in state:
+                if e.value.id in self.mutated_globals:
+                    return {UNKNOWN}
                 return {TRUSTED}  # module attribute, e.g. helpers.utils.TESTFILES_DIR or os.sep
             if q == "os.sep" or e.attr == "sep":
                 return {"/"}
@@ -514,11 +562,13 @@ class Analyzer:
             t = _truth(ev(e.test))
             return (ev(e.body) if t != "false" else set()) | (ev(e.orelse) if t != "true" else set())
         if isinstance(e, (ast.List, ast.Tuple)):
+            self._escapes(e.elts, state)
             elems = [ev(x) for x in e.elts]
             return {("list", tuple(c)) for c in itertools.product(*elems)} if _small(elems) else {_join_worst(elems)}
         if isinstance(e, ast.Dict):
             if any(k is None for k in e.keys):
                 return {UNKNOWN}
+            self._escapes(e.values, state)
             ks, vs = [ev(k) for k in e.keys], [ev(v) for v in e.values]
             if not _small(ks + vs):
                 return {_join_worst(ks + vs)}
@@ -551,6 +601,14 @@ class Analyzer:
         if q in UNSUPPORTED_CALLS:
             self.flags.add(f"unsupported:{q}")
             return {TAINT} if _join_worst(everything) is TAINT else {UNKNOWN}
+        if isinstance(e.func, ast.Name) and (e.func.id in state or e.func.id in self.local_funcs
+                                             or e.func.id in self.module_funcs):
+            # a function defined in this module, or held in a variable: its body is not analysed
+            if e.func.id in self.local_funcs:
+                self.flags.add("unsupported:local_function_call")  # may rebind or mutate captured locals
+            self._escapes(e.args + [k.value for k in e.keywords], state)
+            self._taint_arguments(e, everything, state, ctx)
+            return {TAINT} if _join_worst(everything) is TAINT else {UNKNOWN}
         if q in SANITIZERS:
             return {TRUSTED}
         if q in SOURCE_FUNCS:
@@ -567,14 +625,32 @@ class Analyzer:
                 return set(args[0]) | {""}
             if isinstance(recv_node, ast.Name) and recv_node.id in state:
                 return self.method_on_local(e, recv_node.id, meth, args, state, ctx)
-            return _method_on_value(meth, ev(recv_node), args, everything)
-        # library or module-level function: propagates its inputs (as Semgrep's default does)
+            recv = ev(recv_node)
+            if not all(isinstance(r, str) for r in recv) and meth not in _PURE_METHODS:
+                self._escapes(e.args + [k.value for k in e.keywords], state)
+                self._taint_arguments(e, everything, state, ctx)
+            return _method_on_value(meth, recv, args, everything)
+        # library function: propagates its inputs (as Semgrep's default does)
+        if q not in _NON_RETAINING:
+            self._escapes(e.args + [k.value for k in e.keywords], state)
+            self._taint_arguments(e, everything, state, ctx)
         w = _join_worst(everything)
         return {w} if w in (TAINT, UNKNOWN) else {TRUSTED}
+
+    def _taint_arguments(self, e, everything, state, ctx):
+        """An unmodelled call given attacker data may store it in any mutable local it is also given."""
+        if _join_worst(everything) is not TAINT:
+            return
+        for a in e.args + [k.value for k in e.keywords]:
+            if isinstance(a, ast.Name) and a.id in state and worst(state[a.id].values) is not TAINT and \
+                    not all(isinstance(v, (str, bytes, int, float, bool, type(None))) for v in state[a.id].values):
+                self._mutate(a.id, cap(set(state[a.id].values) | {TAINT}), [a.id], self.cur_stmt, state, ctx)
 
     def method_on_local(self, e, var, meth, args, state, ctx):
         recv = state[var].values
         reads = [var] + [n.id for a in e.args for n in ast.walk(a) if isinstance(n, ast.Name) and n.id in state]
+        if _has_container(recv) or meth not in _PURE_METHODS:
+            self._escapes(e.args + [k.value for k in e.keywords], state)  # e.g. outer.append(inner)
         if meth in _LIST_MUTATORS and any(isinstance(r, tuple) and r and r[0] in ("list", "dict") for r in recv):
             new, results = set(), set()
             for r in recv:
@@ -597,6 +673,70 @@ class Analyzer:
 
 
 # ---------------------------------------------------------------- value helpers
+
+def _has_container(vals) -> bool:
+    return any(isinstance(v, tuple) and v and v[0] in ("list", "dict") for v in vals)
+
+
+def _captures(pattern) -> set:
+    names = set()
+    for n in ast.walk(pattern):
+        if isinstance(n, (ast.MatchAs, ast.MatchStar)) and n.name:
+            names.add(n.name)
+        elif isinstance(n, ast.MatchMapping) and n.rest:
+            names.add(n.rest)
+    return names
+
+
+def _contains(body, target) -> bool:
+    return target is not None and any(n is target for s in body for n in ast.walk(s))
+
+
+def _jumps_out(body) -> bool:
+    """A break or continue in body that leaves it (not one belonging to a loop nested inside it)."""
+    for s in body:
+        if isinstance(s, (ast.Break, ast.Continue)):
+            return True
+        if isinstance(s, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            continue
+        if isinstance(s, (ast.For, ast.While)):
+            if _jumps_out(s.orelse):
+                return True
+            continue
+        if any(_jumps_out(b) for b in _child_blocks(s) if isinstance(b, list)) or \
+                (isinstance(s, ast.Match) and any(_jumps_out(c.body) for c in s.cases)):
+            return True
+    return False
+
+
+_MUTATOR_METHODS = {"append", "extend", "insert", "update", "setdefault", "pop", "popitem", "remove", "clear",
+                    "add", "discard", "set", "read", "read_string", "read_dict", "read_file", "__setitem__"}
+
+
+def _mutated_nonlocals(module) -> set:
+    """Names some function in the module rebinds (global) or mutates without binding them locally.
+
+    Their module-level value is not a trustworthy constant: any handler may have stored request data in them.
+    """
+    out = set()
+    for f in (n for n in ast.walk(module) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))):
+        params = f.args
+        local = {a.arg for a in params.posonlyargs + params.args + params.kwonlyargs} | \
+                {a.arg for a in (params.vararg, params.kwarg) if a} | \
+                {n.id for n in ast.walk(f) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}
+        for n in ast.walk(f):
+            if isinstance(n, ast.Global):
+                out |= set(n.names)
+            elif isinstance(n, (ast.Subscript, ast.Attribute)) and isinstance(n.ctx, (ast.Store, ast.Del)):
+                b = _base_name(n)
+                if b and b not in local:
+                    out.add(b)
+            elif isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and n.func.attr in _MUTATOR_METHODS:
+                b = _base_name(n.func.value)
+                if b and b not in local:
+                    out.add(b)
+    return out
+
 
 def _load(target):
     t = copy.deepcopy(target)
@@ -863,6 +1003,10 @@ _PURE = {
     "pathlib.Path": _path_ctor, "pathlib.PurePath": _path_ctor, "Path": _path_ctor,
 }
 
+# library functions known not to keep a reference to (or mutate) a container argument
+_NON_RETAINING = set(_PURE) | SANITIZERS | NORMALIZERS | SINK_FUNCS | {"len", "repr", "list", "tuple", "sorted",
+                                                                     "print", "bool", "float"}
+
 
 def _join(states):
     states = [s for s in states if s is not None]
@@ -999,8 +1143,9 @@ def _containment(an: Analyzer, snap: Snapshot, target) -> list[dict]:
         if c.node is None or c.reads.get(var) != defs:
             continue
         for atom, required in _atoms(c.node, c.polarity):
-            if required and _is_containment_atom(an, atom, var):
-                out.append({"guard": c.id, "condition": c.code, "recognizer": _is_containment_atom(an, atom, var)})
+            kind = required and _is_containment_atom(an, snap, c, atom, var)
+            if kind:
+                out.append({"guard": c.id, "condition": c.code, "recognizer": kind})
     return out
 
 
@@ -1046,38 +1191,77 @@ def _atoms(test, polarity):
         yield test, polarity
 
 
-def _is_containment_atom(an, atom, var) -> str | None:
+def _is_containment_atom(an, snap, cond, atom, var) -> str | None:
+    """The atom confines the normalised var under a trusted root: v.startswith(root + sep),
+    v.is_relative_to(root) or commonpath([root, v]) == root (the root, not v, on the right)."""
     def is_var(x):
         return _guarded_var(x) == var
 
     if isinstance(atom, ast.Call) and isinstance(atom.func, ast.Attribute):
         if atom.func.attr == "startswith" and is_var(atom.func.value) and len(atom.args) == 1:
-            if _is_root_with_sep(an, atom.args[0]):
+            root = _root_of_prefix(an, atom.args[0])
+            if root is not None and _trusted_root(an, snap, cond, root, var):
                 return "startswith(root + sep)"
         if atom.func.attr == "is_relative_to" and is_var(atom.func.value) and len(atom.args) == 1:
-            return "is_relative_to(root)"
+            if _trusted_root(an, snap, cond, atom.args[0], var):
+                return "is_relative_to(root)"
     if isinstance(atom, ast.Compare) and len(atom.ops) == 1 and isinstance(atom.ops[0], ast.Eq):
         sides = [atom.left, atom.comparators[0]]
         for a, b in (sides, sides[::-1]):
             if isinstance(a, ast.Call) and an.dotted(a.func) == "os.path.commonpath" and len(a.args) == 1 \
                     and isinstance(a.args[0], (ast.List, ast.Tuple)) and len(a.args[0].elts) == 2:
                 elts = a.args[0].elts
-                if any(is_var(x) for x in elts) and any(ast.dump(x) == ast.dump(b) for x in elts):
+                roots = [x for x in elts if not is_var(x)]
+                if len(roots) == 1 and any(is_var(x) for x in elts) and not is_var(b) \
+                        and ast.dump(roots[0]) == ast.dump(b) and _trusted_root(an, snap, cond, b, var):
                     return "commonpath([root, v]) == root"
     return None
 
 
-def _is_root_with_sep(an, e) -> bool:
+def _root_of_prefix(an, e):
+    """root for a prefix of the form root + '/', root + os.sep, os.path.join(root, '') or '/abs/dir/'."""
     if isinstance(e, ast.BinOp) and isinstance(e.op, ast.Add):
         r = e.right
         if (isinstance(r, ast.Constant) and r.value == "/") or an.dotted(r) == "os.sep":
-            return True
+            return e.left
     if isinstance(e, ast.Call) and an.dotted(e.func) == "os.path.join" and len(e.args) == 2 \
             and isinstance(e.args[1], ast.Constant) and e.args[1].value == "":
-        return True
-    if isinstance(e, ast.Constant) and isinstance(e.value, str) and e.value.startswith("/") and e.value.endswith("/"):
-        return True
-    return False
+        return e.args[0]
+    if isinstance(e, ast.Constant) and isinstance(e.value, str) and e.value.endswith("/") and len(e.value) > 1:
+        return ast.Constant(e.value.rstrip("/"))
+    return None
+
+
+_ROOT_FUNCS = {"os.path.join", "os.path.abspath", "os.path.realpath", "os.path.normpath", "str", "pathlib.Path",
+               "pathlib.PurePath", "Path"}
+
+
+def _trusted_root(an, snap, cond, e, var) -> bool:
+    """The root is untainted configuration: built only from constants, module constants and locals whose
+    untainted definitions reach both the guard and the sink, and (when concrete) an absolute non-/ path."""
+    for n in ast.walk(e):
+        if isinstance(n, ast.Name):
+            if n.id == var or (n.id in snap.state and sorted(snap.state[n.id].defs) != cond.reads.get(n.id)):
+                return False
+        elif isinstance(n, ast.Call):
+            if an.dotted(n.func) not in _ROOT_FUNCS and not (isinstance(n.func, ast.Attribute)
+                                                            and n.func.attr == "resolve" and not n.args):
+                return False
+        elif isinstance(n, ast.BinOp):
+            if not isinstance(n.op, (ast.Add, ast.Div)):
+                return False
+        elif not isinstance(n, (ast.Constant, ast.Attribute, ast.JoinedStr, ast.FormattedValue, ast.expr_context,
+                                ast.operator, ast.keyword)):
+            return False
+    vals = an.ev(e, copy.deepcopy(snap.state), (snap.in_loop, snap.in_handler, snap.dead))
+    if worst(vals) not in (None, TRUSTED):
+        return False
+    for v in vals:
+        if worst({v}) is None:
+            p = v[1] if isinstance(v, tuple) and v and v[0] == "path" else v
+            if not isinstance(p, str) or not p.startswith("/") or posixpath.normpath(p) == "/":
+                return False
+    return True
 
 
 def _direct_source(an, target) -> bool:

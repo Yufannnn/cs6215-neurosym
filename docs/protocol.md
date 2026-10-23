@@ -109,3 +109,12 @@ Implementation details fixed during development, before any test-split data was 
 - **EC suppression rule** (as above): structural checks plus, for non-standard guards, the model's confinement claim citing the guard. Such cases are reported as `semantic_judgment_remaining`.
 - **Bootstrap clusters:** OWASP flow-template family; diagnostics semantic family (both pairs of a family together).
 - **Transport:** SoCLaaS rate-limits bursts of long prompts (`RateLimitError` seen at concurrency 3). The client retries transport errors with exponential backoff (honouring `Retry-After`) up to 7 attempts, and logs the retry count. Model answers are never retried except for the single schema-repair retry.
+
+## Post-review amendment (2026-10-23, tag `review-correction-1`)
+
+- **Extractor correction.** The correctness correction D-R1 in `docs/decisions.md` changes only `src/neurosym/evidence.py`, plus run bookkeeping in `pipeline.py`/`cli.py`. Correction runs are named `corr-*` and are checked against tag `review-correction-1`. Results of the frozen runs are kept and reported as the primary evaluation.
+- **Policy location (correction of the text above).** No separate `configs/policy.yaml` exists. The policy is declared in three places that mirror each other:
+  - the frozen Semgrep rule (`baseline/rules/cwe22-taint.yaml`);
+  - the constants at the top of `src/neurosym/evidence.py`;
+  - the system prompt (`src/neurosym/prompts/system.txt`).
+- **Safe-API route not implemented.** The `trusted_base_safe_api` recognizer in D and EC is an interface only: the frozen extractor always emits `safe_api: []`, so this route never fired in any run.

@@ -61,3 +61,22 @@ No frozen file was changed; `git diff protocol-freeze` over the frozen paths is 
   - Held-out pairs: TP retention 0.913 → 1.000, FP removal 0.789 → 0.737.
   - OWASP test: unchanged.
   - OWASP dev: FP removal 0.905 → 0.762. E gave unsound guards as the reason for values that were actually constant.
+
+## 2026-10-23: Post-review correctness correction (D-R1, tag `review-correction-1`)
+
+An independent adversarial review (`docs/review/gptpro-2026-10-23/`) found programs for which the frozen extractor reported **complete** evidence while the warning was real, so D suppressed a true vulnerability. The witnesses are conditional on Semgrep alerting at the sink. All were confirmed, and while fixing them 16 more programs of the same kinds were found. They are all now regression tests (`tests/test_review_regressions.py`, 22 unsafe and 6 safe programs).
+
+| Class | Frozen behaviour | Correction |
+|---|---|---|
+| Containment roles | `commonpath([R, v]) == v` was accepted (it checks that v contains R) | The compared side must be the non-candidate element |
+| Containment root | `v.startswith(root + '/')` was accepted with `root` from the request | The root must be built from constants, module constants or untainted locals whose definitions reach both guard and sink, and (if concrete) be an absolute path other than `/` |
+| Loop `else` | Applied after `break` exits were joined | Jump exits bypass `else` |
+| `try`/`finally` | States at `return` (and exceptions raised in nested blocks) never reached `finally`. Handler entry joined only top-level prefix states | Every state from which the body may raise (nested blocks included) reaches handlers. A `finally` containing the sink also sees abrupt completions. `break`/`continue` through `finally` and `contextlib.suppress` mark the analysis incomplete |
+| Aliasing | Only `alias = container` was detected | Also flagged: chained assignment, a container stored in a container or attribute, passed to an unmodelled call, or iterated as a nested element |
+| Unmodelled code | `*args`, `**kwargs`, positional-only parameters, `match` captures other than a top-level name, module objects mutated by some function, and calls to functions defined in the module were treated as trusted constants | All are unknown (or tainted if given tainted arguments). Calls to nested functions mark the analysis incomplete. An unmodelled call given attacker data taints the mutable locals it receives |
+
+**Effect on the archived results** (`scripts/compare_evidence.py`, saved in `results/corrections/compare_evidence.json`): re-extracting every archived alert gives **byte-identical evidence records for all 220 held-out benchmark alerts** (OWASP test 2 × 68, diagnostics 2 × 42) and for the frozen development runs. The E prompts are therefore identical, the archived E responses answer exactly the same inputs, and D and EC decisions are unchanged. The frozen benchmark results stand as reported. One choice kept this true without losing soundness: handlers also see the completed try body's state (an over-approximation the frozen analysis already made). The 16 real-world evidence records changed. D is still `retain` for all of them; their E inputs changed, so only those E calls were regenerated in the correction runs `corr-rw-*`.
+
+**Correction runs.** `corr-*` runs use the corrected code, checked against tag `review-correction-1` (`--correction`). Benchmark correction runs replay the archived responses offline. Frozen runs are never overwritten; `pipeline.run` now refuses an existing run name.
+
+**What the correction does not change.** EC checks *dependency consistency*: the cited guard dominates the sink, and every tainted flow passes through a definition the guard reads. It does not check that the checked value is the consumed value. A later transformation (`target + '/../x'` after a check on `target`) passes the structural check. Such suppressions are categorised `semantic_judgment_remaining`, never `trusted_contract_matched`, and `test_gate_is_a_dependency_filter_not_value_identity` documents this. The report describes EC accordingly. D's containment recognizer is identity-checked: the guard must read the exact definition the sink consumes.

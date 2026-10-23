@@ -17,6 +17,8 @@ FROZEN_PATHS = ["baseline/rules", "configs", "data/owasp_split.csv", "data/diagn
                 "src/neurosym/evidence.py", "src/neurosym/refine.py", "src/neurosym/triage.py",
                 "src/neurosym/prompts", "src/neurosym/baseline.py", "src/neurosym/scoring.py",
                 "src/neurosym/pipeline.py", "src/neurosym/llm.py", "src/neurosym/owasp.py"]
+# Post-review correctness correction (docs/decisions.md, D-R1): runs named corr-* are checked against this tag.
+CORRECTION_TAG = "review-correction-1"
 
 
 @dataclass(frozen=True)
@@ -33,18 +35,21 @@ def git_state() -> dict:
     def git(*args):
         return subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     return {"commit": git("rev-parse", "HEAD"), "dirty": bool(git("status", "--porcelain", "--", *FROZEN_PATHS)),
-            "freeze_tag": git("rev-parse", "-q", "--verify", "refs/tags/protocol-freeze") or None}
+            "freeze_tag": git("rev-parse", "-q", "--verify", "refs/tags/protocol-freeze") or None,
+            "correction_tag": git("rev-parse", "-q", "--verify", f"refs/tags/{CORRECTION_TAG}") or None}
 
 
-def require_frozen() -> None:
-    """Test data may only be evaluated by the frozen protocol, policy, prompts and code."""
+def require_frozen(tag: str = "protocol-freeze") -> None:
+    """Test data may only be evaluated by the frozen protocol, policy, prompts and code (or, for corr-* runs,
+    by the post-review correction, which changes only the extractor)."""
     g = git_state()
-    if not g["freeze_tag"]:
-        raise SystemExit("refusing to evaluate test data: tag protocol-freeze does not exist")
-    changed = subprocess.run(["git", "diff", "--name-only", "protocol-freeze", "--", *FROZEN_PATHS],
+    if not subprocess.run(["git", "rev-parse", "-q", "--verify", f"refs/tags/{tag}"], cwd=ROOT,
+                          capture_output=True).stdout.strip():
+        raise SystemExit(f"refusing to evaluate test data: tag {tag} does not exist")
+    changed = subprocess.run(["git", "diff", "--name-only", tag, "--", *FROZEN_PATHS],
                              cwd=ROOT, capture_output=True, text=True).stdout.strip()
     if changed or g["dirty"]:
-        raise SystemExit(f"refusing to evaluate test data: frozen files changed since protocol-freeze:\n{changed}")
+        raise SystemExit(f"refusing to evaluate test data: frozen files changed since {tag}:\n{changed}")
 
 
 def load_models() -> dict:
@@ -52,8 +57,10 @@ def load_models() -> dict:
 
 
 def run(name: str, subjects: list[Subject], arms=ARMS, model: str = "qwen3-coder-next", replicate: int = 0,
-        offline: bool = False, workers: int = 3, llm_factory=None) -> dict:
+        offline: bool = False, workers: int = 3, llm_factory=None, overwrite: bool = False) -> dict:
     out = RESULTS / "runs" / name
+    if out.exists() and not overwrite:
+        raise SystemExit(f"refusing to overwrite the archived run {out}; choose a new name")
     (out / "evidence").mkdir(parents=True, exist_ok=True)
     t0 = time.monotonic()
     alerts = [asdict(a) for a in baseline.run({s.unit: s.path for s in subjects}, out / "baseline")]

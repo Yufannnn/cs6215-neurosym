@@ -11,16 +11,16 @@ from . import owasp, pipeline
 from .pipeline import Subject
 
 
-def load_subjects(spec: str, allow_unfrozen: bool = False) -> list[Subject]:
+def load_subjects(spec: str, allow_unfrozen: bool = False, tag: str = "protocol-freeze") -> list[Subject]:
     corpus, _, split = spec.partition(":")
     if corpus == "owasp":
         if split == "test" and not allow_unfrozen:
-            pipeline.require_frozen()
+            pipeline.require_frozen(tag)
         return [Subject(c.name, c.path, c.vulnerable, c.family, c.split, "owasp") for c in owasp.load(split)]
     if corpus == "diag":
         from . import diagnostics
         if split == "test" and not allow_unfrozen:
-            pipeline.require_frozen()
+            pipeline.require_frozen(tag)
         return diagnostics.subjects(split)
     if corpus == "realworld":
         from . import realworld
@@ -40,13 +40,17 @@ def main(argv=None):
     r.add_argument("--replicate", type=int, default=0)
     r.add_argument("--offline", action="store_true", help="replay cached responses only; never call the API")
     r.add_argument("--workers", type=int, default=3)
+    r.add_argument("--correction", action="store_true",
+                   help=f"post-review correction run: name must start with corr-; checked against {pipeline.CORRECTION_TAG}")
     sub.add_parser("tables")
     args = p.parse_args(argv)
 
     if args.cmd == "split":
         owasp.write_split()
     elif args.cmd == "run":
-        subjects = load_subjects(args.subjects)
+        if args.correction != args.name.startswith("corr-"):
+            raise SystemExit("correction runs, and only they, are named corr-*")
+        subjects = load_subjects(args.subjects, tag=pipeline.CORRECTION_TAG if args.correction else "protocol-freeze")
         res = pipeline.run(args.name, subjects, arms=tuple(args.arms.split(",")), model=args.model,
                            replicate=args.replicate, offline=args.offline, workers=args.workers)
         m = res["scores"].get("metrics", {})
