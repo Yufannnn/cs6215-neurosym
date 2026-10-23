@@ -1,0 +1,128 @@
+{
+ "file_sha256": "8a45a20e235b97d9309a73f657d3833d7025097837bda3dd8da8c1046e1feabd",
+ "function": "handler",
+ "sink": {
+  "statement": "s5",
+  "line": 18,
+  "api": "<path>.read_text()",
+  "argument": "resolved",
+  "reads": {
+   "resolved": [
+    "s2:resolved"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "name = request.form.get('doc', '')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "resolved = (pathlib.Path(ROOT) / name).resolve()"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "If",
+   "code": "if not resolved.is_relative_to(ROOT):"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Expr",
+   "code": "abort(400)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Return",
+   "code": "return resolved.read_text()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:name",
+   "var": "name",
+   "line": 14,
+   "code": "name = request.form.get('doc', '')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:resolved",
+   "var": "resolved",
+   "line": 15,
+   "code": "resolved = (pathlib.Path(ROOT) / name).resolve()",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:name"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "not resolved.is_relative_to(ROOT)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s3",
+   "condition": "not resolved.is_relative_to(ROOT)",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "resolved": [
+     "s2:resolved"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "(pathlib.Path(ROOT) / name).resolve",
+  "pathlib.Path"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:name",
+   "s2:resolved"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [
+   {
+    "guard": "s3",
+    "condition": "not resolved.is_relative_to(ROOT)",
+    "recognizer": "is_relative_to(root)"
+   }
+  ],
+  "safe_api": []
+ }
+}

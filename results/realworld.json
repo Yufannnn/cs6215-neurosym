@@ -1,179 +1,261 @@
 {
+ "runs": [
+  "rw-vulnerable",
+  "rw-fixed"
+ ],
  "targets": [
   {
    "target": "benbusby/whoogle-search@3a2e0b262e",
-   "repo": "benbusby/whoogle-search",
-   "functions": [
-    "config",
-    "element",
-    "window"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": true,
-   "s_reports_fixed": true,
-   "vulnerable_alerts": 4,
-   "fixed_alerts": 4,
-   "S_retains_vulnerable": true,
-   "S_retains_fixed": true,
-   "D_retains_vulnerable": true,
-   "D_retains_fixed": true,
-   "L_retains_vulnerable": true,
-   "L_retains_fixed": true,
-   "E_retains_vulnerable": true,
-   "E_retains_fixed": true,
-   "EC_retains_vulnerable": true,
-   "EC_retains_fixed": true
+   "applicable": "yes",
+   "flow": "request.args['name'] joined to CONFIG_PATH; opened for pickle load and dump in config()",
+   "reason": "The fix normalises the name and allow-lists [A-Za-z0-9_.+-]. The element()/window() changes in the same commit fix SSRF (not CWE-22)",
+   "defect_alerts": 3,
+   "related_alerts": 0,
+   "fixed_site_alerts": 3,
+   "keeps_defect": {
+    "S": true,
+    "D": true,
+    "L": true,
+    "E": true,
+    "EC": true
+   },
+   "keeps_related": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_fixed_site": {
+    "S": true,
+    "D": true,
+    "L": true,
+    "E": true,
+    "EC": true
+   }
   },
   {
    "target": "cmusatyalab/opendiamond@398049c187",
-   "repo": "cmusatyalab/opendiamond",
-   "functions": [
-    "_get_index_absolute_path",
-    "_get_obj_abosolute_path",
-    "_get_obj_absolute_path",
-    "_get_object_element",
-    "get_object_src_http"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": false,
-   "s_reports_fixed": false,
-   "vulnerable_alerts": 0,
-   "fixed_alerts": 0,
-   "S_retains_vulnerable": null,
-   "S_retains_fixed": null,
-   "D_retains_vulnerable": null,
-   "D_retains_fixed": null,
-   "L_retains_vulnerable": null,
-   "L_retains_fixed": null,
-   "E_retains_vulnerable": null,
-   "E_retains_fixed": null,
-   "EC_retains_vulnerable": null,
-   "EC_retains_fixed": null
+   "applicable": "yes",
+   "flow": "Flask route variables (<path:video> <gididx>) joined to DATAROOT/INDEXDIR in helper functions",
+   "reason": "Route parameters are not declared sources and the join is in another function (intraprocedural analysis)",
+   "defect_alerts": 0,
+   "related_alerts": 0,
+   "fixed_site_alerts": 0,
+   "keeps_defect": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_related": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_fixed_site": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   }
   },
   {
    "target": "corydolphin/flask-cors@67c4b2cc98",
-   "repo": "corydolphin/flask-cors",
-   "functions": [
-    "make_after_request_function",
-    "make_after_request_function.cors_after_request"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": false,
-   "s_reports_fixed": false,
-   "vulnerable_alerts": 0,
-   "fixed_alerts": 0,
-   "S_retains_vulnerable": null,
-   "S_retains_fixed": null,
-   "D_retains_vulnerable": null,
-   "D_retains_fixed": null,
-   "L_retains_vulnerable": null,
-   "L_retains_fixed": null,
-   "E_retains_vulnerable": null,
-   "E_retains_fixed": null,
-   "EC_retains_vulnerable": null,
-   "EC_retains_fixed": null
+   "applicable": "no",
+   "flow": "request.path matched against CORS resource regexes",
+   "reason": "No filesystem operation: outside the task",
+   "defect_alerts": 0,
+   "related_alerts": 0,
+   "fixed_site_alerts": 0,
+   "keeps_defect": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_related": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_fixed_site": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   }
   },
   {
    "target": "mlflow/mlflow@ac4b697bb0",
-   "repo": "mlflow/mlflow",
-   "functions": [
-    "_list_artifacts",
-    "get_artifact_handler",
-    "get_model_version_artifact_handler"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": false,
-   "s_reports_fixed": false,
-   "vulnerable_alerts": 0,
-   "fixed_alerts": 0,
-   "S_retains_vulnerable": null,
-   "S_retains_fixed": null,
-   "D_retains_vulnerable": null,
-   "D_retains_fixed": null,
-   "L_retains_vulnerable": null,
-   "L_retains_fixed": null,
-   "E_retains_vulnerable": null,
-   "E_retains_fixed": null,
-   "EC_retains_vulnerable": null,
-   "EC_retains_fixed": null
+   "applicable": "yes",
+   "flow": "request path reaches artifact-repository operations in other functions",
+   "reason": "The filesystem operation is in another function (intraprocedural analysis)",
+   "defect_alerts": 0,
+   "related_alerts": 0,
+   "fixed_site_alerts": 0,
+   "keeps_defect": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_related": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_fixed_site": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   }
   },
   {
    "target": "mlflow/mlflow@5044878da0",
-   "repo": "mlflow/mlflow",
-   "functions": [
-    "_abort_multipart_upload_artifact",
-    "_complete_multipart_upload_artifact",
-    "_create_multipart_upload_artifact",
-    "_delete_artifact_mlflow_artifacts",
-    "_download_artifact",
-    "_list_artifacts",
-    "_list_artifacts_mlflow_artifacts",
-    "_upload_artifact",
-    "get_artifact_handler",
-    "get_model_version_artifact_handler",
-    "list_artifacts",
-    "upload_artifact_handler",
-    "validate_path_is_safe"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": true,
-   "s_reports_fixed": true,
-   "vulnerable_alerts": 2,
-   "fixed_alerts": 2,
-   "S_retains_vulnerable": true,
-   "S_retains_fixed": true,
-   "D_retains_vulnerable": true,
-   "D_retains_fixed": true,
-   "L_retains_vulnerable": false,
-   "L_retains_fixed": false,
-   "E_retains_vulnerable": true,
-   "E_retains_fixed": true,
-   "EC_retains_vulnerable": true,
-   "EC_retains_fixed": true
+   "applicable": "yes",
+   "flow": "raw request path used after validate_path_is_safe checked its decoded form",
+   "reason": "The fix uses the validated value. Whether the local tmpdir sinks are exploitable at the parent revision is not established",
+   "defect_alerts": 0,
+   "related_alerts": 2,
+   "fixed_site_alerts": 2,
+   "keeps_defect": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_related": {
+    "S": true,
+    "D": true,
+    "L": false,
+    "E": true,
+    "EC": true
+   },
+   "keeps_fixed_site": {
+    "S": true,
+    "D": true,
+    "L": false,
+    "E": true,
+    "EC": true
+   }
   },
   {
    "target": "mlflow/mlflow@cf83dad4df",
-   "repo": "mlflow/mlflow",
-   "functions": [
-    "validate_path_is_safe"
-   ],
-   "target_source": "pyvul",
-   "s_reports_vulnerable": false,
-   "s_reports_fixed": false,
-   "vulnerable_alerts": 0,
-   "fixed_alerts": 0,
-   "S_retains_vulnerable": null,
-   "S_retains_fixed": null,
-   "D_retains_vulnerable": null,
-   "D_retains_fixed": null,
-   "L_retains_vulnerable": null,
-   "L_retains_fixed": null,
-   "E_retains_vulnerable": null,
-   "E_retains_fixed": null,
-   "EC_retains_vulnerable": null,
-   "EC_retains_fixed": null
+   "applicable": "no",
+   "flow": "validate_path_is_safe misses Windows drive letters",
+   "reason": "Windows-specific: outside the POSIX task",
+   "defect_alerts": 0,
+   "related_alerts": 0,
+   "fixed_site_alerts": 0,
+   "keeps_defect": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_related": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   },
+   "keeps_fixed_site": {
+    "S": null,
+    "D": null,
+    "L": null,
+    "E": null,
+    "EC": null
+   }
   }
  ],
- "unlabeled": {
-  "vulnerable": {
-   "unlabeled_alerts": 2,
-   "S_retained": 2,
-   "D_retained": 2,
-   "L_retained": 1,
-   "E_retained": 2,
-   "EC_retained": 2
+ "retained_by_role": {
+  "vulnerable:defect": {
+   "alerts": 3,
+   "S": 3,
+   "D": 3,
+   "L": 3,
+   "E": 3,
+   "EC": 3
   },
-  "fixed": {
-   "unlabeled_alerts": 2,
-   "S_retained": 2,
-   "D_retained": 2,
-   "L_retained": 1,
-   "E_retained": 2,
-   "EC_retained": 2
+  "vulnerable:unrelated": {
+   "alerts": 1,
+   "S": 1,
+   "D": 1,
+   "L": 0,
+   "E": 1,
+   "EC": 1
+  },
+  "vulnerable:related": {
+   "alerts": 2,
+   "S": 2,
+   "D": 2,
+   "L": 0,
+   "E": 2,
+   "EC": 2
+  },
+  "vulnerable:out_of_scope_target": {
+   "alerts": 2,
+   "S": 2,
+   "D": 2,
+   "L": 1,
+   "E": 2,
+   "EC": 2
+  },
+  "fixed:fixed_defect_site": {
+   "alerts": 3,
+   "S": 3,
+   "D": 3,
+   "L": 1,
+   "E": 3,
+   "EC": 3
+  },
+  "fixed:unrelated": {
+   "alerts": 1,
+   "S": 1,
+   "D": 1,
+   "L": 0,
+   "E": 1,
+   "EC": 1
+  },
+  "fixed:related_fixed_site": {
+   "alerts": 2,
+   "S": 2,
+   "D": 2,
+   "L": 0,
+   "E": 2,
+   "EC": 2
+  },
+  "fixed:out_of_scope_target": {
+   "alerts": 2,
+   "S": 2,
+   "D": 2,
+   "L": 1,
+   "E": 2,
+   "EC": 2
   }
  },
- "coverage": {
-  "targets": 6,
-  "s_reports_vulnerable": 2
+ "summary": {
+  "screened_targets": 6,
+  "applicable": 4,
+  "s_reports_defect": 1,
+  "s_reports_related_only": 1,
+  "s_misses": 2
  }
 }

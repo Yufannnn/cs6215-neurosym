@@ -1,0 +1,128 @@
+{
+ "file_sha256": "1cccb58515741cb754ab2e5972a5b31cf953304ff73fc936fed72627d7f201ae",
+ "function": "handler",
+ "sink": {
+  "statement": "s5",
+  "line": 18,
+  "api": "os.remove",
+  "argument": "backup",
+  "reads": {
+   "backup": [
+    "s2:backup"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "path = os.path.realpath(os.path.join(ROOT, request.form.get('p', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Assign",
+   "code": "backup = os.path.realpath(os.path.join(ROOT, request.form.get('b', '')))"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "If",
+   "code": "if not path.startswith(ROOT + os.sep):"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Expr",
+   "code": "os.remove(backup)"
+  },
+  {
+   "id": "s6",
+   "line": 19,
+   "kind": "Return",
+   "code": "return 'ok'"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:path",
+   "var": "path",
+   "line": 14,
+   "code": "path = os.path.realpath(os.path.join(ROOT, request.form.get('p', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:backup",
+   "var": "backup",
+   "line": 15,
+   "code": "backup = os.path.realpath(os.path.join(ROOT, request.form.get('b', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 16,
+   "condition": "not path.startswith(ROOT + os.sep)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s3",
+   "condition": "not path.startswith(ROOT + os.sep)",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "path": [
+     "s1:path"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s2:backup"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join",
+  "flask.request.form.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:backup"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

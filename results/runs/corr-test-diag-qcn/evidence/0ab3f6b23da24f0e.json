@@ -1,0 +1,65 @@
+{
+ "file_sha256": "a934b5491f297842b409f3d17d87c1dfe5e82ca28a118a5dcf9b474ea0824948",
+ "function": "handler",
+ "sink": {
+  "statement": "s2",
+  "line": 15,
+  "api": "open",
+  "argument": "target",
+  "reads": {
+   "target": [
+    "s1:target"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "target = os.path.realpath(os.path.join(ROOT, request.args.get('f', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Return",
+   "code": "return open(target).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:target",
+   "var": "target",
+   "line": 14,
+   "code": "target = os.path.realpath(os.path.join(ROOT, request.args.get('f', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join",
+  "flask.request.args.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:target"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

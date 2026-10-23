@@ -1,6 +1,7 @@
 """Fresh-generation stability: 3 new replicates (cache bypassed by replicate ID) on a seeded, stratified sample."""
 import json
 import random
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
 
 from . import refine, triage
@@ -36,13 +37,14 @@ def sample(runs):
     return out
 
 
-def run(runs=("test-owasp-qcn", "test-diag-qcn"), model="qwen3-coder-next", workers=2):
+def run(runs=("test-owasp-qcn", "test-diag-qcn"), model="qwen3-coder-next", workers=2, offline=False, out=None):
+    """Fresh replicates (or, offline, a replay of the stored ones). With out, also writes every raw reply."""
     cfg = load_models()[model]
     picked = sample(runs)
-    results = []
+    results, raw = [], []
     for arm in ("L", "E"):
         llm = LLM(model=model, max_tokens=triage.MAX_OUTPUT_TOKENS, tag=f"stability:{arm}",
-                  extra_body=cfg["extra_body"], version=f"{triage.PROMPT_VERSION}:{arm}")
+                  extra_body=cfg["extra_body"], version=f"{triage.PROMPT_VERSION}:{arm}", offline=offline)
         jobs = [(p, r) for p in picked for r in REPLICATES]
         with ThreadPoolExecutor(workers) as pool:
             outs = list(pool.map(lambda j: triage.triage(arm, j[0][1], j[0][2], llm, replicate=j[1]), jobs))
@@ -56,7 +58,13 @@ def run(runs=("test-owasp-qcn", "test-diag-qcn"), model="qwen3-coder-next", work
                 row["ec_decision"] = "suppress" if g["suppress"] else "retain"
                 row["ec_frozen_decision"] = dec["EC"][alert["alert_id"]]["decision"]
             results.append(row)
-    (RESULTS / "stability.json").write_text(json.dumps(results, indent=1))
+            raw.append({k: row[k] for k in ("run", "alert_id", "arm", "replicate", "status")}
+                       | {"verdict": o.get("verdict"), "calls": [{k: c.get(k) for k in ("cache_key", "served_model",
+                          "fingerprint", "prompt_tokens", "completion_tokens", "finish_reason", "content")} for c in o["calls"]]})
+    if out:
+        Path(out).write_text("".join(json.dumps(x) + "\n" for x in raw))
+    if not offline:
+        (RESULTS / "stability.json").write_text(json.dumps(results, indent=1))
     return results
 
 

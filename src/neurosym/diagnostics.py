@@ -1,9 +1,12 @@
 """Diagnostic paired programs: loading and mechanical label validation.
 
-validate() executes each handler (our own fixtures only) against traversal payloads with every
-filesystem call stubbed out, and records the paths those calls would touch. A program is
-vulnerable iff some payload makes a recorded path leave ROOT. This is ground-truth checking only;
-the analyzer never uses it.
+validate() executes each handler (our own fixtures only) against traversal payloads and benign inputs,
+with every filesystem call stubbed out, and records the paths those calls would touch. The outcome is
+one of three: `witness` (some input makes a recorded path leave ROOT: the program is vulnerable),
+`no_witness` (some run completed and touched a path, and no input escaped) or `inconclusive` (no run
+completed normally). `no_witness` is evidence, not proof, that a program is safe; every safe fixture
+also has a short static justification in diagnostics/safe_justification.csv. This is ground-truth
+checking only; the analyzer never uses it.
 """
 import builtins
 import contextlib
@@ -26,7 +29,7 @@ ROOT_DIR = "/srv/app/files"
 CWD = "/srv/app"
 PAYLOADS = ["../secret.txt", "../../etc/passwd", "/etc/passwd", "..", "....//....//etc/passwd",
             "%2e%2e%2fsecret", "..%2f..%2fsecret", "a/../../secret", "../files_secret/x",
-            "x-file/../../../etc/passwd", "ok.txt"]
+            "x-file/../../../etc/passwd", "ok.txt", "7", "a.txt"]  # the last three are benign, valid inputs
 CONTROL = ["", "user", "1", "a", "b"]
 PRIMARY = {"f", "p", "doc", "report", "dir", "X-Doc", "id", "k", "n"}
 SECONDARY = {"g", "b", "legacy"}
@@ -118,7 +121,7 @@ def validate(path: pathlib.Path) -> dict:
                (pathlib.Path, "open", lambda self, *a, **k: touched.append(self) or io.StringIO("data"))]
     saved_flask = sys.modules.get("flask")
     originals = [(obj, name, getattr(obj, name)) for obj, name, _ in patches]
-    escaped, errors, runs = [], 0, 0
+    escaped, errors, rejected, completed, runs = [], 0, 0, 0, 0
     try:
         sys.modules["flask"] = flask
         spec = importlib.util.spec_from_file_location(f"diag_{path.stem}", path)
@@ -133,10 +136,11 @@ def validate(path: pathlib.Path) -> dict:
             try:
                 with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
                     mod.handler()
+                completed += bool(touched)
             except (_Abort, PermissionError):
-                pass
+                rejected += 1  # the program's own input rejection
             except Exception:
-                errors += 1
+                errors += 1  # anything else, e.g. int("../x") raising ValueError
             if any(_escapes(p) for p in touched):
                 escaped.append((payload, control, mode))
     finally:
@@ -146,7 +150,9 @@ def validate(path: pathlib.Path) -> dict:
             sys.modules.pop("flask", None)
         else:
             sys.modules["flask"] = saved_flask
-    return {"vulnerable": bool(escaped), "witnesses": escaped[:3], "runs": runs, "errors": errors}
+    outcome = "witness" if escaped else ("no_witness" if completed else "inconclusive")
+    return {"vulnerable": bool(escaped), "outcome": outcome, "witnesses": escaped[:3], "runs": runs,
+            "completed": completed, "rejected": rejected, "errors": errors}
 
 
 def validate_all() -> list[dict]:
@@ -154,6 +160,8 @@ def validate_all() -> list[dict]:
     for r in manifest():
         res = validate(DIAG / r["path"])
         out.append({"unit": r["unit"], "split": r["split"], "intended": r["intended_vulnerable"] == "True",
-                    "validated": res["vulnerable"], "agree": res["vulnerable"] == (r["intended_vulnerable"] == "True"),
-                    "witness": res["witnesses"][:1], "errors": res["errors"], "runs": res["runs"]})
+                    "validated": res["vulnerable"], "outcome": res["outcome"],
+                    "agree": res["vulnerable"] == (r["intended_vulnerable"] == "True") and res["outcome"] != "inconclusive",
+                    "witness": res["witnesses"][:1], "runs": res["runs"], "completed": res["completed"],
+                    "rejected": res["rejected"], "errors": res["errors"]})
     return out

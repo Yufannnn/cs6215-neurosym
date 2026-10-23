@@ -1,0 +1,112 @@
+{
+ "file_sha256": "725a91aa44d2b172d5614a9911ac17cd6853cbdb75cb1ea8ac041c3ae1bc1d3c",
+ "function": "handler",
+ "sink": {
+  "statement": "s4",
+  "line": 17,
+  "api": "os.remove",
+  "argument": "path",
+  "reads": {
+   "path": [
+    "s1:path"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "path = os.path.realpath(os.path.join(ROOT, request.form.get('p', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if not path.startswith(ROOT + os.sep):"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Expr",
+   "code": "abort(403)"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Expr",
+   "code": "os.remove(path)"
+  },
+  {
+   "id": "s5",
+   "line": 18,
+   "kind": "Return",
+   "code": "return 'ok'"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:path",
+   "var": "path",
+   "line": 14,
+   "code": "path = os.path.realpath(os.path.join(ROOT, request.form.get('p', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "not path.startswith(ROOT + os.sep)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "not path.startswith(ROOT + os.sep)",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "path": [
+     "s1:path"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.realpath",
+  "os.path.join",
+  "flask.request.form.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:path"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [
+   {
+    "guard": "s2",
+    "condition": "not path.startswith(ROOT + os.sep)",
+    "recognizer": "startswith(root + sep)"
+   }
+  ],
+  "safe_api": []
+ }
+}

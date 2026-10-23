@@ -1,0 +1,413 @@
+{
+ "file_sha256": "6730165a7e9f78c7ed2d574703aead027642d77b61279f0443c0720689c44c10",
+ "function": "handler",
+ "sink": {
+  "statement": "s19",
+  "line": 55,
+  "api": "codecs.open",
+  "argument": "f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+  "reads": {
+   "bar": [
+    "s7:bar"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "values = request.args.getlist('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "If",
+   "code": "if values:"
+  },
+  {
+   "id": "s5",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = values[0]"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "num = 106"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "bar = 'This should never happen' if 7 * 42 - num > 200 else param"
+  },
+  {
+   "id": "s8",
+   "line": 40,
+   "kind": "Import",
+   "code": "import platform"
+  },
+  {
+   "id": "s9",
+   "line": 41,
+   "kind": "Import",
+   "code": "import codecs"
+  },
+  {
+   "id": "s10",
+   "line": 42,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s11",
+   "line": 43,
+   "kind": "ImportFrom",
+   "code": "from urllib.parse import urlparse"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "ImportFrom",
+   "code": "from urllib.request import url2pathname"
+  },
+  {
+   "id": "s13",
+   "line": 46,
+   "kind": "Assign",
+   "code": "startURIslashes = ''"
+  },
+  {
+   "id": "s14",
+   "line": 48,
+   "kind": "If",
+   "code": "if platform.system() == 'Windows':"
+  },
+  {
+   "id": "s15",
+   "line": 49,
+   "kind": "Assign",
+   "code": "startURIslashes = '/'"
+  },
+  {
+   "id": "s16",
+   "line": 51,
+   "kind": "Assign",
+   "code": "startURIslashes = '//'"
+  },
+  {
+   "id": "s17",
+   "line": 53,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s18",
+   "line": 54,
+   "kind": "Assign",
+   "code": "fileURI = urlparse('file:' + startURIslashes + helpers.utils.TESTFILES_DIR.replace('\\\\', '/').replace(' ', '_') + bar)"
+  },
+  {
+   "id": "s19",
+   "line": 55,
+   "kind": "Assign",
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')"
+  },
+  {
+   "id": "s20",
+   "line": 57,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\""
+  },
+  {
+   "id": "s21",
+   "line": 61,
+   "kind": "AugAssign",
+   "code": "RESPONSE += ' And file already exists.'"
+  },
+  {
+   "id": "s22",
+   "line": 65,
+   "kind": "AugAssign",
+   "code": "RESPONSE += \" But file doesn't exist yet.\""
+  },
+  {
+   "id": "s23",
+   "line": 69,
+   "kind": "Pass",
+   "code": "pass"
+  },
+  {
+   "id": "s24",
+   "line": 71,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:values",
+   "var": "values",
+   "line": 31,
+   "code": "values = request.args.getlist('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 32,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:param",
+   "var": "param",
+   "line": 34,
+   "code": "param = values[0]",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:values"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:num",
+   "var": "num",
+   "line": 36,
+   "code": "num = 106",
+   "kind": "assign",
+   "value": "106",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s7:bar",
+   "var": "bar",
+   "line": 38,
+   "code": "bar = 'This should never happen' if 7 * 42 - num > 200 else param",
+   "kind": "assign",
+   "value": "'' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param",
+    "s5:param",
+    "s6:num"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s13:startURIslashes",
+   "var": "startURIslashes",
+   "line": 46,
+   "code": "startURIslashes = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s15:startURIslashes",
+   "var": "startURIslashes",
+   "line": 49,
+   "code": "startURIslashes = '/'",
+   "kind": "assign",
+   "value": "'/'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:startURIslashes",
+   "var": "startURIslashes",
+   "line": 51,
+   "code": "startURIslashes = '//'",
+   "kind": "assign",
+   "value": "'//'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:fileURI",
+   "var": "fileURI",
+   "line": 54,
+   "code": "fileURI = urlparse('file:' + startURIslashes + helpers.utils.TESTFILES_DIR.replace('\\\\', '/').replace(' ', '_') + bar)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s15:startURIslashes",
+    "s16:startURIslashes",
+    "s7:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s19:fileTarget",
+   "var": "fileTarget",
+   "line": 55,
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s7:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s20:RESPONSE",
+   "var": "RESPONSE",
+   "line": 57,
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s19:fileTarget",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s21:RESPONSE",
+   "var": "RESPONSE",
+   "line": 61,
+   "code": "RESPONSE += ' And file already exists.'",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s20:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s22:RESPONSE",
+   "var": "RESPONSE",
+   "line": 65,
+   "code": "RESPONSE += \" But file doesn't exist yet.\"",
+   "kind": "augassign",
+   "value": "\" But file doesn't exist yet.\" | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:RESPONSE",
+    "s20:RESPONSE",
+    "s21:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 33,
+   "condition": "values",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s14",
+   "line": 48,
+   "condition": "platform.system() == 'Windows'",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:values",
+   "s5:param",
+   "s7:bar"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

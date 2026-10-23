@@ -1,0 +1,17 @@
+alert_id,revision,target,line,role,reason
+9321a7d20063515b,vulnerable,benbusby/whoogle-search@3a2e0b262e,430,defect,open(config_pkl) with config_pkl = join(CONFIG_PATH; request name)
+afe918a6b2a697ec,vulnerable,benbusby/whoogle-search@3a2e0b262e,431,defect,os.path.exists(config_pkl) on the same value
+75352bc13bdc87ed,vulnerable,benbusby/whoogle-search@3a2e0b262e,445,defect,open(join(CONFIG_PATH; request name); 'wb')
+443ac6cc847354b1,vulnerable,benbusby/whoogle-search@3a2e0b262e,484,unrelated,send_file(tmp_mem) where tmp_mem = io.BytesIO(): not a path
+89bbe3fd33f0ab23,vulnerable,mlflow/mlflow@5044878da0,1278,related,os.makedirs on the raw request path the fix replaces; exploitability at this sink not established
+bff3eb1537c7d09b,vulnerable,mlflow/mlflow@5044878da0,1280,related,open(file_path) on the same raw path
+8b1975362744eb3f,vulnerable,mlflow/mlflow@cf83dad4df,1286,out_of_scope_target,in a target outside the task (Windows-only fix)
+51e620256130a5e0,vulnerable,mlflow/mlflow@cf83dad4df,1288,out_of_scope_target,in a target outside the task (Windows-only fix)
+cfdd4a6ac9a26061,fixed,benbusby/whoogle-search@3a2e0b262e,437,fixed_defect_site,name normalised and allow-listed before the join: no file outside CONFIG_PATH is reachable
+5a04acdb558ae1d3,fixed,benbusby/whoogle-search@3a2e0b262e,438,fixed_defect_site,same value as above
+40820fdbfedd6d0e,fixed,benbusby/whoogle-search@3a2e0b262e,452,fixed_defect_site,same value as above
+74d41151db5a3825,fixed,benbusby/whoogle-search@3a2e0b262e,498,unrelated,send_file(tmp_mem) where tmp_mem = io.BytesIO(): not a path
+6ed3cbc2f401b83b,fixed,mlflow/mlflow@5044878da0,1278,related_fixed_site,uses the validated path after the fix
+c8bb5fabd1b37b17,fixed,mlflow/mlflow@5044878da0,1280,related_fixed_site,uses the validated path after the fix
+fd42035e4aef0166,fixed,mlflow/mlflow@cf83dad4df,1288,out_of_scope_target,in a target outside the task (Windows-only fix)
+056006506f9199c8,fixed,mlflow/mlflow@cf83dad4df,1290,out_of_scope_target,in a target outside the task (Windows-only fix)

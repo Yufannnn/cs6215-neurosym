@@ -1,0 +1,63 @@
+{
+ "name": "corr-test-owasp-q9b",
+ "arms": [
+  "S",
+  "D",
+  "L",
+  "E",
+  "EC"
+ ],
+ "model": "qwen3.5:9b",
+ "model_config": {
+  "role": "small-model check",
+  "extra_body": {
+   "reasoning_effort": "none"
+  }
+ },
+ "replicate": 0,
+ "prompt_version": "p2",
+ "offline_replay": true,
+ "git": {
+  "commit": "066f4e3069915daef259e0c0e1ba68a47223fe5a",
+  "dirty": false,
+  "freeze_tag": "e75213b653515aaa683c57d93f84fbbf2a58846e",
+  "correction_tag": "232b90148053129c9285bfc812128d6ef288d9f6"
+ },
+ "baseline": {
+  "semgrep": "1.182.1",
+  "rule": "baseline/rules/cwe22-taint.yaml",
+  "rule_sha256": "9afd5c32c7431a84e8dba575946d7e9066621c6dbfc26778f340d35d0e18535f",
+  "python": "3.14.0",
+  "platform": "Darwin arm64"
+ },
+ "subjects": 134,
+ "corpora": [
+  "owasp"
+ ],
+ "splits": [
+  "test"
+ ],
+ "alerts": 68,
+ "extraction": {
+  "ok": 68,
+  "unsupported": 0
+ },
+ "timing_s": {
+  "baseline": 0.81,
+  "extraction": 0.11,
+  "llm_L": 0.02,
+  "llm_E": 0.03
+ },
+ "llm": {
+  "calls": 136,
+  "uncached_calls": 0,
+  "prompt_tokens": 351325,
+  "completion_tokens": 21446,
+  "served_models": [
+   "qwen3.5:9b"
+  ],
+  "fingerprints": [
+   "fp_ollama"
+  ]
+ }
+}

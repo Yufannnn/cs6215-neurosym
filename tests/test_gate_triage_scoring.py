@@ -170,6 +170,20 @@ def test_diagnostic_families_disjoint_and_labels_validated():
     assert sum(r["split"] == "dev" for r in rows) == 24 and sum(r["split"] == "test" for r in rows) == 48
 
 
+def test_diagnostic_label_evidence():
+    """Vulnerable fixtures have an execution witness; safe ones completed runs without one and have a static
+    justification (absence of a witness alone is not a proof)."""
+    import csv
+    from neurosym import diagnostics
+    rows = {r["unit"]: r for r in diagnostics.validate_all()}
+    just = {r["unit"] for r in csv.DictReader((diagnostics.DIAG / "safe_justification.csv").open())}
+    for unit, r in rows.items():
+        assert r["outcome"] == ("witness" if r["intended"] else "no_witness"), r
+    assert just == {u for u, r in rows.items() if not r["intended"]}
+    stored = {r["unit"]: r["outcome"] for r in csv.DictReader((diagnostics.DIAG / "label_validation.csv").open())}
+    assert stored == {u: r["outcome"] for u, r in rows.items()}
+
+
 def _units():
     return [{"unit": "a", "gold": True, "family": "f1"}, {"unit": "b", "gold": True, "family": "f2"},
             {"unit": "c", "gold": False, "family": "f3"}, {"unit": "d", "gold": False, "family": "f4"}]

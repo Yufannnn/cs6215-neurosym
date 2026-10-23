@@ -1,0 +1,37 @@
+unit,justification
+allowlist1_safe,The joined name is one of the constants a.txt or b.txt; any other input aborts
+basename1_safe,basename() contains no '/'; '' '.' and '..' are rejected; one path component stays under ROOT
+decode_order1_safe,The check runs on the realpath of the decoded value that is opened; commonpath equal to ROOT means target is ROOT or below
+dict_lookup1_safe,The joined name is a dict value or the default; all are constants
+exception_flow1_safe,Every path that reaches open assigns the constant index.txt
+hashed_name1_safe,The name is a hex digest: no '/' or '.' segment
+loop_source1_safe,The name is index.txt or a loop constant; the request is never read
+lstrip_join1_safe,The realpath that is opened is checked with commonpath against ROOT
+numeric_id1_safe,int() yields an integer (or raises); f'{ROOT}/{n}.txt' has no '/' or '..' from the input
+regex_anchor1_safe,fullmatch [A-Za-z0-9_]+ admits one component with no '.' or '/'
+resolve_order1_safe,The resolved path that is read is checked with is_relative_to(ROOT)
+ternary1_safe,The conditional is constant False; the target is index.txt
+absolute_join1_safe,Inputs containing '..' abort; without a '..' segment ROOT/name normalises under ROOT (a leading '/' only doubles the separator)
+absolute_join2_safe,Leading '/' is stripped and '..' rejected; os.path.join then stays under ROOT
+alternate_branch1_safe,Both branches produce a realpath; the common guard startswith(ROOT + sep) dominates the sink
+alternate_branch2_safe,The abspath that is checked with commonpath is the value used
+canonicalize_only1_safe,The realpath is checked with commonpath before open
+canonicalize_only2_safe,normpath removes '..'; startswith(ROOT + sep) then confines it (symlinks out of scope)
+checked_vs_original1_safe,The checked realpath is the opened value
+checked_vs_original2_safe,The resolved path checked with is_relative_to is the read value
+container_alias1_safe,The list is rebound to a constant list before use
+container_alias2_safe,The key is overwritten with a constant before use
+guard_other_value1_safe,The checked realpath is the opened value
+guard_other_value2_safe,The checked realpath is the removed value
+named_sanitizer1_safe,sanitize() returns a basename other than '' '.' '..' (or aborts)
+named_sanitizer2_safe,basename() with '' '.' '..' rejected: one component under ROOT
+overwrite1_safe,use_default is constant True; the name is default.txt
+overwrite2_safe,The cookie value is overwritten with a constant
+prefix_confusion1_safe,commonpath (not a string prefix) against ROOT on the opened realpath
+prefix_confusion2_safe,startswith(ROOT + sep) on the abspath that is used
+reject_exits1_safe,The rejecting branch returns; the opened realpath satisfies startswith(ROOT + sep)
+reject_exits2_safe,The rejecting branch raises; the used abspath satisfies commonpath equal to ROOT
+send_from_directory_base1_safe,Flask send_from_directory joins with werkzeug safe_join under a constant directory (documented contract)
+send_from_directory_base2_safe,As above
+unreachable_flow1_safe,debug is constant False; the tainted assignment is unreachable
+unreachable_flow2_safe,The match subject is the constant 'a'; the tainted case is unreachable

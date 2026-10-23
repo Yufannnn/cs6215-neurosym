@@ -1,0 +1,474 @@
+{
+ "file_sha256": "5a5e4e305a3ee4d1e04f8e5ff3b4a604c33eb9d3c289941d2f747f3870418eb7",
+ "function": "handler",
+ "sink": {
+  "statement": "s22",
+  "line": 1278,
+  "api": "os.makedirs",
+  "argument": "dir_path",
+  "reads": {
+   "dir_path": [
+    "s20:dir_path"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 1226,
+   "kind": "Assign",
+   "code": "args = request.args"
+  },
+  {
+   "id": "s2",
+   "line": 1227,
+   "kind": "Assign",
+   "code": "run_uuid = args.get('run_uuid')"
+  },
+  {
+   "id": "s3",
+   "line": 1228,
+   "kind": "If",
+   "code": "if not run_uuid:"
+  },
+  {
+   "id": "s4",
+   "line": 1229,
+   "kind": "Raise",
+   "code": "raise MlflowException(message='Request must specify run_uuid.', error_code=INVALID_PARAMETER_VALUE)"
+  },
+  {
+   "id": "s5",
+   "line": 1233,
+   "kind": "Assign",
+   "code": "path = args.get('path')"
+  },
+  {
+   "id": "s6",
+   "line": 1234,
+   "kind": "If",
+   "code": "if not path:"
+  },
+  {
+   "id": "s7",
+   "line": 1235,
+   "kind": "Raise",
+   "code": "raise MlflowException(message='Request must specify path.', error_code=INVALID_PARAMETER_VALUE)"
+  },
+  {
+   "id": "s8",
+   "line": 1239,
+   "kind": "Expr",
+   "code": "validate_path_is_safe(path)"
+  },
+  {
+   "id": "s9",
+   "line": 1241,
+   "kind": "If",
+   "code": "if request.content_length and request.content_length > 10 * 1024 * 1024:"
+  },
+  {
+   "id": "s10",
+   "line": 1242,
+   "kind": "Raise",
+   "code": "raise MlflowException(message='Artifact size is too large. Max size is 10MB.', error_code=INVALID_PARAMETER_VALUE)"
+  },
+  {
+   "id": "s11",
+   "line": 1247,
+   "kind": "Assign",
+   "code": "data = request.data"
+  },
+  {
+   "id": "s12",
+   "line": 1248,
+   "kind": "If",
+   "code": "if not data:"
+  },
+  {
+   "id": "s13",
+   "line": 1249,
+   "kind": "Raise",
+   "code": "raise MlflowException(message='Request must specify data.', error_code=INVALID_PARAMETER_VALUE)"
+  },
+  {
+   "id": "s14",
+   "line": 1254,
+   "kind": "Assign",
+   "code": "run = _get_tracking_store().get_run(run_uuid)"
+  },
+  {
+   "id": "s15",
+   "line": 1255,
+   "kind": "Assign",
+   "code": "artifact_dir = run.info.artifact_uri"
+  },
+  {
+   "id": "s16",
+   "line": 1257,
+   "kind": "Assign",
+   "code": "basename = posixpath.basename(path)"
+  },
+  {
+   "id": "s17",
+   "line": 1258,
+   "kind": "Assign",
+   "code": "dirname = posixpath.dirname(path)"
+  },
+  {
+   "id": "s18",
+   "line": 1260,
+   "kind": "FunctionDef",
+   "code": "def _log_artifact_to_repo(...):"
+  },
+  {
+   "id": "s19",
+   "line": 1274,
+   "kind": "With",
+   "code": "with tempfile.TemporaryDirectory() as tmpdir:"
+  },
+  {
+   "id": "s20",
+   "line": 1275,
+   "kind": "Assign",
+   "code": "dir_path = os.path.join(tmpdir, dirname) if dirname else tmpdir"
+  },
+  {
+   "id": "s21",
+   "line": 1276,
+   "kind": "Assign",
+   "code": "file_path = os.path.join(dir_path, basename)"
+  },
+  {
+   "id": "s22",
+   "line": 1278,
+   "kind": "Expr",
+   "code": "os.makedirs(dir_path, exist_ok=True)"
+  },
+  {
+   "id": "s23",
+   "line": 1280,
+   "kind": "With",
+   "code": "with open(file_path, 'wb') as f:"
+  },
+  {
+   "id": "s24",
+   "line": 1281,
+   "kind": "Expr",
+   "code": "f.write(data)"
+  },
+  {
+   "id": "s25",
+   "line": 1283,
+   "kind": "Expr",
+   "code": "_log_artifact_to_repo(file_path, run, dirname, artifact_dir)"
+  },
+  {
+   "id": "s26",
+   "line": 1285,
+   "kind": "Return",
+   "code": "return Response(mimetype='application/json')"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:args",
+   "var": "args",
+   "line": 1226,
+   "code": "args = request.args",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:run_uuid",
+   "var": "run_uuid",
+   "line": 1227,
+   "code": "run_uuid = args.get('run_uuid')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:args"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s5:path",
+   "var": "path",
+   "line": 1233,
+   "code": "path = args.get('path')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:args"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:data",
+   "var": "data",
+   "line": 1247,
+   "code": "data = request.data",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s14:run",
+   "var": "run",
+   "line": 1254,
+   "code": "run = _get_tracking_store().get_run(run_uuid)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:run_uuid"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s15:artifact_dir",
+   "var": "artifact_dir",
+   "line": 1255,
+   "code": "artifact_dir = run.info.artifact_uri",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s14:run"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:basename",
+   "var": "basename",
+   "line": 1257,
+   "code": "basename = posixpath.basename(path)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s5:path"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s17:dirname",
+   "var": "dirname",
+   "line": 1258,
+   "code": "dirname = posixpath.dirname(path)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s5:path"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s19:tmpdir",
+   "var": "tmpdir",
+   "line": 1274,
+   "code": "with tempfile.TemporaryDirectory() as tmpdir:",
+   "kind": "with_target",
+   "value": "<unknown>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s20:dir_path",
+   "var": "dir_path",
+   "line": 1275,
+   "code": "dir_path = os.path.join(tmpdir, dirname) if dirname else tmpdir",
+   "kind": "assign",
+   "value": "<tainted> | <unknown>",
+   "tainted": true,
+   "depends_on": [
+    "s17:dirname",
+    "s19:tmpdir"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s21:file_path",
+   "var": "file_path",
+   "line": 1276,
+   "code": "file_path = os.path.join(dir_path, basename)",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s16:basename",
+    "s20:dir_path"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s23:f",
+   "var": "f",
+   "line": 1280,
+   "code": "with open(file_path, 'wb') as f:",
+   "kind": "with_target",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s21:file_path"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 1228,
+   "condition": "not run_uuid",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s6",
+   "line": 1234,
+   "condition": "not path",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s9",
+   "line": 1241,
+   "condition": "request.content_length and request.content_length > 10 * 1024 * 1024",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s12",
+   "line": 1248,
+   "condition": "not data",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s3",
+   "condition": "not run_uuid",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "run_uuid": [
+     "s2:run_uuid"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s1:args"
+   ]
+  },
+  {
+   "id": "s6",
+   "condition": "not path",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "path": [
+     "s5:path"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  },
+  {
+   "id": "s9",
+   "condition": "request.content_length and request.content_length > 10 * 1024 * 1024",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {},
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s1:args"
+   ]
+  },
+  {
+   "id": "s12",
+   "condition": "not data",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "data": [
+     "s11:data"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s1:args"
+   ]
+  }
+ ],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <unknown>",
+  "complete": false,
+  "incomplete_reasons": [
+   "unsupported:local_function_call"
+  ],
+  "tainted_definitions": [
+   "s1:args",
+   "s5:path",
+   "s17:dirname",
+   "s20:dir_path"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -1,0 +1,356 @@
+{
+ "file_sha256": "9277e9855b7813b7041cde6364c1348685ac4a612aadee00a8a3504371d7f666",
+ "function": "handler",
+ "sink": {
+  "statement": "s17",
+  "line": 498,
+  "api": "flask.send_file",
+  "argument": "tmp_mem",
+  "reads": {
+   "tmp_mem": [
+    "s15:tmp_mem"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 473,
+   "kind": "Assign",
+   "code": "empty_gif = base64.b64decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')"
+  },
+  {
+   "id": "s2",
+   "line": 475,
+   "kind": "Assign",
+   "code": "element_url = src_url = request.args.get('url')"
+  },
+  {
+   "id": "s3",
+   "line": 476,
+   "kind": "If",
+   "code": "if element_url.startswith('gAAAAA'):"
+  },
+  {
+   "id": "s4",
+   "line": 477,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s5",
+   "line": 478,
+   "kind": "Assign",
+   "code": "cipher_suite = Fernet(g.session_key)"
+  },
+  {
+   "id": "s6",
+   "line": 479,
+   "kind": "Assign",
+   "code": "src_url = cipher_suite.decrypt(element_url.encode()).decode()"
+  },
+  {
+   "id": "s7",
+   "line": 481,
+   "kind": "Return",
+   "code": "return (render_template('error.html', error_message=str(e)), 401)"
+  },
+  {
+   "id": "s8",
+   "line": 485,
+   "kind": "Assign",
+   "code": "src_type = request.args.get('type')"
+  },
+  {
+   "id": "s9",
+   "line": 488,
+   "kind": "Assign",
+   "code": "domain = urlparse.urlparse(src_url).netloc"
+  },
+  {
+   "id": "s10",
+   "line": 489,
+   "kind": "If",
+   "code": "if not validators.domain(domain):"
+  },
+  {
+   "id": "s11",
+   "line": 490,
+   "kind": "Return",
+   "code": "return send_file(io.BytesIO(empty_gif), mimetype='image/gif')"
+  },
+  {
+   "id": "s12",
+   "line": 492,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s13",
+   "line": 493,
+   "kind": "Assign",
+   "code": "file_data = g.user_request.send(base_url=src_url).content"
+  },
+  {
+   "id": "s14",
+   "line": 494,
+   "kind": "Assign",
+   "code": "tmp_mem = io.BytesIO()"
+  },
+  {
+   "id": "s15",
+   "line": 495,
+   "kind": "Expr",
+   "code": "tmp_mem.write(file_data)"
+  },
+  {
+   "id": "s16",
+   "line": 496,
+   "kind": "Expr",
+   "code": "tmp_mem.seek(0)"
+  },
+  {
+   "id": "s17",
+   "line": 498,
+   "kind": "Return",
+   "code": "return send_file(tmp_mem, mimetype=src_type)"
+  },
+  {
+   "id": "s18",
+   "line": 500,
+   "kind": "Pass",
+   "code": "pass"
+  },
+  {
+   "id": "s19",
+   "line": 502,
+   "kind": "Return",
+   "code": "return send_file(io.BytesIO(empty_gif), mimetype='image/gif')"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:empty_gif",
+   "var": "empty_gif",
+   "line": 473,
+   "code": "empty_gif = base64.b64decode('R0lGODlhAQABAIAAAP///////yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==')",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:element_url",
+   "var": "element_url",
+   "line": 475,
+   "code": "element_url = src_url = request.args.get('url')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:src_url",
+   "var": "src_url",
+   "line": 475,
+   "code": "element_url = src_url = request.args.get('url')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:cipher_suite",
+   "var": "cipher_suite",
+   "line": 478,
+   "code": "cipher_suite = Fernet(g.session_key)",
+   "kind": "assign",
+   "value": "<unknown>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:cipher_suite",
+   "var": "cipher_suite",
+   "line": 479,
+   "code": "src_url = cipher_suite.decrypt(element_url.encode()).decode()",
+   "kind": "mutation",
+   "value": "<tainted> | <unknown>",
+   "tainted": true,
+   "depends_on": [
+    "s2:element_url",
+    "s5:cipher_suite"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:src_url",
+   "var": "src_url",
+   "line": 479,
+   "code": "src_url = cipher_suite.decrypt(element_url.encode()).decode()",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:element_url",
+    "s6:cipher_suite"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:src_type",
+   "var": "src_type",
+   "line": 485,
+   "code": "src_type = request.args.get('type')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s9:domain",
+   "var": "domain",
+   "line": 488,
+   "code": "domain = urlparse.urlparse(src_url).netloc",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:src_url",
+    "s6:src_url"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s13:file_data",
+   "var": "file_data",
+   "line": 493,
+   "code": "file_data = g.user_request.send(base_url=src_url).content",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:src_url",
+    "s6:src_url"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s14:tmp_mem",
+   "var": "tmp_mem",
+   "line": 494,
+   "code": "tmp_mem = io.BytesIO()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s15:tmp_mem",
+   "var": "tmp_mem",
+   "line": 495,
+   "code": "tmp_mem.write(file_data)",
+   "kind": "mutation",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s13:file_data",
+    "s14:tmp_mem"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 476,
+   "condition": "element_url.startswith('gAAAAA')",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s10",
+   "line": 489,
+   "condition": "not validators.domain(domain)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s10",
+   "condition": "not validators.domain(domain)",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "domain": [
+     "s9:domain"
+    ]
+   },
+   "guards_sink_value": false,
+   "covers_all_tainted_flows": false,
+   "uncovered_tainted_definitions": [
+    "s2:element_url",
+    "s2:src_url"
+   ]
+  }
+ ],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:element_url",
+   "s2:src_url",
+   "s6:cipher_suite",
+   "s6:src_url",
+   "s13:file_data",
+   "s15:tmp_mem"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

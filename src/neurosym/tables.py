@@ -131,21 +131,33 @@ def diagnostic_table(run="test-diag-qcn"):
     write("diagnostic_pairs", "\n".join(tex) + "\n", "\n".join(lines_md) + "\n")
 
 
+def gold_by_unit(run):
+    if "owasp" in run:
+        return {c.name: c.vulnerable for c in owasp.load("test")}
+    return {u.unit: u.gold for u in diagnostics.subjects("test")}
+
+
 def gate_table():
-    md = ["| Run | E suppressions | EC accepted: structural | EC accepted: trusted contract | EC accepted: semantic judgment | Rejected by gate |",
-          "|---|---|---|---|---|---|"]
-    tex = ["\\begin{tabular}{lrrrrr}", "\\toprule", "Corpus, model & E supp. & Struct. & Contract & Semantic & Rejected \\\\", "\\midrule"]
+    """E suppressions by EC outcome; a rejection is correct if the alert's unit is vulnerable (alert level)."""
+    md = ["| Run | E suppressions | EC accepted: structural | EC accepted: trusted contract | EC accepted: semantic judgment "
+          "| Rejected: wrong E suppression (benefit) | Rejected: correct E suppression (cost) |",
+          "|---|---|---|---|---|---|---|"]
+    tex = ["\\begin{tabular}{lrrrrrr}", "\\toprule",
+           "Corpus, model & E supp. & Struct. & Contract & Semantic & \\multicolumn{2}{c}{Rejected: wrong / correct} \\\\",
+           "\\midrule"]
     for label, run, model in MAIN:
         r = _run(run)
         if r is None or "EC" not in r["decisions"]:
             continue
-        ec = r["decisions"]["EC"].values()
-        supp = [d for d in ec if d["e_decision"] == "suppress"]
-        cnt = collections.Counter(d["gate"]["category"] for d in supp if d["gate"]["suppress"])
-        rej = sum(not d["gate"]["suppress"] for d in supp)
+        gold = gold_by_unit(run)
+        unit = {a["alert_id"]: a["unit"] for a in r["alerts"]}
+        supp = [(k, d) for k, d in r["decisions"]["EC"].items() if d["e_decision"] == "suppress"]
+        cnt = collections.Counter(d["gate"]["category"] for _, d in supp if d["gate"]["suppress"])
+        rej_wrong = sum(not d["gate"]["suppress"] and gold[unit[k]] for k, d in supp)
+        rej_right = sum(not d["gate"]["suppress"] and not gold[unit[k]] for k, d in supp)
         short = {"qwen3-coder-next": "coder-next", "qwen3.5:9b": "9b"}[model]
         row = (f"{label.split()[0]}, {short}", len(supp), cnt["structural_check_passed"], cnt["trusted_contract_matched"],
-               cnt["semantic_judgment_remaining"], rej)
+               cnt["semantic_judgment_remaining"], rej_wrong, rej_right)
         md.append("| " + " | ".join(str(x) for x in row) + " |")
         tex.append(" & ".join(str(x).replace("_", "\\_") for x in row) + " \\\\")
     tex += ["\\bottomrule", "\\end{tabular}"]
@@ -154,9 +166,10 @@ def gate_table():
 
 def resources_table():
     log = [json.loads(l) for l in (RESULTS / "llm_calls.jsonl").read_text().splitlines() if l.strip()]
-    md = ["| Run | Model | Logical calls | Uncached | Prompt tokens | Completion tokens | LLM wall time (s) | Transport retries | Backend |",
-          "|---|---|---|---|---|---|---|---|---|"]
-    tex = ["\\begin{tabular}{llrrrrr}", "\\toprule", "Run & Model & Calls & Uncached & In tok. & Out tok. & Time (s) \\\\", "\\midrule"]
+    md = ["| Run | Model | Triage jobs (alerts x L,E) | Completion requests (incl. schema repair) | Uncached | Prompt tokens "
+          "| Completion tokens | LLM wall time (s) | Transport retries | Backend |",
+          "|---|---|---|---|---|---|---|---|---|---|"]
+    tex = ["\\begin{tabular}{llrrrrr}", "\\toprule", "Run & Model & Requests & Uncached & In tok. & Out tok. & Time (s) \\\\", "\\midrule"]
     for label, run, model in MAIN:
         r = _run(run)
         if r is None:
@@ -165,7 +178,7 @@ def resources_table():
         rows = [x for x in log if x["tag"].startswith(f"{run}:")]
         retries = sum(x.get("transport_retries") or 0 for x in rows)
         t = sum(v for k, v in m["timing_s"].items() if k.startswith("llm_"))
-        md.append(f"| {run} | {model} | {m['llm']['calls']} | {m['llm']['uncached_calls']} | {m['llm']['prompt_tokens']:,} | "
+        md.append(f"| {run} | {model} | {2 * m['alerts']} | {m['llm']['calls']} | {m['llm']['uncached_calls']} | {m['llm']['prompt_tokens']:,} | "
                   f"{m['llm']['completion_tokens']:,} | {t:.0f} | {retries} | {', '.join(m['llm']['fingerprints'])} |")
         tex.append(f"{run.replace('test-', '')} & \\texttt{{{model}}} & {m['llm']['calls']} & {m['llm']['uncached_calls']} & "
                    f"{m['llm']['prompt_tokens']:,} & {m['llm']['completion_tokens']:,} & {t:.0f} \\\\")
@@ -177,6 +190,53 @@ def resources_table():
     write("resources", "\n".join(tex) + "\n", "\n".join(md) + "\n")
 
 
+def status_table():
+    """How each L/E decision came about: a valid first reply, a repaired reply, or a conservative fallback."""
+    md = ["| Run | Arm | Valid reply | Valid after schema repair | Invalid after repair (kept) | No evidence (kept) | Transport error (kept) |",
+          "|---|---|---|---|---|---|---|"]
+    for label, run, model in MAIN:
+        r = _run(run)
+        if r is None:
+            continue
+        for arm in ("L", "E"):
+            st = collections.Counter(d["status"] for d in r["decisions"][arm].values())
+            row = (st["ok"], sum(v for k, v in st.items() if k.startswith("repaired_")),
+                   sum(v for k, v in st.items() if k.startswith("invalid_")), st["no_evidence"] + st["over_input_budget"],
+                   sum(v for k, v in st.items() if k.startswith("error:")))
+            md.append(f"| {run} | {arm} | " + " | ".join(str(x) for x in row) + " |")
+    (OUT_MD / "status.md").write_text("\n".join(md) + "\n")
+
+
+def sensitivity_table():
+    """OWASP metrics on the official labels and with the cases our review marked ambiguous left out."""
+    import csv
+    from . import scoring
+    amb = {r["case"] for r in csv.DictReader((ROOT / "data" / "adjudications.csv").open()) if r["review"] == "ambiguous"}
+    md = ["| Run | Arm | FP removal (official) | FP removal (ambiguous excluded) | TP retention (official) | TP retention (excluded) |",
+          "|---|---|---|---|---|---|"]
+    tex = ["\\begin{tabular}{llrrrr}", "\\toprule",
+           "Model & Arm & \\multicolumn{2}{c}{FP removal} & \\multicolumn{2}{c}{TP retention} \\\\",
+           " & & official & excl. & official & excl. \\\\", "\\midrule"]
+    units_all = [{"unit": c.name, "gold": c.vulnerable, "family": c.family} for c in owasp.load("test")]
+    for label, run, model in MAIN:
+        if "owasp" not in run or (r := _run(run)) is None:
+            continue
+        reported = {a["unit"] for a in r["alerts"]}
+        kept = {a: set(u) for a, u in r["scores"]["retained_units"].items()}
+        sub = [u for u in units_all if u["unit"] not in amb]
+        for arm in ARMS:
+            o, x = scoring.metrics(units_all, reported, kept[arm]), scoring.metrics(sub, reported, kept[arm])
+            fpo, fpx = f"{o['fp_removal']:.3f}", f"{x['fp_removal']:.3f}"
+            md.append(f"| {run} | {arm} | {fpo} | {fpx} | {f3(o['tp_retention'])} | {f3(x['tp_retention'])} |")
+            short = {"qwen3-coder-next": "coder-next", "qwen3.5:9b": "9b"}[model]
+            tex.append(f"{short if arm == 'S' else ''} & {arm} & {fpo} & {fpx} & {f3(o['tp_retention'])} & {f3(x['tp_retention'])} \\\\")
+        tex.append("\\midrule")
+    tex[-1] = "\\bottomrule"
+    tex.append("\\end{tabular}")
+    md.append(f"\nExcluded as ambiguous ({len(amb)}): {', '.join(sorted(amb))}")
+    write("sensitivity", "\n".join(tex) + "\n", "\n".join(md) + "\n")
+
+
 def main():
     subjects_table()
     main_table()
@@ -184,6 +244,8 @@ def main():
     gate_table()
     resources_table()
     differences_table()
+    status_table()
+    sensitivity_table()
     print(f"tables written to {OUT_TEX} and {OUT_MD}")
 
 

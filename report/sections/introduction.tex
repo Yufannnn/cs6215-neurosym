@@ -14,7 +14,7 @@ This project compares five configurations on the same set of warnings from Semgr
 \end{itemize}
 Because every arm can only drop baseline warnings, none can exceed the baseline's recall. What the comparison isolates is the precision gained and the real vulnerabilities lost.
 
-The contributions are an independently designed evidence representation and gate for path-traversal triage, and a controlled comparison on 134 held-out OWASP Benchmark cases, 24 held-out diagnostic program pairs with mechanically validated labels, and real-world vulnerability fixes. We make no novelty claim for combining static analysis with LLMs; Section~\ref{sec:related} positions the work. The questions are:
+The contributions are an independently designed evidence representation and gate for path-traversal triage, and a controlled comparison on 134 held-out OWASP Benchmark cases and 24 held-out diagnostic program pairs with execution-checked labels, plus a small real-world case study. The comparison includes an independent correctness review of our own analyzer, whose counterexamples and their effect on the results we report. We make no novelty claim for combining static analysis with LLMs; Section~\ref{sec:related} positions the work. The questions are:
 \begin{itemize}
 \item \textbf{RQ1.} What false-positive removal / true-positive retention trade-off does each configuration achieve?
 \item \textbf{RQ2.} Do structured evidence and the gate add value beyond ordinary prompting and beyond deterministic refinement?

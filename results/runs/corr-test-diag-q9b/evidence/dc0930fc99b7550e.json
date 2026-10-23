@@ -1,0 +1,106 @@
+{
+ "file_sha256": "02415f5cd8ff078e9ee3abc95fffacf62cd7113e4e5eb1ac704a98980dd5a463",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "os.path.exists",
+  "argument": "target",
+  "reads": {
+   "target": [
+    "s1:target"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "target = os.path.abspath(os.path.join(ROOT, request.form.get('f', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if target.startswith(ROOT + os.sep):"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return os.path.exists(target)"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Return",
+   "code": "return False"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:target",
+   "var": "target",
+   "line": 14,
+   "code": "target = os.path.abspath(os.path.join(ROOT, request.form.get('f', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "target.startswith(ROOT + os.sep)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s2",
+   "condition": "target.startswith(ROOT + os.sep)",
+   "polarity_to_reach_sink": true,
+   "kind": "enclosing",
+   "reads": {
+    "target": [
+     "s1:target"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "os.path.abspath",
+  "os.path.join",
+  "flask.request.form.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:target"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [
+   {
+    "guard": "s2",
+    "condition": "target.startswith(ROOT + os.sep)",
+    "recognizer": "startswith(root + sep)"
+   }
+  ],
+  "safe_api": []
+ }
+}

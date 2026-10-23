@@ -1,73 +1,73 @@
-unit,split,intended,validated,agree,witness,errors,runs
-checked_vs_original1_vuln,test,True,True,True,"[('%2e%2e%2fsecret', '', 'all')]",0,165
-checked_vs_original1_safe,test,False,False,True,[],0,165
-checked_vs_original2_vuln,test,True,True,True,"[('%2e%2e%2fsecret', '', 'all')]",0,165
-checked_vs_original2_safe,test,False,False,True,[],0,165
-overwrite1_vuln,test,True,True,True,"[('../../etc/passwd', '', 'all')]",0,165
-overwrite1_safe,test,False,False,True,[],0,165
-overwrite2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-overwrite2_safe,test,False,False,True,[],0,165
-guard_other_value1_vuln,test,True,True,True,"[('../secret.txt', '', 'primary')]",0,165
-guard_other_value1_safe,test,False,False,True,[],0,165
-guard_other_value2_vuln,test,True,True,True,"[('../secret.txt', '', 'secondary')]",0,165
-guard_other_value2_safe,test,False,False,True,[],0,165
-reject_exits1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-reject_exits1_safe,test,False,False,True,[],0,165
-reject_exits2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-reject_exits2_safe,test,False,False,True,[],0,165
-send_from_directory_base1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-send_from_directory_base1_safe,test,False,False,True,[],0,165
-send_from_directory_base2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-send_from_directory_base2_safe,test,False,False,True,[],0,165
-prefix_confusion1_vuln,test,True,True,True,"[('../files_secret/x', '', 'all')]",0,165
-prefix_confusion1_safe,test,False,False,True,[],0,165
-prefix_confusion2_vuln,test,True,True,True,"[('../files_secret/x', '', 'all')]",0,165
-prefix_confusion2_safe,test,False,False,True,[],0,165
-canonicalize_only1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-canonicalize_only1_safe,test,False,False,True,[],0,165
-canonicalize_only2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-canonicalize_only2_safe,test,False,False,True,[],0,165
-absolute_join1_vuln,test,True,True,True,"[('/etc/passwd', '', 'all')]",0,165
-absolute_join1_safe,test,False,False,True,[],0,165
-absolute_join2_vuln,test,True,True,True,"[('/etc/passwd', '', 'all')]",0,165
-absolute_join2_safe,test,False,False,True,[],0,165
-alternate_branch1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-alternate_branch1_safe,test,False,False,True,[],0,165
-alternate_branch2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-alternate_branch2_safe,test,False,False,True,[],0,165
-named_sanitizer1_vuln,test,True,True,True,"[('/etc/passwd', '', 'all')]",0,165
-named_sanitizer1_safe,test,False,False,True,[],0,165
-named_sanitizer2_vuln,test,True,True,True,"[('/etc/passwd', '', 'all')]",0,165
-named_sanitizer2_safe,test,False,False,True,[],0,165
-unreachable_flow1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-unreachable_flow1_safe,test,False,False,True,[],0,165
-unreachable_flow2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-unreachable_flow2_safe,test,False,False,True,[],0,165
-container_alias1_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-container_alias1_safe,test,False,False,True,[],0,165
-container_alias2_vuln,test,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-container_alias2_safe,test,False,False,True,[],0,165
-allowlist1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-allowlist1_safe,dev,False,False,True,[],0,165
-dict_lookup1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-dict_lookup1_safe,dev,False,False,True,[],0,165
-ternary1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-ternary1_safe,dev,False,False,True,[],0,165
-basename1_vuln,dev,True,True,True,"[('..', '', 'all')]",0,165
-basename1_safe,dev,False,False,True,[],0,165
-decode_order1_vuln,dev,True,True,True,"[('%2e%2e%2fsecret', '', 'all')]",0,165
-decode_order1_safe,dev,False,False,True,[],0,165
-exception_flow1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-exception_flow1_safe,dev,False,False,True,[],0,165
-resolve_order1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-resolve_order1_safe,dev,False,False,True,[],0,165
-loop_source1_vuln,dev,True,True,True,"[('x-file/../../../etc/passwd', '', 'all')]",0,165
-loop_source1_safe,dev,False,False,True,[],0,165
-lstrip_join1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-lstrip_join1_safe,dev,False,False,True,[],0,165
-numeric_id1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-numeric_id1_safe,dev,False,False,True,[],165,165
-hashed_name1_vuln,dev,True,True,True,"[('../secret.txt', '', 'all')]",0,165
-hashed_name1_safe,dev,False,False,True,[],0,165
-regex_anchor1_vuln,dev,True,True,True,"[('a/../../secret', '', 'all')]",0,165
-regex_anchor1_safe,dev,False,False,True,[],0,165
+unit,split,intended,validated,outcome,agree,witness,runs,completed,rejected,errors
+checked_vs_original1_vuln,test,True,True,witness,True,"[('%2e%2e%2fsecret', '', 'all')]",195,125,70,0
+checked_vs_original1_safe,test,False,False,no_witness,True,[],195,125,70,0
+checked_vs_original2_vuln,test,True,True,witness,True,"[('%2e%2e%2fsecret', '', 'all')]",195,125,70,0
+checked_vs_original2_safe,test,False,False,no_witness,True,[],195,125,70,0
+overwrite1_vuln,test,True,True,witness,True,"[('../../etc/passwd', '', 'all')]",195,195,0,0
+overwrite1_safe,test,False,False,no_witness,True,[],195,195,0,0
+overwrite2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+overwrite2_safe,test,False,False,no_witness,True,[],195,195,0,0
+guard_other_value1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'primary')]",195,125,70,0
+guard_other_value1_safe,test,False,False,no_witness,True,[],195,125,70,0
+guard_other_value2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'secondary')]",195,125,70,0
+guard_other_value2_safe,test,False,False,no_witness,True,[],195,125,70,0
+reject_exits1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+reject_exits1_safe,test,False,False,no_witness,True,[],195,125,0,0
+reject_exits2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+reject_exits2_safe,test,False,False,no_witness,True,[],195,125,70,0
+send_from_directory_base1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+send_from_directory_base1_safe,test,False,False,no_witness,True,[],195,125,0,0
+send_from_directory_base2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+send_from_directory_base2_safe,test,False,False,no_witness,True,[],195,125,0,0
+prefix_confusion1_vuln,test,True,True,witness,True,"[('../files_secret/x', '', 'all')]",195,135,60,0
+prefix_confusion1_safe,test,False,False,no_witness,True,[],195,125,70,0
+prefix_confusion2_vuln,test,True,True,witness,True,"[('../files_secret/x', '', 'all')]",195,135,0,0
+prefix_confusion2_safe,test,False,False,no_witness,True,[],195,125,0,0
+canonicalize_only1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+canonicalize_only1_safe,test,False,False,no_witness,True,[],195,125,70,0
+canonicalize_only2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+canonicalize_only2_safe,test,False,False,no_witness,True,[],195,125,70,0
+absolute_join1_vuln,test,True,True,witness,True,"[('/etc/passwd', '', 'all')]",195,115,80,0
+absolute_join1_safe,test,False,False,no_witness,True,[],195,115,80,0
+absolute_join2_vuln,test,True,True,witness,True,"[('/etc/passwd', '', 'all')]",195,135,60,0
+absolute_join2_safe,test,False,False,no_witness,True,[],195,115,80,0
+alternate_branch1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,181,14,0
+alternate_branch1_safe,test,False,False,no_witness,True,[],195,125,70,0
+alternate_branch2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,139,56,0
+alternate_branch2_safe,test,False,False,no_witness,True,[],195,125,70,0
+named_sanitizer1_vuln,test,True,True,witness,True,"[('/etc/passwd', '', 'all')]",195,195,0,0
+named_sanitizer1_safe,test,False,False,no_witness,True,[],195,185,10,0
+named_sanitizer2_vuln,test,True,True,witness,True,"[('/etc/passwd', '', 'all')]",195,195,0,0
+named_sanitizer2_safe,test,False,False,no_witness,True,[],195,185,10,0
+unreachable_flow1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+unreachable_flow1_safe,test,False,False,no_witness,True,[],195,195,0,0
+unreachable_flow2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+unreachable_flow2_safe,test,False,False,no_witness,True,[],195,195,0,0
+container_alias1_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+container_alias1_safe,test,False,False,no_witness,True,[],195,195,0,0
+container_alias2_vuln,test,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+container_alias2_safe,test,False,False,no_witness,True,[],195,195,0,0
+allowlist1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+allowlist1_safe,dev,False,False,no_witness,True,[],195,10,185,0
+dict_lookup1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+dict_lookup1_safe,dev,False,False,no_witness,True,[],195,195,0,0
+ternary1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+ternary1_safe,dev,False,False,no_witness,True,[],195,195,0,0
+basename1_vuln,dev,True,True,witness,True,"[('..', '', 'all')]",195,195,0,0
+basename1_safe,dev,False,False,no_witness,True,[],195,185,0,0
+decode_order1_vuln,dev,True,True,witness,True,"[('%2e%2e%2fsecret', '', 'all')]",195,115,80,0
+decode_order1_safe,dev,False,False,no_witness,True,[],195,105,90,0
+exception_flow1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+exception_flow1_safe,dev,False,False,no_witness,True,[],195,195,0,0
+resolve_order1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,185,10,0
+resolve_order1_safe,dev,False,False,no_witness,True,[],195,125,70,0
+loop_source1_vuln,dev,True,True,witness,True,"[('x-file/../../../etc/passwd', '', 'all')]",195,195,0,0
+loop_source1_safe,dev,False,False,no_witness,True,[],195,195,0,0
+lstrip_join1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+lstrip_join1_safe,dev,False,False,no_witness,True,[],195,135,60,0
+numeric_id1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+numeric_id1_safe,dev,False,False,no_witness,True,[],195,10,0,185
+hashed_name1_vuln,dev,True,True,witness,True,"[('../secret.txt', '', 'all')]",195,195,0,0
+hashed_name1_safe,dev,False,False,no_witness,True,[],195,195,0,0
+regex_anchor1_vuln,dev,True,True,witness,True,"[('a/../../secret', '', 'all')]",195,115,80,0
+regex_anchor1_safe,dev,False,False,no_witness,True,[],195,10,185,0

@@ -1,10 +1,23 @@
-| Target | S reports (vuln / fixed) | S keeps vuln / fixed | D keeps vuln / fixed | L keeps vuln / fixed | E keeps vuln / fixed | EC keeps vuln / fixed |
-|---|---|---|---|---|---|---|
-| benbusby/whoogle-search@3a2e0b262e | yes / yes | yes / yes | yes / yes | yes / yes | yes / yes | yes / yes |
-| cmusatyalab/opendiamond@398049c187 | no / no | - / - | - / - | - / - | - / - | - / - |
-| corydolphin/flask-cors@67c4b2cc98 | no / no | - / - | - / - | - / - | - / - | - / - |
-| mlflow/mlflow@ac4b697bb0 | no / no | - / - | - / - | - / - | - / - | - / - |
-| mlflow/mlflow@5044878da0 | yes / yes | yes / yes | yes / yes | no / no | yes / yes | yes / yes |
-| mlflow/mlflow@cf83dad4df | no / no | - / - | - / - | - / - | - / - | - / - |
+| Target | Applicable | Defect alerts | S | D | L | E | EC |
+|---|---|---|---|---|---|---|---|
+| benbusby/whoogle-search@3a2e0b262e | yes | 3 defect, 0 related | keep / - / keep | keep / - / keep | keep / - / keep | keep / - / keep | keep / - / keep |
+| cmusatyalab/opendiamond@398049c187 | yes | 0 defect, 0 related | - / - / - | - / - / - | - / - / - | - / - / - | - / - / - |
+| corydolphin/flask-cors@67c4b2cc98 | no | 0 defect, 0 related | - / - / - | - / - / - | - / - / - | - / - / - | - / - / - |
+| mlflow/mlflow@ac4b697bb0 | yes | 0 defect, 0 related | - / - / - | - / - / - | - / - / - | - / - / - | - / - / - |
+| mlflow/mlflow@5044878da0 | yes | 0 defect, 2 related | - / keep / keep | - / keep / keep | - / drop / drop | - / keep / keep | - / keep / keep |
+| mlflow/mlflow@cf83dad4df | no | 0 defect, 0 related | - / - / - | - / - / - | - / - / - | - / - / - | - / - / - |
 
-Unlabeled alerts outside targets: {"vulnerable": {"unlabeled_alerts": 2, "S_retained": 2, "D_retained": 2, "L_retained": 1, "E_retained": 2, "EC_retained": 2}, "fixed": {"unlabeled_alerts": 2, "S_retained": 2, "D_retained": 2, "L_retained": 1, "E_retained": 2, "EC_retained": 2}}
+Cells: defect alert kept / related alert kept / fixed-revision site kept.
+
+| Revision:role | Alerts | S kept | D kept | L kept | E kept | EC kept |
+|---|---|---|---|---|---|---|
+| fixed:fixed_defect_site | 3 | 3 | 3 | 1 | 3 | 3 |
+| fixed:out_of_scope_target | 2 | 2 | 2 | 1 | 2 | 2 |
+| fixed:related_fixed_site | 2 | 2 | 2 | 0 | 2 | 2 |
+| fixed:unrelated | 1 | 1 | 1 | 0 | 1 | 1 |
+| vulnerable:defect | 3 | 3 | 3 | 3 | 3 | 3 |
+| vulnerable:out_of_scope_target | 2 | 2 | 2 | 1 | 2 | 2 |
+| vulnerable:related | 2 | 2 | 2 | 0 | 2 | 2 |
+| vulnerable:unrelated | 1 | 1 | 1 | 0 | 1 | 1 |
+
+{"screened_targets": 6, "applicable": 4, "s_reports_defect": 1, "s_reports_related_only": 1, "s_misses": 2}

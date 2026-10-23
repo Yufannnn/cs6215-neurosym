@@ -1,7 +1,7 @@
 \section{Approach: Evidence-Checked Triage}
 \label{sec:approach}
 
-Figure~\ref{fig:pipeline} summarizes the pipeline. All components after the baseline are our own design and implementation, about 2{,}000 lines of Python. The model is reached through the NUS SoCLaaS service; no existing neuro-symbolic analyzer, released tool or prebuilt workflow is used.
+Figure~\ref{fig:pipeline} summarizes the pipeline. All components after the baseline are our own design and implementation, about 3{,}000 lines of Python. The model is reached through the NUS SoCLaaS service; no existing neuro-symbolic analyzer, released tool or prebuilt workflow is used.
 
 \begin{figure}[t]
 \centering
@@ -31,9 +31,10 @@ Statements are walked in order:
 \begin{itemize}
 \item Expressions are constant-folded. String operations, \texttt{os.path} and \texttt{pathlib} functions, subscripts and slices, and local list and dict mutation are interpreted element by element. This lets \texttt{lst.append(param); lst.pop(0); bar = lst[1]} evaluate to a constant when the selected element is one.
 \item \texttt{if} and \texttt{match} statements whose condition or subject folds to a constant prune the infeasible branch. Definitions made there are recorded as \emph{on an infeasible path}.
-\item Loops are iterated to a fixpoint (at most five rounds; otherwise values are widened and the record is marked incomplete). States leaving through \texttt{break} or \texttt{continue} are joined after the loop. An exception handler starts from the join of every prefix state of its \texttt{try} body.
+\item Loops are iterated to a fixpoint (at most five rounds; otherwise values are widened and the record is marked incomplete). States leaving through \texttt{break} or \texttt{continue} are joined after the loop and bypass its \texttt{else}.
+\item An exception handler starts from the join of every state from which the \texttt{try} body may raise, nested blocks included. A \texttt{finally} block containing the sink also sees returns and exceptions.
 \item Non-returning calls (\texttt{flask.abort}, \texttt{sys.exit}) end a path.
-\item Unmodelled functions propagate their inputs, matching Semgrep's default.
+\item Unmodelled library functions propagate their inputs, matching Semgrep's default. Functions defined in the analysed module are unknown, since their bodies are not analysed.
 \end{itemize}
 
 \paragraph{Guards.}
@@ -43,7 +44,10 @@ An \texttt{if} whose one branch always exits makes its condition a \emph{dominat
 The \emph{EvidenceRecord} lists every statement with a stable ID, and every definition with its value, its dependencies (reaching definitions of the variables it reads) and its flags. It also lists branch feasibility, the dominating guards, and a few facts: the abstract value at the sink, whether the analysis is complete, and the tainted definitions pruned as infeasible.
 
 \paragraph{Completeness.}
-The record is marked incomplete when a construct the analysis cannot treat soundly affects the result. Examples are a loop that does not converge, \texttt{global}/\texttt{nonlocal}/\texttt{exec}/\texttt{getattr}, comprehensions, and assigning a container to a second name (two names, one mutable object). Incomplete records can never justify a suppression.
+The record is marked incomplete when the analysis meets a construct it does not model. Examples are a loop that does not converge, \texttt{global}/\texttt{nonlocal}/\texttt{exec}/\texttt{getattr}, comprehensions, \texttt{break} through \texttt{finally}, exception-suppressing context managers, calls to nested functions, and a local container that gets a second name (by assignment, by being stored in another container or attribute, or by being passed to an unmodelled call). Incomplete records can never justify a suppression.
+
+\paragraph{Assumptions.}
+A ``proof'' by D is relative to these assumptions. Only declared sources produce attacker data. Library callees neither read request data themselves nor keep references to their arguments beyond what is modelled. The analysis is intraprocedural, and symlinks are out of scope. Section~\ref{sec:correction} reports counterexamples that broke the frozen version of this analysis.
 
 \paragraph{Guard coverage.}
 We do not compare variable names. A guard \emph{constrains the sink value} if the definitions it reads are in the sink's dependency slice. It \emph{covers every attacker flow} if no taint origin can be reached backwards from the sink without crossing those guarded definitions. A taint origin is a definition that reads a source directly. This distinguishes a check on \texttt{candidate} followed by \texttt{open(name)} from \texttt{open(candidate)}, and a guard in one branch from a guard that dominates both.
@@ -54,15 +58,15 @@ D suppresses an alert only if the record is complete and one of these holds:
 \begin{enumerate}
 \item the sink is unreachable;
 \item the sink value is constant or trusted on every feasible path (an overwrite or an infeasible branch);
-\item a documented safe API applies with its preconditions;
-\item \emph{sound containment}: the sink value is one definition normalized by \texttt{realpath}, \texttt{abspath} or \texttt{resolve()}, and a guard dominating the sink tests that same definition with one of:
+\item \emph{containment}: the sink value is one definition normalized by \texttt{realpath}, \texttt{abspath} or \texttt{resolve()}, and a guard dominating the sink tests that same definition with one of
 \begin{itemize}
 \item \texttt{v.startswith(root + os.sep)}
-\item \texttt{commonpath([root, v]) == root}
+\item \texttt{commonpath([root, v]) == root} (the root, not \texttt{v}, on the right)
 \item \texttt{v.is\_relative\_to(root)}
 \end{itemize}
+where \texttt{root} is built only from constants, module constants or untainted locals whose definitions reach both the guard and the sink.
 \end{enumerate}
-String-prefix checks without a separator, containment on an unnormalized path, and block-lists (\texttt{'../' in name}) are deliberately \emph{not} recognized.
+String-prefix checks without a separator, containment on an unnormalized path, and block-lists (\texttt{'../' in name}) are deliberately \emph{not} recognized. The code has a route for documented safe APIs, but no API contract was implemented, so that route never fired in any run.
 
 \paragraph{L: ordinary triage.}
 The model receives the threat model, the warning (sink API, argument, line), and the line-numbered source of the enclosing function. It returns JSON with a decision (\texttt{retain}, \texttt{suppress} or \texttt{unknown}), one of five reason kinds, supporting lines and a short rationale.
@@ -82,7 +86,7 @@ EC replays E's responses unchanged and applies a deterministic gate. A suppressi
   \item a guard claim requires a cited guard that dominates the sink, constrains the sink value and covers every attacker flow.
   \end{itemize}
 \end{itemize}
-If such a guard also matches a sound-containment recognizer, the gate logs \texttt{trusted\_contract\_matched}. Otherwise it logs \texttt{semantic\_judgment\_remaining}: the guard is structurally right, but whether its predicate actually confines the path is the model's judgment. We keep this category visible because it is exactly where the LLM can add something D cannot, and exactly where it can be wrong.
+The gate logs such a suppression as \texttt{trusted\_contract\_matched} if the guard also matches D's containment recognizer, and as \texttt{semantic\_judgment\_remaining} otherwise. The guard check is a \emph{dependency-consistency} filter: every tainted flow to the sink passes through a definition the guard reads. It does not establish that the checked value is the consumed value. A transformation applied after the check (\texttt{name = target + '/../x'} after a check on \texttt{target}) passes it. Whether the predicate, and anything applied after it, actually confines the path is the model's judgment. We keep this category visible because it is exactly where the LLM can add something D cannot, and exactly where it can be wrong.
 
 The boundary between D and EC was fixed before any test data was seen. D has no recognizer that the gate lacks. EC can differ from D only where the model asserts confinement by a non-standard guard, or where it misses a suppression D would make.
 
@@ -91,7 +95,7 @@ The boundary between D and EC was fixed before any test data was seen. D has no 
 \item \textbf{Same inputs.} L and E see the same function source and token budget (12k input, 2k output tokens). Benchmark identifiers and category routes are masked in everything a model sees.
 \item \textbf{Fixed retries.} Each alert gets one logical call per arm, plus a single fixed schema-repair retry. Transport errors are retried with backoff and logged; answers are never re-sampled.
 \item \textbf{Replayable responses.} Responses are cached under a key that includes prompt version and replicate ID. Fresh-generation experiments use new replicate IDs and never overwrite the frozen responses.
-\item \textbf{Freeze enforcement.} The rule, split, prompts and analyzer were tagged \texttt{protocol-freeze} before any test data was opened, and the pipeline refuses test subjects if any frozen file differs from the tag.
+\item \textbf{Freeze enforcement.} The rule, split, prompts and analyzer were tagged \texttt{protocol-freeze} before any arm was run on test data. The pipeline refuses test subjects if any frozen file differs from the tag, and refuses to overwrite an archived run.
 \end{itemize}
 
 \subsection{Design iterations}
@@ -101,3 +105,17 @@ All changes were made on development data before the freeze; the full log is in 
 \item \textbf{Three soundness bugs found by development data and regression tests:} states leaving loops through \texttt{break} were dropped, which made a vulnerable case look constant; \texttt{abort()} was not treated as an exit; and container aliasing was not detected.
 \item \textbf{Four wrong diagnostic labels.} The label validator (Section~\ref{sec:eval}) rejected four of our own intended labels, which we then fixed.
 \end{itemize}
+
+\subsection{Post-review correctness correction}
+\label{sec:correction}
+After the experiments, an independent adversarial review (by GPT Pro) of the frozen artifact constructed programs on which the extractor reported \emph{complete} evidence while the warning was real, so D would suppress a true vulnerability (assuming Semgrep alerts at the sink). Its witnesses were:
+\begin{itemize}
+\item \texttt{commonpath([R, v]) != v}, which checks the wrong containment direction;
+\item a \texttt{startswith} root taken from the request;
+\item a loop \texttt{else} applied after \texttt{break};
+\item a \texttt{return} skipping to a \texttt{finally} that contains the sink;
+\item chained (\texttt{a = b = [...]}) and nested container aliasing.
+\end{itemize}
+Fixing these, we found 16 more programs of the same kinds: exceptions raised from nested blocks, \texttt{*args}/\texttt{**kwargs} parameters, \texttt{match} captures, mutated module objects, and module or nested helper functions. All 22 are now regression tests, alongside 6 safe programs that must stay suppressed.
+
+The corrected extractor (tag \texttt{review-correction-1}) re-extracts all 220 held-out benchmark alerts to \emph{byte-identical} evidence records. So the E prompts, the archived E responses, and all D, E and EC decisions are unchanged; offline correction runs reproduce every score. On the real-world snapshots, 16 records changed; D still keeps all of them, and re-querying the 16 changed E prompts changed no decision. The frozen results below therefore stand, but D's guarantees are only as strong as the assumptions above. The gate's limitation (dependency consistency rather than value identity) is unchanged and documented by a test.

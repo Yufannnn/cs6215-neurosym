@@ -1,4 +1,4 @@
-# Handoff (2026-10-22)
+# Handoff (updated 2026-10-23)
 
 State of the CS6215 project for continuing on another machine. Read with `README.md`, `CLAUDE.md` and `docs/decisions.md`.
 
@@ -6,13 +6,13 @@ State of the CS6215 project for continuing on another machine. Read with `README
 
 - **Experiments complete:** OWASP test, held-out diagnostic pairs, both models, stability, real-world.
 - **Protocol:** frozen at tag `protocol-freeze`, and the frozen files are unchanged since.
-- **Report** (`report/`): 7 pages, ACM sigconf, no overfull boxes. Build with `latexmk -pdf -outdir=build main.tex`.
-- **Tests:** 50/50 pass. A fresh-clone offline replay reproduced the held-out decisions exactly.
-- **Review:** a package was sent to GPT Pro (`REVIEW_BRIEF.md` lists what it was asked to check). Its findings are not yet applied.
+- **Report** (`report/`): 9 pages including references, ACM sigconf, no overfull boxes and no underfull lines with badness ≥ 2000. Build with `latexmk -pdf -outdir=build main.tex`.
+- **Tests:** 81/81 pass. A fresh-clone offline replay reproduced the held-out decisions exactly.
+- **Review:** GPT Pro's adversarial review (2026-10-23) has been applied; see `docs/review/gptpro-2026-10-23/RESPONSE.md`. The extractor correction is tagged `review-correction-1` and changed no held-out result.
 
 ## Open items
 
-1. Apply GPT Pro's review findings. Narrow claims rather than add scope. Do not re-run held-out data unless a finding requires it, and record any such re-run in `docs/decisions.md`.
+1. Optional: send the v2 review package for a re-review. Any new finding is handled the same way: a versioned correction plus narrowed claims.
 2. Make the repository public, put its URL in place of `ARTIFACT_URL` in `report/main.tex`, and rebuild. Before going public, delete the `llm-cache-2026-10-22` release; see the cache note below.
 3. Yufan edits the three `[confirm]` sentences in `report/sections/ai_usage.tex`.
 4. Deadline: 30 Nov 2026, 23:59 SGT. Submit the PDF with the repo link.

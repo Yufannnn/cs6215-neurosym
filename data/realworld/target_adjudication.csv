@@ -1,0 +1,7 @@
+target,applicable,flow,reason
+benbusby/whoogle-search@3a2e0b262e,yes,request.args['name'] joined to CONFIG_PATH; opened for pickle load and dump in config(),The fix normalises the name and allow-lists [A-Za-z0-9_.+-]. The element()/window() changes in the same commit fix SSRF (not CWE-22)
+cmusatyalab/opendiamond@398049c187,yes,Flask route variables (<path:video> <gididx>) joined to DATAROOT/INDEXDIR in helper functions,Route parameters are not declared sources and the join is in another function (intraprocedural analysis)
+corydolphin/flask-cors@67c4b2cc98,no,request.path matched against CORS resource regexes,No filesystem operation: outside the task
+mlflow/mlflow@ac4b697bb0,yes,request path reaches artifact-repository operations in other functions,The filesystem operation is in another function (intraprocedural analysis)
+mlflow/mlflow@5044878da0,yes,raw request path used after validate_path_is_safe checked its decoded form,The fix uses the validated value. Whether the local tmpdir sinks are exploitable at the parent revision is not established
+mlflow/mlflow@cf83dad4df,no,validate_path_is_safe misses Windows drive letters,Windows-specific: outside the POSIX task

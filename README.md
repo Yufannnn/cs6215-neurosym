@@ -7,10 +7,10 @@ A comparative static-analysis study. A symbolic baseline (Semgrep CE taint analy
 | Arm | What it is |
 |---|---|
 | **S** | Semgrep CE 1.182.1 with a project-authored, frozen taint rule (`baseline/rules/cwe22-taint.yaml`) |
-| **D** | S, then our deterministic recognizers only (constant/overwrite, infeasible branch, sound containment) |
+| **D** | S, then our deterministic recognizers only (constant/overwrite, infeasible branch, normalised containment under a trusted root) |
 | **L** | S, then ordinary LLM triage of the enclosing function |
 | **E** | S, then LLM triage over our structured evidence (definitions, branch feasibility, dominating guards) and four obligations |
-| **EC** | E's *same* responses, then an evidence gate: a suppression stands only if its claim matches the extracted facts |
+| **EC** | E's *same* responses, then an evidence gate: a suppression stands only if its cited evidence is consistent with the extracted facts (dependency consistency, not value identity) |
 
 All arms consume the same baseline warnings, so no arm can exceed S's recall. The study measures the trade-off between **false-positive removal** and **true-positive retention**. Protocol: [`docs/protocol.md`](docs/protocol.md). Design iterations, including failed ones: [`docs/decisions.md`](docs/decisions.md).
 
@@ -31,7 +31,7 @@ All arms consume the same baseline warnings, so no arm can exceed S's recall. Th
 | `results/runs/<run>/` | Per run: raw Semgrep JSON, alerts, evidence records, per-arm decisions (with raw model output), scores, manifest |
 | `results/llm_calls.jsonl` | One line per LLM call: served model, backend fingerprint, tokens, latency, cache hit, retries |
 | `results/tables/`, `report/tables/` | Generated tables (Markdown / LaTeX) |
-| `tests/` | 50 regression tests (offline; no API needed) |
+| `tests/` | 81 regression tests (offline; no API needed), including the post-review counterexamples |
 | `report/` | ACM `sigconf` report source |
 
 ## Setup
@@ -47,7 +47,7 @@ git clone https://github.com/OWASP-Benchmark/BenchmarkPython && git -C Benchmark
 git clone https://github.com/billquan/PyVul && git -C PyVul checkout 1172bfd1579b4ad2a524549412170d08ca618fb3
 git clone https://github.com/semgrep/semgrep-rules && git -C semgrep-rules checkout 16b9e6d45f10649f6a531ec4838ed9924372c3bc
 cd ../..
-.venv/bin/python -m pytest -q tests           # 50 offline tests
+.venv/bin/python -m pytest -q tests           # 81 offline tests
 ```
 
 LLM experiments use NUS SoCLaaS, an OpenAI-compatible API that is free for SoC users and needs the NUS network or VPN. Copy `.env.example` to `.env` and set `SOCLAAS_API_KEY`, then check access with `.venv/bin/python scripts/smoke_llm.py`.
@@ -72,9 +72,21 @@ cd report && latexmk -pdf -outdir=build main.tex
 **Replay without API access.** If `results/llm_cache/` is present (it is not committed, but can be shared), add `--offline` to any `run`: stored responses are replayed and the API is never called. A cache miss is an error, not a silent network call. Without the cache, re-running calls the model again. The service models may have changed since 22 October 2026, so expect small differences. The frozen responses that produced the reported numbers are stored inside each `results/runs/<run>/decisions_{L,E}.jsonl`.
 
 **Verified reproduction (2026-10-22).** A fresh clone of this repository on the same Mac (no `.env`, only the copied response cache) was set up exactly as above:
-- all 50 tests passed;
+- all 50 tests (at the time) passed;
 - `--offline` replays of `test-diag-qcn` and `test-owasp-qcn` reproduced every per-arm decision and every score exactly, with 0 API calls;
 - the report built (7 pages).
+
+**Post-review correction (2026-10-23, tag `review-correction-1`).** An independent review found programs on which the frozen extractor wrongly proved a warning safe. The fixes and 28 regression programs are described in `docs/decisions.md` (D-R1); the review and a point-by-point response are in `docs/review/gptpro-2026-10-23/`. To check the effect:
+
+```bash
+.venv/bin/python scripts/compare_evidence.py            # re-extract every archived alert, diff against the frozen records
+N=".venv/bin/python -m neurosym.cli run --correction"
+$N --subjects owasp:test --name corr-test-owasp-qcn --model qwen3-coder-next --offline   # likewise for the other three
+$N --subjects realworld:vulnerable --name corr-rw-vulnerable --model qwen3-coder-next
+.venv/bin/python scripts/realworld_eval.py corr-rw-vulnerable corr-rw-fixed            # same table as the frozen runs
+```
+
+All 220 held-out benchmark evidence records are byte-identical, so every frozen score is reproduced. The real-world case study (`scripts/realworld_eval.py`) uses a manual, per-warning defect mapping in `data/realworld/*_adjudication.csv`. The raw stability replies are in `results/stability_responses.jsonl`.
 
 **Development runs**, used before the freeze and not reported as test results: `dev-offline-D`, `dev-smoke` (prompts p1), `dev-p2`, `dev-final-owasp`, `dev-final-diag`.
 

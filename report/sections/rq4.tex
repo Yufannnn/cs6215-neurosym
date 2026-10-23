@@ -7,16 +7,16 @@ We drew 30 held-out alerts by a seeded rule, stratified by E's frozen decision (
 Decoding at temperature 0 is therefore not deterministic. E's held-out count of two wrongful suppressions could as well have been three, and that variation falls exactly in the category the gate cannot check.
 
 \paragraph{Smaller model.}
-With \texttt{qwen3.5:9b} (thinking disabled), ordinary triage became more aggressive and more harmful. On OWASP, L removed 23 of 33 false positives but discarded 6 of 35 real vulnerabilities (TP retention 0.829). On the pairs, it lost 8 of 23 (0.652). E kept every real vulnerability on both corpora, but added nothing over D: identical on OWASP, and one removal fewer on the pairs (0.632 versus 0.684).
+With \texttt{qwen3.5:9b} (thinking disabled), ordinary triage became more aggressive and more harmful. On OWASP, L removed 23 of 33 false positives but discarded 6 of 35 real vulnerabilities (TP retention 0.829). On the pairs, it lost 8 of 23 (0.652). E kept every real vulnerability on both corpora, two of them on the pairs only by fallback (no evidence record, and one invalid reply). It added nothing over D: identical on OWASP, and one removal fewer on the pairs (0.632 versus 0.684).
 
-The gate behaved differently with this model. It rejected five correct E suppressions on OWASP, so EC's FP removal fell from 0.364 to 0.212. In every case the model cited line numbers instead of the evidence IDs it was asked for. The gate's value thus depends on the model following the citation protocol: a weaker model makes it lose precision, but never safety.
+The gate behaved differently with this model. It rejected five correct E suppressions on OWASP, so EC's FP removal fell from 0.364 to 0.212. In every case the model cited line numbers instead of the evidence IDs it was asked for. The gate's value thus depends on the model following the citation protocol. With a weaker model, its rejections here cost precision and recovered no vulnerability.
 
 \paragraph{Cost.}
 Table~\ref{tab:resources} lists the LLM cost of each held-out run.
 \begin{itemize}
 \item \textbf{Speed.} The primary model answered in a median of 1.9\,s per cold call (90th percentile 3.2\,s), the small model in 13.0\,s (32.8\,s). Each LLM arm over the 68 OWASP alerts took 2.5 to 13 minutes.
-\item \textbf{Rate limiting.} SoCLaaS limited bursts: 171 transport retries were logged across the four held-out runs, and none changed an answer.
-\item \textbf{Total use.} The whole project, development included, used 857 uncached requests and 1.93M tokens, within the planned caps of 1{,}500 and 12M.
+\item \textbf{Rate limiting.} SoCLaaS limited bursts: 171 transport retries were logged across the four held-out runs. Transport retries did not depend on answer content, and the only content-dependent retry was the declared schema repair (6 requests in total).
+\item \textbf{Total use.} The whole project, development and the post-review correction runs included, used 874 uncached requests and 2.0M tokens, within the planned caps of 1{,}500 and 12M. Table~\ref{tab:resources} counts completion requests, which include schema repairs: 68 OWASP alerts give 136 triage jobs but 137 requests.
 \item \textbf{Deterministic parts.} Semgrep and evidence extraction took under 2\,s per corpus.
 \item \textbf{Price.} SoCLaaS has no charge or quota for SoC users. The figures matter as shared compute, and because they bound what a larger study would need.
 \end{itemize}
