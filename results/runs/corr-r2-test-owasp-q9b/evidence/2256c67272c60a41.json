@@ -1,0 +1,365 @@
+{
+ "file_sha256": "526ebfb02d23df5696090893887aaa297961c4e9357bb8c1a629a39cb72a32e2",
+ "function": "handler",
+ "sink": {
+  "statement": "s16",
+  "line": 54,
+  "api": "<path>.exists()",
+  "argument": "p",
+  "reads": {
+   "p": [
+    "s12:p"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "headers = request.headers.getlist('Handler')"
+  },
+  {
+   "id": "s4",
+   "line": 34,
+   "kind": "If",
+   "code": "if headers:"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Assign",
+   "code": "param = headers[0]"
+  },
+  {
+   "id": "s6",
+   "line": 37,
+   "kind": "Import",
+   "code": "import helpers.ThingFactory"
+  },
+  {
+   "id": "s7",
+   "line": 39,
+   "kind": "Assign",
+   "code": "thing = helpers.ThingFactory.createThing()"
+  },
+  {
+   "id": "s8",
+   "line": 40,
+   "kind": "Assign",
+   "code": "bar = thing.doSomething(param)"
+  },
+  {
+   "id": "s9",
+   "line": 42,
+   "kind": "Import",
+   "code": "import pathlib"
+  },
+  {
+   "id": "s10",
+   "line": 43,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s11",
+   "line": 45,
+   "kind": "Assign",
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)"
+  },
+  {
+   "id": "s12",
+   "line": 46,
+   "kind": "Assign",
+   "code": "p = (testfiles / bar).resolve()"
+  },
+  {
+   "id": "s13",
+   "line": 48,
+   "kind": "If",
+   "code": "if not str(p).startswith(str(testfiles)):"
+  },
+  {
+   "id": "s14",
+   "line": 49,
+   "kind": "AugAssign",
+   "code": "RESPONSE += 'Invalid Path.'"
+  },
+  {
+   "id": "s15",
+   "line": 52,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  },
+  {
+   "id": "s16",
+   "line": 54,
+   "kind": "If",
+   "code": "if p.exists():"
+  },
+  {
+   "id": "s17",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\""
+  },
+  {
+   "id": "s18",
+   "line": 57,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\""
+  },
+  {
+   "id": "s19",
+   "line": 59,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s3:headers",
+   "var": "headers",
+   "line": 32,
+   "code": "headers = request.headers.getlist('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:param",
+   "var": "param",
+   "line": 35,
+   "code": "param = headers[0]",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:headers"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s7:thing",
+   "var": "thing",
+   "line": 39,
+   "code": "thing = helpers.ThingFactory.createThing()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:bar",
+   "var": "bar",
+   "line": 40,
+   "code": "bar = thing.doSomething(param)",
+   "kind": "assign",
+   "value": "'' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s5:param",
+    "s7:thing"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:testfiles",
+   "var": "testfiles",
+   "line": 45,
+   "code": "testfiles = pathlib.Path(helpers.utils.TESTFILES_DIR)",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:p",
+   "var": "p",
+   "line": 46,
+   "code": "p = (testfiles / bar).resolve()",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:testfiles",
+    "s8:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s14:RESPONSE",
+   "var": "RESPONSE",
+   "line": 49,
+   "code": "RESPONSE += 'Invalid Path.'",
+   "kind": "augassign",
+   "value": "'Invalid Path.'",
+   "tainted": false,
+   "depends_on": [
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s17:RESPONSE",
+   "var": "RESPONSE",
+   "line": 55,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' exists.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s18:RESPONSE",
+   "var": "RESPONSE",
+   "line": 57,
+   "code": "RESPONSE += f\"File '{escape_for_html(str(p))}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:p",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 34,
+   "condition": "headers",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s13",
+   "line": 48,
+   "condition": "not str(p).startswith(str(testfiles))",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s16",
+   "line": 54,
+   "condition": "p.exists()",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s13",
+   "condition": "not str(p).startswith(str(testfiles))",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "testfiles": [
+     "s11:testfiles"
+    ],
+    "p": [
+     "s12:p"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [
+  "(testfiles / bar).resolve"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s3:headers",
+   "s5:param",
+   "s8:bar",
+   "s12:p"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

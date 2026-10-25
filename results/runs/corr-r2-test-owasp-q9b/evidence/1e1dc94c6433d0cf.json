@@ -1,0 +1,219 @@
+{
+ "file_sha256": "be0322edf87adb01228dbf054908e12ce34612e02b722e14384ff5eecb967df6",
+ "function": "handler",
+ "sink": {
+  "statement": "s8",
+  "line": 47,
+  "api": "codecs.open",
+  "argument": "f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+  "reads": {
+   "bar": [
+    "s4:bar"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 36,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 38,
+   "kind": "Import",
+   "code": "import urllib.parse"
+  },
+  {
+   "id": "s3",
+   "line": 39,
+   "kind": "Assign",
+   "code": "param = urllib.parse.unquote_plus(request.cookies.get('Handler', 'noCookieValueSupplied'))"
+  },
+  {
+   "id": "s4",
+   "line": 41,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s5",
+   "line": 43,
+   "kind": "Import",
+   "code": "import codecs"
+  },
+  {
+   "id": "s6",
+   "line": 44,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s7",
+   "line": 46,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s8",
+   "line": 47,
+   "kind": "Assign",
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')"
+  },
+  {
+   "id": "s9",
+   "line": 49,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\""
+  },
+  {
+   "id": "s10",
+   "line": 53,
+   "kind": "AugAssign",
+   "code": "RESPONSE += ' And file already exists.'"
+  },
+  {
+   "id": "s11",
+   "line": 58,
+   "kind": "AugAssign",
+   "code": "RESPONSE += \" But file doesn't exist yet.\""
+  },
+  {
+   "id": "s12",
+   "line": 62,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 36,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 39,
+   "code": "param = urllib.parse.unquote_plus(request.cookies.get('Handler', 'noCookieValueSupplied'))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:bar",
+   "var": "bar",
+   "line": 41,
+   "code": "bar = param",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s8:fileTarget",
+   "var": "fileTarget",
+   "line": 47,
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s4:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s9:RESPONSE",
+   "var": "RESPONSE",
+   "line": 49,
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:RESPONSE",
+    "s8:fileTarget"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s10:RESPONSE",
+   "var": "RESPONSE",
+   "line": 53,
+   "code": "RESPONSE += ' And file already exists.'",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s9:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s11:RESPONSE",
+   "var": "RESPONSE",
+   "line": 58,
+   "code": "RESPONSE += \" But file doesn't exist yet.\"",
+   "kind": "augassign",
+   "value": "\" But file doesn't exist yet.\" | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s10:RESPONSE",
+    "s1:RESPONSE",
+    "s9:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s3:param",
+   "s4:bar"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

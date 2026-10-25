@@ -1,0 +1,436 @@
+{
+ "file_sha256": "cfe4c1af4544def1a968c3f6c806938ad1831553ecec4da979d7c0a3610daa64",
+ "function": "handler",
+ "sink": {
+  "statement": "s20",
+  "line": 53,
+  "api": "codecs.open",
+  "argument": "f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+  "reads": {
+   "bar": [
+    "s10:bar"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "values = request.args.getlist('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "If",
+   "code": "if values:"
+  },
+  {
+   "id": "s5",
+   "line": 34,
+   "kind": "Assign",
+   "code": "param = values[0]"
+  },
+  {
+   "id": "s6",
+   "line": 36,
+   "kind": "Assign",
+   "code": "possible = 'ABC'"
+  },
+  {
+   "id": "s7",
+   "line": 37,
+   "kind": "Assign",
+   "code": "guess = possible[0]"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Match",
+   "code": "match guess:"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "case",
+   "code": "case 'A':"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "case",
+   "code": "case 'B':"
+  },
+  {
+   "id": "s12",
+   "line": 43,
+   "kind": "Assign",
+   "code": "bar = 'bob'"
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "kind": "case",
+   "code": "case 'C' | 'D':"
+  },
+  {
+   "id": "s14",
+   "line": 45,
+   "kind": "Assign",
+   "code": "bar = param"
+  },
+  {
+   "id": "s15",
+   "line": 46,
+   "kind": "case",
+   "code": "case _:"
+  },
+  {
+   "id": "s16",
+   "line": 47,
+   "kind": "Assign",
+   "code": "bar = \"bob's your uncle\""
+  },
+  {
+   "id": "s17",
+   "line": 49,
+   "kind": "Import",
+   "code": "import codecs"
+  },
+  {
+   "id": "s18",
+   "line": 50,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s19",
+   "line": 52,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s20",
+   "line": 53,
+   "kind": "Assign",
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')"
+  },
+  {
+   "id": "s21",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\""
+  },
+  {
+   "id": "s22",
+   "line": 59,
+   "kind": "AugAssign",
+   "code": "RESPONSE += ' And file already exists.'"
+  },
+  {
+   "id": "s23",
+   "line": 64,
+   "kind": "AugAssign",
+   "code": "RESPONSE += \" But file doesn't exist yet.\""
+  },
+  {
+   "id": "s24",
+   "line": 68,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:values",
+   "var": "values",
+   "line": 31,
+   "code": "values = request.args.getlist('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s3:param",
+   "var": "param",
+   "line": 32,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s5:param",
+   "var": "param",
+   "line": 34,
+   "code": "param = values[0]",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:values"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:possible",
+   "var": "possible",
+   "line": 36,
+   "code": "possible = 'ABC'",
+   "kind": "assign",
+   "value": "'ABC'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:guess",
+   "var": "guess",
+   "line": 37,
+   "code": "guess = possible[0]",
+   "kind": "assign",
+   "value": "'A'",
+   "tainted": false,
+   "depends_on": [
+    "s6:possible"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s10:bar",
+   "var": "bar",
+   "line": 41,
+   "code": "bar = param",
+   "kind": "assign",
+   "value": "'' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param",
+    "s5:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s12:bar",
+   "var": "bar",
+   "line": 43,
+   "code": "bar = 'bob'",
+   "kind": "assign",
+   "value": "'bob'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s14:bar",
+   "var": "bar",
+   "line": 45,
+   "code": "bar = param",
+   "kind": "assign",
+   "value": "'' | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s3:param",
+    "s5:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s16:bar",
+   "var": "bar",
+   "line": 47,
+   "code": "bar = \"bob's your uncle\"",
+   "kind": "assign",
+   "value": "\"bob's your uncle\"",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": true,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s20:fileTarget",
+   "var": "fileTarget",
+   "line": 53,
+   "code": "fileTarget = codecs.open(f'{helpers.utils.TESTFILES_DIR}/{bar}', 'r', 'utf-8')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s10:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s21:RESPONSE",
+   "var": "RESPONSE",
+   "line": 55,
+   "code": "RESPONSE += f\"Access to file: '{escape_for_html(fileTarget.name)}' created.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:RESPONSE",
+    "s20:fileTarget"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s22:RESPONSE",
+   "var": "RESPONSE",
+   "line": 59,
+   "code": "RESPONSE += ' And file already exists.'",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s21:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s23:RESPONSE",
+   "var": "RESPONSE",
+   "line": 64,
+   "code": "RESPONSE += \" But file doesn't exist yet.\"",
+   "kind": "augassign",
+   "value": "\" But file doesn't exist yet.\" | <tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s1:RESPONSE",
+    "s21:RESPONSE",
+    "s22:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s4",
+   "line": 33,
+   "condition": "values",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "condition": "match guess: case 'A'",
+   "feasible_true": true,
+   "feasible_false": null
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "condition": "match guess: case 'B'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s13",
+   "line": 44,
+   "condition": "match guess: case 'C' | 'D'",
+   "feasible_true": false,
+   "feasible_false": null
+  },
+  {
+   "id": "s15",
+   "line": 46,
+   "condition": "match guess: case _",
+   "feasible_true": false,
+   "feasible_false": null
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:values",
+   "s5:param",
+   "s10:bar"
+  ],
+  "pruned_tainted_definitions": [
+   "s14:bar"
+  ],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

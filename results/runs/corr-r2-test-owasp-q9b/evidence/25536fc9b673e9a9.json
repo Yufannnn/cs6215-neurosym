@@ -1,0 +1,315 @@
+{
+ "file_sha256": "0f0695e10183d23dcf8b320690761a5efb29a48695ccb15d8de2598d68a6d0a7",
+ "function": "handler",
+ "sink": {
+  "statement": "s15",
+  "line": 48,
+  "api": "os.path.exists",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s14:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.form.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 35,
+   "kind": "Import",
+   "code": "import configparser"
+  },
+  {
+   "id": "s6",
+   "line": 37,
+   "kind": "Assign",
+   "code": "bar = 'safe!'"
+  },
+  {
+   "id": "s7",
+   "line": 38,
+   "kind": "Assign",
+   "code": "conf48394 = configparser.ConfigParser()"
+  },
+  {
+   "id": "s8",
+   "line": 39,
+   "kind": "Expr",
+   "code": "conf48394.add_section('section48394')"
+  },
+  {
+   "id": "s9",
+   "line": 40,
+   "kind": "Expr",
+   "code": "conf48394.set('section48394', 'keyA-48394', 'a-Value')"
+  },
+  {
+   "id": "s10",
+   "line": 41,
+   "kind": "Expr",
+   "code": "conf48394.set('section48394', 'keyB-48394', param)"
+  },
+  {
+   "id": "s11",
+   "line": 42,
+   "kind": "Assign",
+   "code": "bar = conf48394.get('section48394', 'keyB-48394')"
+  },
+  {
+   "id": "s12",
+   "line": 44,
+   "kind": "Import",
+   "code": "import os"
+  },
+  {
+   "id": "s13",
+   "line": 45,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s14",
+   "line": 47,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'"
+  },
+  {
+   "id": "s15",
+   "line": 48,
+   "kind": "If",
+   "code": "if os.path.exists(fileName):"
+  },
+  {
+   "id": "s16",
+   "line": 49,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\""
+  },
+  {
+   "id": "s17",
+   "line": 51,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\""
+  },
+  {
+   "id": "s18",
+   "line": 53,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = request.form.get('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 33,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:bar",
+   "var": "bar",
+   "line": 37,
+   "code": "bar = 'safe!'",
+   "kind": "assign",
+   "value": "'safe!'",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:conf48394",
+   "var": "conf48394",
+   "line": 38,
+   "code": "conf48394 = configparser.ConfigParser()",
+   "kind": "assign",
+   "value": "<trusted>",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s10:conf48394",
+   "var": "conf48394",
+   "line": 41,
+   "code": "conf48394.set('section48394', 'keyB-48394', param)",
+   "kind": "mutation",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s4:param",
+    "s7:conf48394"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s11:bar",
+   "var": "bar",
+   "line": 42,
+   "code": "bar = conf48394.get('section48394', 'keyB-48394')",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s10:conf48394"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s14:fileName",
+   "var": "fileName",
+   "line": 47,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{bar}'",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s11:bar"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s16:RESPONSE",
+   "var": "RESPONSE",
+   "line": 49,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' exists.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s14:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s17:RESPONSE",
+   "var": "RESPONSE",
+   "line": 51,
+   "code": "RESPONSE += f\"File '{escape_for_html(fileName)}' does not exist.\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s14:fileName",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s15",
+   "line": 48,
+   "condition": "os.path.exists(fileName)",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:param",
+   "s10:conf48394",
+   "s11:bar",
+   "s14:fileName"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

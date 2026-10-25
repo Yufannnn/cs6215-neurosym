@@ -1,0 +1,7 @@
+# Subjects, sources and results are hashed byte for byte (baseline alert IDs, EvidenceRecord file_sha256).
+# Keep LF on every platform so a Windows checkout produces the same hashes as the archived runs.
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.gz binary
+*.csv -text

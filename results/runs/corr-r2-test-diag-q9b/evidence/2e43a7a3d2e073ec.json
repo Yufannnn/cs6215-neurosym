@@ -1,0 +1,85 @@
+{
+ "file_sha256": "151e7a11342d9c907a60e67fa567a3eb6c9ae537a8fbf508b8144dbc3dc17eb6",
+ "function": "handler",
+ "sink": {
+  "statement": "s4",
+  "line": 17,
+  "api": "os.path.exists",
+  "argument": "target",
+  "reads": {
+   "target": [
+    "s1:target"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "target = os.path.abspath(os.path.join(ROOT, request.headers.get('X-Doc', '')))"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "If",
+   "code": "if os.path.commonpath([ROOT, target]) != ROOT:"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Expr",
+   "code": "print('outside root')"
+  },
+  {
+   "id": "s4",
+   "line": 17,
+   "kind": "Return",
+   "code": "return os.path.exists(target)"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:target",
+   "var": "target",
+   "line": 14,
+   "code": "target = os.path.abspath(os.path.join(ROOT, request.headers.get('X-Doc', '')))",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [
+  {
+   "id": "s2",
+   "line": 15,
+   "condition": "os.path.commonpath([ROOT, target]) != ROOT",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.abspath",
+  "os.path.join",
+  "flask.request.headers.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:target"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

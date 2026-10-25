@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/assets/neurosym-banner.png" alt="NeuroSym: evidence-guided static analysis for Python path traversal" width="100%"></p>
+
 # Evidence-Checked LLM Triage for Python Path-Traversal Warnings
 
 Yufan (A0238993J) · CS6215 Advanced Topics in Program Analysis, NUS, Fall 2026
@@ -31,7 +33,7 @@ All arms consume the same baseline warnings, so no arm can exceed S's recall. Th
 | `results/runs/<run>/` | Per run: raw Semgrep JSON, alerts, evidence records, per-arm decisions (with raw model output), scores, manifest |
 | `results/llm_calls.jsonl` | One line per LLM call: served model, backend fingerprint, tokens, latency, cache hit, retries |
 | `results/tables/`, `report/tables/` | Generated tables (Markdown / LaTeX) |
-| `tests/` | 81 regression tests (offline; no API needed), including the post-review counterexamples |
+| `tests/` | 99 regression tests (offline; no API needed), including the counterexamples from both reviews |
 | `report/` | ACM `sigconf` report source |
 
 ## Setup
@@ -47,46 +49,49 @@ git clone https://github.com/OWASP-Benchmark/BenchmarkPython && git -C Benchmark
 git clone https://github.com/billquan/PyVul && git -C PyVul checkout 1172bfd1579b4ad2a524549412170d08ca618fb3
 git clone https://github.com/semgrep/semgrep-rules && git -C semgrep-rules checkout 16b9e6d45f10649f6a531ec4838ed9924372c3bc
 cd ../..
-.venv/bin/python -m pytest -q tests           # 81 offline tests
+.venv/bin/python -m pytest -q tests           # 99 offline tests (2 need Semgrep, 2 the OWASP download)
 ```
 
 LLM experiments use NUS SoCLaaS, an OpenAI-compatible API that is free for SoC users and needs the NUS network or VPN. Copy `.env.example` to `.env` and set `SOCLAAS_API_KEY`, then check access with `.venv/bin/python scripts/smoke_llm.py`.
 
 ## Reproducing the results
 
-```bash
-N=".venv/bin/python -m neurosym.cli"
-$N run --subjects owasp:test --name test-owasp-qcn --model qwen3-coder-next --workers 2
-$N run --subjects diag:test  --name test-diag-qcn  --model qwen3-coder-next --workers 2
-$N run --subjects owasp:test --name test-owasp-q9b --model qwen3.5:9b --workers 2
-$N run --subjects diag:test  --name test-diag-q9b  --model qwen3.5:9b --workers 2
-.venv/bin/python -c "from neurosym import stability as s; print(s.summarize(s.run()))"
-.venv/bin/python -c "from neurosym import realworld as r; r.screen(); r.materialize()"
-$N run --subjects realworld:vulnerable --name rw-vulnerable --model qwen3-coder-next --workers 2
-$N run --subjects realworld:fixed      --name rw-fixed      --model qwen3-coder-next --workers 2
-.venv/bin/python scripts/realworld_eval.py
-$N tables
-cd report && latexmk -pdf -outdir=build main.tex
-```
+There are three levels, from cheapest to most complete. Archived runs are never overwritten: `run` refuses an existing name, so every replay needs a new one.
 
-**Replay without API access.** If `results/llm_cache/` is present (it is not committed, but can be shared), add `--offline` to any `run`: stored responses are replayed and the API is never called. A cache miss is an error, not a silent network call. Without the cache, re-running calls the model again. The service models may have changed since 22 October 2026, so expect small differences. The frozen responses that produced the reported numbers are stored inside each `results/runs/<run>/decisions_{L,E}.jsonl`.
-
-**Verified reproduction (2026-10-22).** A fresh clone of this repository on the same Mac (no `.env`, only the copied response cache) was set up exactly as above:
-- all 50 tests (at the time) passed;
-- `--offline` replays of `test-diag-qcn` and `test-owasp-qcn` reproduced every per-arm decision and every score exactly, with 0 API calls;
-- the report built (7 pages).
-
-**Post-review correction (2026-10-23, tag `review-correction-1`).** An independent review found programs on which the frozen extractor wrongly proved a warning safe. The fixes and 28 regression programs are described in `docs/decisions.md` (D-R1); the review and a point-by-point response are in `docs/review/gptpro-2026-10-23/`. To check the effect:
+**1. Audit the saved results (no API, no Semgrep, no cache).** Every reported number is regenerated from the run directories in `results/runs/`, and the extractor can be re-checked against the archived evidence.
 
 ```bash
-.venv/bin/python scripts/compare_evidence.py            # re-extract every archived alert, diff against the frozen records
-N=".venv/bin/python -m neurosym.cli run --correction"
-$N --subjects owasp:test --name corr-test-owasp-qcn --model qwen3-coder-next --offline   # likewise for the other three
-$N --subjects realworld:vulnerable --name corr-rw-vulnerable --model qwen3-coder-next
-.venv/bin/python scripts/realworld_eval.py corr-rw-vulnerable corr-rw-fixed            # same table as the frozen runs
+.venv/bin/python -m neurosym.cli tables            # results/tables/ and report/tables/ from the saved runs
+.venv/bin/python scripts/realworld_eval.py         # the real-world table, from the saved runs and the defect mapping
+.venv/bin/python scripts/compare_evidence.py       # re-extract every archived alert (needs data/downloads/BenchmarkPython)
 ```
 
-All 220 held-out benchmark evidence records are byte-identical, so every frozen score is reproduced. The real-world case study (`scripts/realworld_eval.py`) uses a manual, per-warning defect mapping in `data/realworld/*_adjudication.csv`. The raw stability replies are in `results/stability_responses.jsonl`.
+**2. Replay the current version end to end (Semgrep, no API).** This runs the baseline again, re-extracts all evidence with the corrected extractor and replays the stored model responses. It needs the response cache in `results/llm_cache/` (not committed; it is shared on request) and a clone that has the tags. Correction runs are named `corr-*` and are checked against the latest correction tag, `review-correction-2`.
+
+```bash
+N=".venv/bin/python -m neurosym.cli run --correction --offline"
+$N --subjects diag:test  --name corr-r2-test-diag-qcn  --model qwen3-coder-next
+$N --subjects diag:test  --name corr-r2-test-diag-q9b  --model qwen3.5:9b
+$N --subjects owasp:test --name corr-r2-test-owasp-qcn --model qwen3-coder-next
+$N --subjects owasp:test --name corr-r2-test-owasp-q9b --model qwen3.5:9b
+```
+
+These four runs are archived. On 25 October 2026 they reproduced every per-alert decision of every arm and every score file of the frozen runs `test-*` exactly, with 0 uncached calls, on Windows 11 with Semgrep 1.182.1. A cache miss is an error and never a silent network call. The real-world runs cannot be replayed offline from the shared cache, because 16 of their E prompts were regenerated in the first correction.
+
+**3. Re-run the original frozen protocol.** Check out the tag in a separate worktree and use new run names. Without the cache this calls SoCLaaS again, and the service models may have changed since 22 October 2026, so expect small differences.
+
+```bash
+git worktree add ../neurosym-frozen protocol-freeze && cd ../neurosym-frozen
+N=".venv/bin/python -m neurosym.cli"   # a venv made in this worktree as in Setup
+$N run --subjects owasp:test --name replay-owasp-qcn --model qwen3-coder-next --workers 2
+$N run --subjects diag:test  --name replay-diag-qcn  --model qwen3-coder-next --workers 2
+```
+
+The frozen responses that produced the reported numbers are stored in each `results/runs/<run>/decisions_{L,E}.jsonl`, so level 1 needs neither the cache nor the API.
+
+**Windows.** The project was developed on macOS and replayed on Windows. `.gitattributes` keeps every checkout in LF, because the baseline hashes subject files byte for byte. Clone the OWASP benchmark with `git -c core.autocrlf=false clone ...` for the same reason. One test, `test_diagnostic_label_evidence`, assumes POSIX paths and fails on Windows.
+
+**Post-review corrections.** Two independent reviews found programs on which the extractor wrongly proved a warning safe. The fixes, 44 regression programs and their effect are in `docs/decisions.md` (D-R1, tag `review-correction-1`, and D-R2, tag `review-correction-2`). The reviews and the responses to them are in `docs/review/`. Neither correction changed an evidence record of the 220 held-out alert slots (`results/corrections/`), so every frozen score stands. The real-world case study uses a manual per-warning defect mapping in `data/realworld/*_adjudication.csv`, and the raw stability replies are in `results/stability_responses.jsonl`.
 
 **Development runs**, used before the freeze and not reported as test results: `dev-offline-D`, `dev-smoke` (prompts p1), `dev-p2`, `dev-final-owasp`, `dev-final-diag`.
 

@@ -1,0 +1,38 @@
+{
+ "file_sha256": "28995bfaae713a64271225a437f071bac3117fc4273d7dbeb3f27cb01b6fba27",
+ "function": "handler",
+ "sink": {
+  "statement": "s1",
+  "line": 21,
+  "api": "open",
+  "argument": "os.path.join(ROOT, sanitize(request.args.get('f', '')))",
+  "reads": {}
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 21,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, sanitize(request.args.get('f', '')))).read()"
+  }
+ ],
+ "definitions": [],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join",
+  "sanitize",
+  "flask.request.args.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -1,0 +1,85 @@
+{
+ "file_sha256": "532f35624bd5b08305102b18a06d0db197e3ddbad57e9c32c2fba6ab25caf480",
+ "function": "handler",
+ "sink": {
+  "statement": "s3",
+  "line": 16,
+  "api": "open",
+  "argument": "os.path.join(ROOT, box['f'])",
+  "reads": {
+   "box": [
+    "s2:box"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "box = {'f': 'fixed.txt'}"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Expr",
+   "code": "box.update(request.args)"
+  },
+  {
+   "id": "s3",
+   "line": 16,
+   "kind": "Return",
+   "code": "return open(os.path.join(ROOT, box['f'])).read()"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:box",
+   "var": "box",
+   "line": 14,
+   "code": "box = {'f': 'fixed.txt'}",
+   "kind": "assign",
+   "value": "{'f': 'fixed.txt'}",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s2:box",
+   "var": "box",
+   "line": 15,
+   "code": "box.update(request.args)",
+   "kind": "mutation",
+   "value": "<tainted> | {'f': 'fixed.txt'}",
+   "tainted": true,
+   "depends_on": [
+    "s1:box"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "os.path.join"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:box"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

@@ -1,0 +1,63 @@
+{
+ "file_sha256": "620ec9ef07f7f772b17b8e22e727727ca9880048a3f8865bfd749558342f4ded",
+ "function": "handler",
+ "sink": {
+  "statement": "s2",
+  "line": 15,
+  "api": "flask.send_from_directory",
+  "argument": "folder",
+  "reads": {
+   "folder": [
+    "s1:folder"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 14,
+   "kind": "Assign",
+   "code": "folder = request.args.get('dir', 'public')"
+  },
+  {
+   "id": "s2",
+   "line": 15,
+   "kind": "Return",
+   "code": "return send_from_directory(folder, 'index.html')"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:folder",
+   "var": "folder",
+   "line": 14,
+   "code": "folder = request.args.get('dir', 'public')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  }
+ ],
+ "branches": [],
+ "path_conditions_at_sink": [],
+ "transformations": [
+  "flask.request.args.get"
+ ],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s1:folder"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}

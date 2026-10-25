@@ -1,0 +1,348 @@
+{
+ "file_sha256": "3612fa54b71a76caffcace48790987f2fa3b6a70cc8bdc73c4ac1e1cec23164b",
+ "function": "handler",
+ "sink": {
+  "statement": "s13",
+  "line": 49,
+  "api": "open",
+  "argument": "fileName",
+  "reads": {
+   "fileName": [
+    "s12:fileName"
+   ]
+  }
+ },
+ "nodes": [
+  {
+   "id": "s1",
+   "line": 29,
+   "kind": "Assign",
+   "code": "RESPONSE = ''"
+  },
+  {
+   "id": "s2",
+   "line": 31,
+   "kind": "Assign",
+   "code": "param = request.args.get('Handler')"
+  },
+  {
+   "id": "s3",
+   "line": 32,
+   "kind": "If",
+   "code": "if not param:"
+  },
+  {
+   "id": "s4",
+   "line": 33,
+   "kind": "Assign",
+   "code": "param = ''"
+  },
+  {
+   "id": "s5",
+   "line": 36,
+   "kind": "Import",
+   "code": "import helpers.utils"
+  },
+  {
+   "id": "s6",
+   "line": 38,
+   "kind": "Assign",
+   "code": "fileName = None"
+  },
+  {
+   "id": "s7",
+   "line": 39,
+   "kind": "Assign",
+   "code": "fd = None"
+  },
+  {
+   "id": "s8",
+   "line": 41,
+   "kind": "If",
+   "code": "if '../' in param:"
+  },
+  {
+   "id": "s9",
+   "line": 42,
+   "kind": "AugAssign",
+   "code": "RESPONSE += \"File name must not include '../'\""
+  },
+  {
+   "id": "s10",
+   "line": 45,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  },
+  {
+   "id": "s11",
+   "line": 47,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s12",
+   "line": 48,
+   "kind": "Assign",
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{param}'"
+  },
+  {
+   "id": "s13",
+   "line": 49,
+   "kind": "Assign",
+   "code": "fd = open(fileName, 'rb')"
+  },
+  {
+   "id": "s14",
+   "line": 50,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"The beginning of file: '{escape_for_html(fileName)}' is:\\n\\n{escape_for_html(fd.read(1000).decode('utf-8'))}\""
+  },
+  {
+   "id": "s15",
+   "line": 55,
+   "kind": "AugAssign",
+   "code": "RESPONSE += f\"Problem reading from file '{{escape_for_html(fileName)}}': {escape_for_html(e.strerror)}\""
+  },
+  {
+   "id": "s16",
+   "line": 60,
+   "kind": "Try",
+   "code": "try:"
+  },
+  {
+   "id": "s17",
+   "line": 61,
+   "kind": "If",
+   "code": "if fd is not None:"
+  },
+  {
+   "id": "s18",
+   "line": 62,
+   "kind": "Expr",
+   "code": "fd.close()"
+  },
+  {
+   "id": "s19",
+   "line": 64,
+   "kind": "Pass",
+   "code": "pass"
+  },
+  {
+   "id": "s20",
+   "line": 66,
+   "kind": "Return",
+   "code": "return RESPONSE"
+  }
+ ],
+ "definitions": [
+  {
+   "id": "s1:RESPONSE",
+   "var": "RESPONSE",
+   "line": 29,
+   "code": "RESPONSE = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s2:param",
+   "var": "param",
+   "line": 31,
+   "code": "param = request.args.get('Handler')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s4:param",
+   "var": "param",
+   "line": 33,
+   "code": "param = ''",
+   "kind": "assign",
+   "value": "''",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s6:fileName",
+   "var": "fileName",
+   "line": 38,
+   "code": "fileName = None",
+   "kind": "assign",
+   "value": "None",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s7:fd",
+   "var": "fd",
+   "line": 39,
+   "code": "fd = None",
+   "kind": "assign",
+   "value": "None",
+   "tainted": false,
+   "depends_on": [],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s9:RESPONSE",
+   "var": "RESPONSE",
+   "line": 42,
+   "code": "RESPONSE += \"File name must not include '../'\"",
+   "kind": "augassign",
+   "value": "\"File name must not include '../'\"",
+   "tainted": false,
+   "depends_on": [
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s12:fileName",
+   "var": "fileName",
+   "line": 48,
+   "code": "fileName = f'{helpers.utils.TESTFILES_DIR}/{param}'",
+   "kind": "assign",
+   "value": "<tainted> | <trusted>",
+   "tainted": true,
+   "depends_on": [
+    "s2:param",
+    "s4:param"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": true
+  },
+  {
+   "id": "s13:fd",
+   "var": "fd",
+   "line": 49,
+   "code": "fd = open(fileName, 'rb')",
+   "kind": "assign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:fileName"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s14:RESPONSE",
+   "var": "RESPONSE",
+   "line": 50,
+   "code": "RESPONSE += f\"The beginning of file: '{escape_for_html(fileName)}' is:\\n\\n{escape_for_html(fd.read(1000).decode('utf-8'))}\"",
+   "kind": "augassign",
+   "value": "<tainted>",
+   "tainted": true,
+   "depends_on": [
+    "s12:fileName",
+    "s13:fd",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": false,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  },
+  {
+   "id": "s15:RESPONSE",
+   "var": "RESPONSE",
+   "line": 55,
+   "code": "RESPONSE += f\"Problem reading from file '{{escape_for_html(fileName)}}': {escape_for_html(e.strerror)}\"",
+   "kind": "augassign",
+   "value": "<tainted> | <unknown>",
+   "tainted": true,
+   "depends_on": [
+    "s14:RESPONSE",
+    "s1:RESPONSE"
+   ],
+   "in_loop": false,
+   "in_exception_handler": true,
+   "on_infeasible_path": false,
+   "in_sink_slice": false
+  }
+ ],
+ "branches": [
+  {
+   "id": "s3",
+   "line": 32,
+   "condition": "not param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s8",
+   "line": 41,
+   "condition": "'../' in param",
+   "feasible_true": true,
+   "feasible_false": true
+  },
+  {
+   "id": "s17",
+   "line": 61,
+   "condition": "fd is not None",
+   "feasible_true": true,
+   "feasible_false": true
+  }
+ ],
+ "path_conditions_at_sink": [
+  {
+   "id": "s8",
+   "condition": "'../' in param",
+   "polarity_to_reach_sink": false,
+   "kind": "early_exit",
+   "reads": {
+    "param": [
+     "s2:param",
+     "s4:param"
+    ]
+   },
+   "guards_sink_value": true,
+   "covers_all_tainted_flows": true,
+   "uncovered_tainted_definitions": []
+  }
+ ],
+ "transformations": [],
+ "facts": {
+  "sink_unreachable": false,
+  "sink_value_kind": "tainted",
+  "sink_value": "<tainted> | <trusted>",
+  "complete": true,
+  "incomplete_reasons": [],
+  "tainted_definitions": [
+   "s2:param",
+   "s12:fileName"
+  ],
+  "pruned_tainted_definitions": [],
+  "containment_guards": [],
+  "safe_api": []
+ }
+}
