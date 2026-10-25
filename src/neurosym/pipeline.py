@@ -17,8 +17,9 @@ FROZEN_PATHS = ["baseline/rules", "configs", "data/owasp_split.csv", "data/diagn
                 "src/neurosym/evidence.py", "src/neurosym/refine.py", "src/neurosym/triage.py",
                 "src/neurosym/prompts", "src/neurosym/baseline.py", "src/neurosym/scoring.py",
                 "src/neurosym/pipeline.py", "src/neurosym/llm.py", "src/neurosym/owasp.py"]
-# Post-review correctness correction (docs/decisions.md, D-R1): runs named corr-* are checked against this tag.
-CORRECTION_TAG = "review-correction-1"
+# Post-review correctness corrections (docs/decisions.md, D-R1 and D-R2): runs named corr-* are checked against
+# the latest correction tag. The corr-* runs archived before D-R2 were made at review-correction-1.
+CORRECTION_TAG = "review-correction-2"
 
 
 @dataclass(frozen=True)

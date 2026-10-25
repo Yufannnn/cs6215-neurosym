@@ -9,7 +9,8 @@ RESULTS = ROOT / "results"
 def local_path(path: str | Path) -> Path:
     """An archived absolute path (from the machine that made the run), re-rooted at this checkout."""
     p = Path(path)
-    if p.exists() or not p.is_absolute():
+    # a POSIX path from another machine is not absolute to Windows' Path, but still needs re-rooting
+    if p.exists() or not (p.is_absolute() or str(path).startswith("/")):
         return p
     parts = p.parts
     for anchor in ("data", "results"):

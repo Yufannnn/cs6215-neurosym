@@ -7,7 +7,7 @@ afe918a6b2a697ec,vulnerable,benbusby/whoogle-search@3a2e0b262e,431,defect,os.pat
 bff3eb1537c7d09b,vulnerable,mlflow/mlflow@5044878da0,1280,related,open(file_path) on the same raw path
 8b1975362744eb3f,vulnerable,mlflow/mlflow@cf83dad4df,1286,out_of_scope_target,in a target outside the task (Windows-only fix)
 51e620256130a5e0,vulnerable,mlflow/mlflow@cf83dad4df,1288,out_of_scope_target,in a target outside the task (Windows-only fix)
-cfdd4a6ac9a26061,fixed,benbusby/whoogle-search@3a2e0b262e,437,fixed_defect_site,name normalised and allow-listed before the join: no file outside CONFIG_PATH is reachable
+cfdd4a6ac9a26061,fixed,benbusby/whoogle-search@3a2e0b262e,437,fixed_defect_site,fix normalises the name and allow-lists [A-Za-z0-9_.+-]; the list still accepts '..' which joins to the parent of CONFIG_PATH and is probed by os.path.exists and opened (a directory open fails: no file read shown)
 5a04acdb558ae1d3,fixed,benbusby/whoogle-search@3a2e0b262e,438,fixed_defect_site,same value as above
 40820fdbfedd6d0e,fixed,benbusby/whoogle-search@3a2e0b262e,452,fixed_defect_site,same value as above
 74d41151db5a3825,fixed,benbusby/whoogle-search@3a2e0b262e,498,unrelated,send_file(tmp_mem) where tmp_mem = io.BytesIO(): not a path

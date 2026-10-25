@@ -175,6 +175,8 @@ class Analyzer:
         self.module_funcs = {n.name for n in ast.walk(module) if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
                              and n is not func} - self.local_funcs
         self.mutated_globals = _mutated_nonlocals(module)
+        # names that something other than an import may bind: their meaning is not the imported one
+        self.shadowed = _module_bindings(module) | self.local_funcs | self.module_funcs | _local_names(func)
         self._number(func.body)
 
     # --- bookkeeping
@@ -218,6 +220,17 @@ class Analyzer:
             return None
         base = self.local_imports.get(expr.id) or self.imports.get(expr.id) or expr.id
         return ".".join([base, *reversed(parts)])
+
+    def trusted_name(self, expr) -> str | None:
+        """dotted(), but None when the base name may be rebound in this module or function. Used wherever a
+        name grants trust (normalizers, sanitizers, abort, pure library functions): a familiar name is not
+        evidence of what the called code does. Taint lookups keep using dotted(), which over-taints."""
+        base = expr
+        while isinstance(base, ast.Attribute):
+            base = base.value
+        if not isinstance(base, ast.Name) or (base.id in self.shadowed and base.id not in self.local_imports):
+            return None
+        return self.dotted(expr)
 
     # --- entry
     def run(self):
@@ -289,7 +302,7 @@ class Analyzer:
             return state
         if isinstance(s, ast.Expr):
             self.ev(s.value, state, ctx, stmt=s)
-            if isinstance(s.value, ast.Call) and self.dotted(s.value.func) in NORETURN:
+            if isinstance(s.value, ast.Call) and self.trusted_name(s.value.func) in NORETURN:
                 return None  # abort()/exit() never return
             return state
         if isinstance(s, (ast.Import, ast.ImportFrom)):
@@ -553,14 +566,19 @@ class Analyzer:
         if isinstance(e, ast.UnaryOp):
             return _lift(lambda a: _unary(e.op, a), [ev(e.operand)])
         if isinstance(e, ast.BoolOp):
-            vals = [ev(v) for v in e.values]
-            return _lift(lambda *xs: _boolop(e.op, xs), vals)
+            return self.boolop(e, state, ctx, stmt)
         if isinstance(e, ast.Compare):
             vals = [ev(e.left)] + [ev(c) for c in e.comparators]
             return _lift(lambda *xs: _compare(e.ops, xs), vals)
         if isinstance(e, ast.IfExp):
             t = _truth(ev(e.test))
-            return (ev(e.body) if t != "false" else set()) | (ev(e.orelse) if t != "true" else set())
+            if t != "both":
+                return ev(e.body if t == "true" else e.orelse)
+            # either branch may run: each sees the current state, and their side effects are joined
+            arms = [copy.deepcopy(state), copy.deepcopy(state)]
+            vals = self.ev(e.body, arms[0], ctx, stmt) | self.ev(e.orelse, arms[1], ctx, stmt)
+            _replace(state, _join(arms))
+            return set(vals)
         if isinstance(e, (ast.List, ast.Tuple)):
             self._escapes(e.elts, state)
             elems = [ev(x) for x in e.elts]
@@ -575,7 +593,10 @@ class Analyzer:
             out = set()
             for kc in itertools.product(*ks):
                 for vc in itertools.product(*vs):
-                    out.add(("dict", tuple(zip(kc, vc))))
+                    items = ()
+                    for k, v in zip(kc, vc):  # a repeated key keeps its last value, as at runtime
+                        items = _setitem(("dict", items), k, v)[1] if worst({k}) is None else items + ((k, v),)
+                    out.add(("dict", items))
             return out
         if isinstance(e, ast.Subscript):
             base, key = ev(e.value), ev(e.slice)
@@ -597,7 +618,7 @@ class Analyzer:
         args = [ev(a) for a in e.args]
         kwargs = [ev(k.value) for k in e.keywords]
         everything = args + kwargs
-        q = self.dotted(e.func)
+        q, tq = self.dotted(e.func), self.trusted_name(e.func)
         if q in UNSUPPORTED_CALLS:
             self.flags.add(f"unsupported:{q}")
             return {TAINT} if _join_worst(everything) is TAINT else {UNKNOWN}
@@ -609,12 +630,12 @@ class Analyzer:
             self._escapes(e.args + [k.value for k in e.keywords], state)
             self._taint_arguments(e, everything, state, ctx)
             return {TAINT} if _join_worst(everything) is TAINT else {UNKNOWN}
-        if q in SANITIZERS:
+        if tq in SANITIZERS:
             return {TRUSTED}
         if q in SOURCE_FUNCS:
             return {TAINT}
-        if q in _PURE:
-            return _lift(_PURE[q], args) if not e.keywords else {_join_worst(everything) or TRUSTED}
+        if tq in _PURE:
+            return _lift(_PURE[tq], args) if not e.keywords else {_join_worst(everything) or TRUSTED}
         if isinstance(e.func, ast.Attribute):
             meth, recv_node = e.func.attr, e.func.value
             if meth in SOURCE_METHODS:
@@ -624,14 +645,14 @@ class Analyzer:
             if meth in PASSTHROUGH_METHODS and args:
                 return set(args[0]) | {""}
             if isinstance(recv_node, ast.Name) and recv_node.id in state:
-                return self.method_on_local(e, recv_node.id, meth, args, state, ctx)
+                return self.method_on_local(e, recv_node.id, meth, args, kwargs, state, ctx)
             recv = ev(recv_node)
             if not all(isinstance(r, str) for r in recv) and meth not in _PURE_METHODS:
                 self._escapes(e.args + [k.value for k in e.keywords], state)
                 self._taint_arguments(e, everything, state, ctx)
-            return _method_on_value(meth, recv, args, everything)
+            return _with_keywords(_method_on_value(meth, recv, args, everything), kwargs)
         # library function: propagates its inputs (as Semgrep's default does)
-        if q not in _NON_RETAINING:
+        if tq not in _NON_RETAINING:
             self._escapes(e.args + [k.value for k in e.keywords], state)
             self._taint_arguments(e, everything, state, ctx)
         w = _join_worst(everything)
@@ -646,12 +667,14 @@ class Analyzer:
                     not all(isinstance(v, (str, bytes, int, float, bool, type(None))) for v in state[a.id].values):
                 self._mutate(a.id, cap(set(state[a.id].values) | {TAINT}), [a.id], self.cur_stmt, state, ctx)
 
-    def method_on_local(self, e, var, meth, args, state, ctx):
+    def method_on_local(self, e, var, meth, args, kwargs, state, ctx):
         recv = state[var].values
-        reads = [var] + [n.id for a in e.args for n in ast.walk(a) if isinstance(n, ast.Name) and n.id in state]
+        reads = [var] + [n.id for a in e.args + [k.value for k in e.keywords] for n in ast.walk(a)
+                         if isinstance(n, ast.Name) and n.id in state]
         if _has_container(recv) or meth not in _PURE_METHODS:
             self._escapes(e.args + [k.value for k in e.keywords], state)  # e.g. outer.append(inner)
-        if meth in _LIST_MUTATORS and any(isinstance(r, tuple) and r and r[0] in ("list", "dict") for r in recv):
+        if meth in _LIST_MUTATORS and not e.keywords and \
+                any(isinstance(r, tuple) and r and r[0] in ("list", "dict") for r in recv):
             new, results = set(), set()
             for r in recv:
                 for combo in (itertools.product(*args) if args else [()]):
@@ -665,17 +688,80 @@ class Analyzer:
                         results.add(out[1])
             self._mutate(var, cap(new), reads, self.cur_stmt, state, ctx)
             return results
-        result = _method_on_value(meth, recv, args, args)
-        # unmodelled method with a tainted argument taints its receiver (side effect, e.g. ConfigParser.set)
-        if _join_worst(args) is TAINT and worst(recv) is not TAINT and meth not in _PURE_METHODS:
-            self._mutate(var, cap(set(recv) | {TAINT}), reads, self.cur_stmt, state, ctx)
+        everything = args + kwargs
+        result = _with_keywords(_method_on_value(meth, recv, args, everything), kwargs)
+        # an unmodelled method may store its arguments, keyword ones included, in the receiver (e.g.
+        # ConfigParser.set, dict.update(f=...)): the receiver becomes as severe as the worst argument
+        w = _join_worst(everything)
+        # (a tainted element inside the receiver is not enough: a lookup of another key would miss it)
+        if meth not in _PURE_METHODS and w in (TAINT, UNKNOWN) and w not in recv and TAINT not in recv:
+            self._mutate(var, cap(set(recv) | {w}), reads, self.cur_stmt, state, ctx)
         return result
+
+    def boolop(self, e, state, ctx, stmt):
+        """`a or b` / `a and b`: the value is an operand, and an operand runs only if the ones before it did
+        not decide the result. When that is undecided, the side effects of the remaining operands are joined
+        with the state in which evaluation stopped."""
+        stop_on = "true" if isinstance(e.op, ast.Or) else "false"
+        out, stopped = set(), []
+        for i, operand in enumerate(e.values):
+            vals = self.ev(operand, state, ctx, stmt)
+            if i == len(e.values) - 1:
+                out |= vals
+                break
+            truths = {v: _truth({v}) for v in vals}
+            out |= {v for v, t in truths.items() if t in (stop_on, "both")}
+            if all(t == stop_on for t in truths.values()):
+                break  # the remaining operands never run
+            if any(t in (stop_on, "both") for t in truths.values()):
+                stopped.append(copy.deepcopy(state))
+        if stopped:
+            _replace(state, _join([state] + stopped))
+        return out
 
 
 # ---------------------------------------------------------------- value helpers
 
 def _has_container(vals) -> bool:
     return any(isinstance(v, tuple) and v and v[0] in ("list", "dict") for v in vals)
+
+
+def _with_keywords(result, kwargs):
+    """Modelled methods are evaluated on positional arguments: an abstract keyword argument makes the result
+    at least as severe as itself."""
+    w = _join_worst(kwargs) if kwargs else None
+    return set(result) | {w} if w in (TAINT, UNKNOWN) else result
+
+
+def _replace(state, new):
+    """Overwrite a state in place (expressions mutate the caller's state)."""
+    state.clear()
+    state.update(new)
+
+
+def _module_bindings(module) -> set:
+    """Names bound at module level by anything other than an import."""
+    out, todo = set(), list(module.body)
+    while todo:
+        s = todo.pop()
+        if isinstance(s, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            out.add(s.name)
+            continue
+        if isinstance(s, (ast.Import, ast.ImportFrom)):
+            continue
+        for n in ast.walk(s):
+            if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store):
+                out.add(n.id)
+            elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                out.add(n.name)
+    return out | {n.name for n in ast.walk(module) if isinstance(n, ast.ClassDef)}
+
+
+def _local_names(func) -> set:
+    params = func.args
+    return {a.arg for a in params.posonlyargs + params.args + params.kwonlyargs} | \
+        {a.arg for a in (params.vararg, params.kwarg) if a} | \
+        {n.id for n in ast.walk(func) if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store)}
 
 
 def _captures(pattern) -> set:
@@ -820,11 +906,6 @@ def _unary(op, a):
     return {ast.Not: lambda: not x, ast.USub: lambda: -x, ast.UAdd: lambda: +x}[type(op)]()
 
 
-def _boolop(op, xs):
-    vals = [_plain(x) for x in xs]
-    return all(vals) if isinstance(op, ast.And) else any(vals)
-
-
 def _compare(ops, xs):
     vals = [_plain(x) for x in xs]
     fns = {ast.Eq: lambda a, b: a == b, ast.NotEq: lambda a, b: a != b, ast.In: lambda a, b: a in b,
@@ -861,14 +942,25 @@ def _getitem(base, key):
     if isinstance(base, tuple) and base and base[0] == "list":
         return base[1][_plain(key)]
     if isinstance(base, tuple) and base and base[0] == "dict":
-        k = _plain(key)
-        for kk, vv in base[1]:
-            if worst({kk}) is not None:
-                raise _NeedsAbstract(UNKNOWN)
-            if _plain(kk) == k:
-                return vv
-        raise KeyError(k)
+        hit = _dict_lookup(base[1], _plain(key))
+        if hit is _AMBIGUOUS:
+            raise _NeedsAbstract(UNKNOWN)
+        if hit is _MISSING:
+            raise KeyError(_plain(key))
+        return hit
     return _plain(base)[_plain(key)]
+
+
+_MISSING, _AMBIGUOUS = object(), object()
+
+
+def _dict_lookup(items, key):
+    """The value stored under a concrete key: the last equal entry wins, as at runtime. Any abstract key
+    might equal it, so its presence makes the lookup ambiguous."""
+    if any(worst({kk}) is not None for kk, _ in items):
+        return _AMBIGUOUS
+    hits = [vv for kk, vv in items if _plain(kk) == key]
+    return hits[-1] if hits else _MISSING
 
 
 def _setitem(cur, key, val):
@@ -888,9 +980,11 @@ _LIST_MUTATORS = {"append", "pop", "insert", "extend", "remove", "reverse", "cle
 def _list_mutate(r, meth, args):
     if not (isinstance(r, tuple) and r and r[0] == "list"):
         if isinstance(r, tuple) and r and r[0] == "dict" and meth == "pop" and args and worst({args[0]}) is None:
-            items = [(k, v) for k, v in r[1] if worst({k}) is None and _plain(k) != _plain(args[0])]
-            hit = [v for k, v in r[1] if worst({k}) is None and _plain(k) == _plain(args[0])]
-            return (("dict", tuple(items)), hit[0] if hit else (args[1] if len(args) > 1 else UNKNOWN))
+            hit = _dict_lookup(r[1], _plain(args[0]))
+            if hit is _AMBIGUOUS:
+                return None
+            items = [(k, v) for k, v in r[1] if _plain(k) != _plain(args[0])]
+            return (("dict", tuple(items)), hit if hit is not _MISSING else (args[1] if len(args) > 1 else UNKNOWN))
         return None
     lst = list(r[1])
     try:
@@ -950,8 +1044,11 @@ def _method_on_value(meth, recv, args, everything):
                 if worst({k}) is not None:  # unknown key: any stored value, or the default
                     out |= {v for _, v in r[1]} | (set(args[1]) if len(args) > 1 else {None})
                     continue
-                hit = [v for kk, v in r[1] if worst({kk}) is None and _plain(kk) == _plain(k)]
-                out |= {hit[0]} if hit else (set(args[1]) if len(args) > 1 else {None})
+                hit = _dict_lookup(r[1], _plain(k))
+                if hit is _AMBIGUOUS:
+                    out |= {v for _, v in r[1]} | {UNKNOWN}
+                else:
+                    out |= {hit} if hit is not _MISSING else (set(args[1]) if len(args) > 1 else {None})
             continue
         if meth in _PURE_METHODS:
             out |= _lift(lambda x, *a: getattr(_plain(x), meth)(*[_plain(y) for y in a]), [{r}, *args])
@@ -1136,7 +1233,7 @@ def _containment(an: Analyzer, snap: Snapshot, target) -> list[dict]:
         return []
     d = an.defs[defs[0]]
     rhs = _def_rhs(an, d)
-    if rhs is None or not _is_normalized(an, rhs):
+    if rhs is None or not _is_normalized(an, rhs, d):
         return []
     out = []
     for c in snap.conds:
@@ -1165,13 +1262,38 @@ def _def_rhs(an, d: Def):
     return None
 
 
-def _is_normalized(an, rhs) -> bool:
+def _is_normalized(an, rhs, d: Def) -> bool:
+    """The definition's value comes from a real normalizer: an unshadowed os.path.realpath/abspath, or
+    .resolve() on something that is a pathlib path (any object may have a method called resolve)."""
     if isinstance(rhs, ast.Call):
-        q = an.dotted(rhs.func)
-        if q in NORMALIZERS:
+        if an.trusted_name(rhs.func) in NORMALIZERS:
             return True
-        if isinstance(rhs.func, ast.Attribute) and rhs.func.attr == "resolve":
+        if isinstance(rhs.func, ast.Attribute) and rhs.func.attr == "resolve" and not rhs.args \
+                and _is_path_object(an, rhs.func.value, d):
             return True
+    return False
+
+
+_PATH_CTORS = {"pathlib.Path", "pathlib.PosixPath", "Path"}
+_PATH_METHODS = {"resolve", "absolute", "joinpath", "with_name", "with_suffix"}
+
+
+def _is_path_object(an, e, d: Def, depth=4) -> bool:
+    """e evaluates to a pathlib path: a Path(...) call, path / x, a path method, or a local whose every
+    reaching definition (among d's dependencies) is one of these."""
+    if depth == 0:
+        return False
+    if isinstance(e, ast.Call):
+        if an.trusted_name(e.func) in _PATH_CTORS:
+            return True
+        return isinstance(e.func, ast.Attribute) and e.func.attr in _PATH_METHODS and \
+            _is_path_object(an, e.func.value, d, depth - 1)
+    if isinstance(e, ast.BinOp) and isinstance(e.op, ast.Div):
+        return _is_path_object(an, e.left, d, depth - 1)
+    if isinstance(e, ast.Name):
+        defs = [an.defs[x] for x in d.depends if x in an.defs and an.defs[x].var == e.id]
+        rhss = [_def_rhs(an, x) for x in defs]
+        return bool(defs) and all(r is not None and _is_path_object(an, r, x, depth - 1) for r, x in zip(rhss, defs))
     return False
 
 
@@ -1208,7 +1330,7 @@ def _is_containment_atom(an, snap, cond, atom, var) -> str | None:
     if isinstance(atom, ast.Compare) and len(atom.ops) == 1 and isinstance(atom.ops[0], ast.Eq):
         sides = [atom.left, atom.comparators[0]]
         for a, b in (sides, sides[::-1]):
-            if isinstance(a, ast.Call) and an.dotted(a.func) == "os.path.commonpath" and len(a.args) == 1 \
+            if isinstance(a, ast.Call) and an.trusted_name(a.func) == "os.path.commonpath" and len(a.args) == 1 \
                     and isinstance(a.args[0], (ast.List, ast.Tuple)) and len(a.args[0].elts) == 2:
                 elts = a.args[0].elts
                 roots = [x for x in elts if not is_var(x)]
@@ -1222,9 +1344,9 @@ def _root_of_prefix(an, e):
     """root for a prefix of the form root + '/', root + os.sep, os.path.join(root, '') or '/abs/dir/'."""
     if isinstance(e, ast.BinOp) and isinstance(e.op, ast.Add):
         r = e.right
-        if (isinstance(r, ast.Constant) and r.value == "/") or an.dotted(r) == "os.sep":
+        if (isinstance(r, ast.Constant) and r.value == "/") or an.trusted_name(r) == "os.sep":
             return e.left
-    if isinstance(e, ast.Call) and an.dotted(e.func) == "os.path.join" and len(e.args) == 2 \
+    if isinstance(e, ast.Call) and an.trusted_name(e.func) == "os.path.join" and len(e.args) == 2 \
             and isinstance(e.args[1], ast.Constant) and e.args[1].value == "":
         return e.args[0]
     if isinstance(e, ast.Constant) and isinstance(e.value, str) and e.value.endswith("/") and len(e.value) > 1:
@@ -1244,7 +1366,7 @@ def _trusted_root(an, snap, cond, e, var) -> bool:
             if n.id == var or (n.id in snap.state and sorted(snap.state[n.id].defs) != cond.reads.get(n.id)):
                 return False
         elif isinstance(n, ast.Call):
-            if an.dotted(n.func) not in _ROOT_FUNCS and not (isinstance(n.func, ast.Attribute)
+            if an.trusted_name(n.func) not in _ROOT_FUNCS and not (isinstance(n.func, ast.Attribute)
                                                             and n.func.attr == "resolve" and not n.args):
                 return False
         elif isinstance(n, ast.BinOp):
