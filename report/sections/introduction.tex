@@ -1,22 +1,14 @@
 \section{Introduction}
 
-Taint-style static analyzers report a flow whenever attacker-controlled data \emph{may} reach a dangerous operation. For path traversal (CWE-22) this means any flow from request data into a filesystem path. The analysis is cheap and its rules are auditable. But it is usually blind to the facts that make a reported flow harmless: the attacker value was overwritten, the branch carrying it can never run, or a check confines the path to the intended directory. The resulting false positives are a well-known cost of static analysis in practice.
+Taint-style static analyzers report a flow whenever attacker-controlled data \emph{may} reach a dangerous operation, which for path traversal (CWE-22) means any flow from request data into a filesystem path. Such analysis is cheap and its rules are easy to audit, but it usually cannot see the facts that make a reported flow harmless, for example that the attacker value was overwritten, that the branch carrying it can never run, or that a check confines the path to the intended directory. The resulting false positives are a well-known cost of static analysis in practice.
 
-Large language models (LLMs) can read the surrounding code and argue that a warning is a false alarm. This makes them attractive as a second stage after a symbolic analyzer. The danger is the opposite error: an LLM that confidently dismisses a real vulnerability does more harm than a noisy warning. Recent work reports exactly this risk~\cite{sifting2026}. A triage stage should therefore be judged by two numbers together: how many false warnings it removes, and how many true warnings it keeps.
+Large language models (LLMs) can read the surrounding code and argue that a warning is a false alarm, which makes them attractive as a second stage after a symbolic analyzer. The danger lies in the opposite error, since an LLM that confidently dismisses a real vulnerability does more harm than a noisy warning, and recent work reports this risk directly~\cite{sifting2026}. A triage stage should be judged by how many false warnings it removes and how many true warnings it keeps, taken together.
 
-This project compares five configurations on the same set of warnings from Semgrep Community Edition~\cite{semgrep}. They differ only in what happens after the baseline:
+This project compares five configurations, which we call arms, on the same set of warnings from Semgrep Community Edition~\cite{semgrep}. The symbolic baseline \textbf{S} is followed in \textbf{D} by a purely deterministic refinement built on our own value analysis, in \textbf{L} by ordinary LLM triage of the enclosing function, and in \textbf{E} by LLM triage over our structured program evidence with four explicit obligations. The fifth arm, \textbf{EC}, passes E's replies through an evidence gate that accepts a suppression only when the model's claim matches the extracted facts. Because every arm can only drop baseline warnings, no arm can exceed the baseline's recall, so the comparison isolates the precision each arm gains and the real vulnerabilities it loses.
+
+The contributions are an independently designed evidence representation and gate for path-traversal triage, a controlled comparison on 134 held-out OWASP Benchmark cases and 24 held-out diagnostic program pairs with execution-checked labels, and a small real-world case study. The comparison also reports an independent correctness review of our own analyzer together with the effect of its counterexamples on the results. Section~\ref{sec:related} places this work among earlier systems that combine static analysis with LLMs, and the study is organised around four research questions.
 \begin{itemize}
-\item a symbolic baseline (\textbf{S});
-\item a purely deterministic refinement built on our own value analysis (\textbf{D});
-\item ordinary LLM triage of the enclosing function (\textbf{L});
-\item LLM triage over our structured program evidence, with four explicit obligations (\textbf{E});
-\item the same E responses, filtered by an evidence gate that accepts a suppression only when the model's claim matches the extracted facts (\textbf{EC}).
-\end{itemize}
-Because every arm can only drop baseline warnings, none can exceed the baseline's recall. What the comparison isolates is the precision gained and the real vulnerabilities lost.
-
-The contributions are an independently designed evidence representation and gate for path-traversal triage, and a controlled comparison on 134 held-out OWASP Benchmark cases and 24 held-out diagnostic program pairs with execution-checked labels, plus a small real-world case study. The comparison includes an independent correctness review of our own analyzer, whose counterexamples and their effect on the results we report. We make no novelty claim for combining static analysis with LLMs; Section~\ref{sec:related} positions the work. The questions are:
-\begin{itemize}
-\item \textbf{RQ1.} What false-positive removal / true-positive retention trade-off does each configuration achieve?
+\item \textbf{RQ1.} What trade-off between false-positive removal and true-positive retention does each configuration achieve?
 \item \textbf{RQ2.} Do structured evidence and the gate add value beyond ordinary prompting and beyond deterministic refinement?
 \item \textbf{RQ3.} Which program patterns cause improvements, wrongful suppressions or no benefit?
 \item \textbf{RQ4.} How stable are the findings across fresh generations and a smaller model, and what do they cost?

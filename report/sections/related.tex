@@ -1,14 +1,6 @@
 \section{Related Work}
 \label{sec:related}
 
-Several systems combine static analysis with LLMs; our design was positioned against them before implementation.
-\begin{itemize}
-\item \textbf{LLMDFA}~\cite{llmdfa} extracts sources and sinks, summarizes functions with an LLM and validates path feasibility with external tools. It is a general LLM data-flow analysis, whereas we keep the symbolic engine as the only source of candidates.
-\item \textbf{IRIS}~\cite{iris} uses LLMs to infer taint specifications for CodeQL and to filter its alerts in context. We instead freeze the specification and study triage alone.
-\item \textbf{ZeroFalse}~\cite{zerofalse} is the closest: it enriches static alerts with flow context and CWE-specific prompts for structured LLM adjudication. Our difference is the deterministic gate that checks the model's cited evidence against extracted facts, the separate deterministic-only arm, and the separate accounting of semantic judgments.
-\item \textbf{LLM4PFA}~\cite{llm4pfa} performs iterative interprocedural path-feasibility reasoning with LLM-generated SMT queries; we deliberately stay intraprocedural and solver-free.
-\item \textbf{Sifting the Noise}~\cite{sifting2026} compares LLM agents for false-positive filtering and shows that they also discard genuine vulnerabilities. This motivates our retention-first metrics.
-\item \textbf{PySeType}~\cite{pysetype} integrates LLM-assisted semantic type checking with Python vulnerability analysis.
-\item \textbf{Memoir}~\cite{memoir} learns and verifies reusable false-positive patterns.
-\end{itemize}
-We use neither semantic types nor memory or retrieval. Our evaluation subjects come from the OWASP Benchmark for Python~\cite{owaspbench} and PyVul~\cite{pyvul}.
+Several systems combine static analysis with LLMs, and we positioned our design against them before implementation. LLMDFA~\cite{llmdfa} extracts sources and sinks, summarizes functions with an LLM and validates path feasibility with external tools, which makes it a general LLM data-flow analysis, whereas our design keeps the symbolic engine as the only source of candidates. IRIS~\cite{iris} uses LLMs to infer taint specifications for CodeQL and to filter its alerts in context, while we freeze the specification and study triage alone. LLM4PFA~\cite{llm4pfa} reasons iteratively about interprocedural path feasibility with LLM-generated SMT queries, and we deliberately stay intraprocedural and solver-free.
+
+The closest work is ZeroFalse~\cite{zerofalse}, which enriches static alerts with flow context and CWE-specific prompts for structured LLM adjudication. Our design differs in the deterministic gate that checks the model's cited evidence against extracted facts, in the separate deterministic-only arm and in the separate accounting of semantic judgments. Sifting the Noise~\cite{sifting2026} compares LLM agents for false-positive filtering and finds that they also discard genuine vulnerabilities, which motivates our retention-first metrics. PySeType~\cite{pysetype} integrates LLM-assisted semantic type checking with Python vulnerability analysis and Memoir~\cite{memoir} learns and verifies reusable false-positive patterns, whereas our arms use neither semantic types nor memory or retrieval. Our evaluation subjects come from the OWASP Benchmark for Python~\cite{owaspbench} and PyVul~\cite{pyvul}.

@@ -1,12 +1,13 @@
 \section{Conclusion}
 
-Within a deliberately narrow scope (Python CWE-22, Flask request sources, intraprocedural analysis), the frozen runs support four conclusions.
+Within a deliberately narrow scope of Python CWE-22 warnings, Flask request sources and intraprocedural analysis, the frozen runs support four conclusions.
 
-\begin{enumerate}
-\item \textbf{A modest deterministic analysis is a strong control.} Constant folding, branch pruning, a loop fixpoint and a few containment patterns removed 36\% (OWASP) and 68\% (pairs) of false warnings and kept every benchmark-labelled vulnerability. An independent review still found programs on which this analysis wrongly proved a warning safe. Its proofs hold only under stated assumptions, and only for the constructs it actually models.
-\item \textbf{The value of an LLM is in what the analysis cannot prove,} namely the sufficiency of non-standard checks, and that is also where it errs. Ordinary prompting judged nearby checks and reassuring names rather than the value actually consumed, and discarded up to a third of real vulnerabilities. On our diagnostic suite, the evidence-guided configuration kept the removals and avoided most of those losses.
-\item \textbf{A structural evidence gate did not pay off here.} The gate checks dependency consistency, not that a check confines the path. It rejected no wrong suppression, rejected one and five correct ones on OWASP, and both of its accepted mistakes were insufficient guards. A post-hoc variant that refuses containment-shaped but unsound guards fixed those two cases, at the cost of correct suppressions on development data.
-\item \textbf{Much is lost before triage.} On OWASP all 23 missed vulnerabilities come from Semgrep CE's handling of slices and dictionary stores. In the real-world case study, two of four applicable targets were missed because the flow crosses functions or starts from an undeclared source. No triage stage can recover these.
-\end{enumerate}
+First, a modest deterministic analysis is a strong control. Constant folding, branch pruning, a loop fixpoint and a few containment patterns removed 36\% of false warnings on OWASP and 68\% on the pairs while keeping every benchmark-labelled vulnerability. An independent review still found programs on which this analysis wrongly proved a warning safe, so its proofs hold only under the stated assumptions and only for the constructs it models.
 
-The practical lesson is that a triage stage should be measured by false-positive removal and true-positive retention \emph{together}, against a deterministic control. Here that control matched the best LLM configuration on OWASP without a measured loss, and evidence for an LLM helped mainly by keeping it from dismissing real vulnerabilities.
+Second, an LLM is most useful on what the analysis cannot prove, which is whether a non-standard check suffices, and that is also where it errs. Ordinary prompting trusted nearby checks and reassuring names over the value consumed at the sink and discarded up to a third of real vulnerabilities, whereas on our diagnostic suite the evidence-guided configuration kept the removals and avoided most of those losses.
+
+Third, a structural evidence gate did not pay off in our runs. Because the gate checks dependency consistency without checking that a guard confines the path, it rejected no wrong suppression, rejected one and five correct ones on OWASP, and let through two mistakes that were both insufficient guards. A post-hoc variant that refuses containment-shaped but unsound guards fixed those two cases at the cost of correct suppressions on development data.
+
+Fourth, much is lost before triage begins. All 23 missed vulnerabilities on OWASP come from the handling of slices and dictionary stores in Semgrep CE, and in the real-world case study two of the four applicable targets were missed because the flow crosses functions or starts from an undeclared source, which no triage stage can recover.
+
+A triage stage should be measured by false-positive removal and true-positive retention \emph{together}, and against a deterministic control. In this study that control matched the best LLM configuration on OWASP without a measured loss, and evidence given to an LLM helped mainly by keeping it from dismissing real vulnerabilities.

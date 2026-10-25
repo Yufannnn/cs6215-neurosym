@@ -2,13 +2,12 @@
 \label{sec:eval}
 
 \subsection{Setup}
-\paragraph{Subjects (Table~\ref{tab:subjects}).}
-We use three complementary sets of subjects.
-\begin{itemize}
-\item \textbf{OWASP Benchmark for Python}~\cite{owaspbench} (pinned revision). We use its 168 path-traversal test cases (65 vulnerable, 103 safe), split by a seeded procedure grouped by \emph{flow template}: the normalized code between the source and the value reaching the sink. 34 cases in 7 families form the development set, and 134 cases in 61 families are held out. The splitter reads every file automatically to compute families; the one case we read while planning was placed in development, and no held-out case was inspected or run through an arm before the freeze.
-\item \textbf{Diagnostic pairs.} We wrote 12 development and 24 held-out pairs of small Flask handlers, modelled on Python, Flask and OWASP guidance. They are author-constructed stress tests, frozen before evaluation, not an independent benchmark. Family labels are disjoint between the splits, but some mechanisms recur across them (\texttt{basename} checks, decode-after-check). The two members of a pair differ in one security-relevant way, for example a check on the value used versus a check on another value. A harness runs each handler under 195 combinations of traversal payloads, benign inputs, control values and input groups, with the filesystem stubbed out. Every vulnerable program has an input whose accessed path leaves the root (a witness). Every safe program has completed runs with no witness, and a one-line static justification. Absence of a witness among finitely many inputs is evidence, not proof. The harness rejected four intended labels; we fixed them, redesigning two held-out programs, before any arm was run on held-out data.
-\item \textbf{Real-world case study} from PyVul~\cite{pyvul}. PyVul CWE-22 commits were screened in a fixed order on feasibility only: accessible repository, non-test Python change, and Flask request usage. Each screening decision is recorded. This yielded 6 candidate vulnerable/fixed target pairs in 4 projects, which we adjudicated afterwards for applicability and mapped warning by warning to the documented defect.
-\end{itemize}
+\paragraph{Subjects.}
+We use three complementary sets of subjects, which Table~\ref{tab:subjects} summarizes. The first is the OWASP Benchmark for Python~\cite{owaspbench} at a pinned revision, whose 168 path-traversal test cases, 65 vulnerable and 103 safe, we split by a seeded procedure grouped by \emph{flow template}, which is the normalized code between the source and the value reaching the sink. The development set holds 34 cases in 7 families and the held-out set 134 cases in 61 families. The splitter computes families automatically from every file, the one case we read while planning went into development, and no held-out case was inspected or run through an arm before the freeze.
+
+The second set consists of diagnostic pairs, 12 for development and 24 held out, which we wrote as small Flask handlers modelled on Python, Flask and OWASP guidance. They are author-constructed stress tests frozen before evaluation, and they cannot stand in for an independent benchmark. Family labels are disjoint between the splits, although some mechanisms such as \texttt{basename} checks and decode-after-check recur across them. The two members of a pair differ in one security-relevant way, for example a check on the value that is used against a check on some other value. A harness runs each handler under 195 combinations of traversal payloads, benign inputs, control values and input groups with the filesystem stubbed out. Every vulnerable program has a witness input whose accessed path leaves the root, and every safe program has completed runs without a witness together with a one-line static justification, although the absence of a witness among finitely many inputs is evidence that falls short of proof. The harness rejected four intended labels, which we fixed before any arm was run on held-out data, redesigning two held-out programs in the process.
+
+The third set is a real-world case study drawn from PyVul~\cite{pyvul}. We screened its CWE-22 commits in a fixed order on feasibility alone, requiring an accessible repository, a non-test Python change and Flask request usage, and recorded each screening decision. Screening yielded six candidate pairs of vulnerable and fixed targets in four projects, which we afterwards adjudicated for applicability and mapped warning by warning to the documented defect.
 
 \begin{table}[t]
 \caption{Evaluation subjects.}
@@ -17,40 +16,22 @@ We use three complementary sets of subjects.
 \end{table}
 
 \paragraph{Protocol.}
-Before any arm was run on test data, the following were frozen and tagged in version control:
-\begin{itemize}
-\item the Semgrep rule and its hash, the split, the diagnostic manifest and the prompts (version p2);
-\item the analyzer, the gate and the scorer.
-\end{itemize}
-The scoring unit is the test case or program: it counts as reported if any of its alerts is retained. We report precision, recall, F1, TP retention $|R\cap G|/|A\cap G|$ and FP removal $|(A\setminus R)\setminus G|/|A\setminus G|$, where $A$ is the set of baseline-reported units, $R$ the units an arm retains and $G$ the vulnerable units. Uncertainty is a 95\% percentile bootstrap over families (2{,}000 resamples). Models are \texttt{qwen3-coder-next} (primary) and \texttt{qwen3.5:9b} (with thinking off), served by SoCLaaS, with temperature 0 and JSON output.
+Before any arm was run on test data, we froze and tagged in version control the Semgrep rule and its hash, the split, the diagnostic manifest, the p2 prompts, the analyzer, the gate and the scorer. The scoring unit is the test case or program, which counts as reported if any of its alerts is retained. We report precision, recall, F1, TP retention $|R\cap G|/|A\cap G|$ and FP removal $|(A\setminus R)\setminus G|/|A\setminus G|$, where $A$ is the set of baseline-reported units, $R$ the units an arm retains and $G$ the vulnerable units. Uncertainty is a 95\% percentile bootstrap over families with 2{,}000 resamples. The models are \texttt{qwen3-coder-next} as the primary model and \texttt{qwen3.5:9b} with thinking turned off, both served by SoCLaaS at temperature 0 with JSON output.
 
 \subsection{RQ1: The removal/retention trade-off}
-Table~\ref{tab:main} gives the main results. On \textbf{OWASP} the baseline reports 68 of 134 held-out cases: 35 of the 58 vulnerable ones, and 33 safe ones.
+Table~\ref{tab:main} gives the main results, where TP retention is the share of baseline true positives an arm keeps and FP removal the share of baseline false positives it drops. On OWASP the baseline reports 68 of the 134 held-out cases, of which 35 are vulnerable and 33 safe, and its 23 misses all come from two engine limitations of Semgrep CE. Fifteen involve taint passing through string slices and eight involve a value stored in a dict by subscript and read back by key, and since every arm only filters baseline warnings, no refinement can recover them.
 
-\paragraph{OWASP: S misses.} All 23 misses come from two Semgrep CE engine limitations:
-\begin{itemize}
-\item 15 cases where taint passes through string slices (one of them also involves a dict store);
-\item 8 cases where a value is stored in a dict by subscript and read back by key.
-\end{itemize}
-No refinement can recover these.
+D removes 12 of the 33 false positives without losing a vulnerability, and in all 12 the attacker value reaches the sink only through a branch or conditional expression whose condition folds to a constant. The 21 false positives it keeps are fully analysed but tainted. Eight are protected only by a block-list such as \texttt{'../' in bar}, and although their official label is safe we mark them \emph{ambiguous}, because a bare \texttt{..} still reaches the parent directory. Five rely on a prefix check that compares an absolute path with a relative string and so always rejects, and four rely on \texttt{ConfigParser} key separation, in which the tainted value is stored under one key and a different key is read, which our analysis does not model. The last four take the attacker value from the first path segment, which the benchmark's routing always fixes to the constant \texttt{benchmark}, so they are safe for a reason that no request-data threat model captures. All scores use the official labels, but leaving out the eight ambiguous cases raises the FP removal of D and E from 0.36 to 0.48 and lowers that of the small model's L from 0.70 to 0.64, since seven of its removals are ambiguous cases. Part of the apparent advantage of that arm therefore rests on disputed labels.
 
-\paragraph{OWASP: D.} D removes 12 of the 33 false positives with no loss. In all 12, the attacker value reaches the sink only through a branch or conditional expression whose condition folds to a constant. The 21 it keeps are all fully analysed but tainted, and fall into four groups:
-\begin{itemize}
-\item 8 are protected only by a block-list (\texttt{'../' in bar}). Their official label is safe, but we mark them \emph{ambiguous}: a bare \texttt{..} still reaches the parent directory itself;
-\item 5 by a prefix check that compares an absolute path with a relative string and so always rejects;
-\item 4 by \texttt{ConfigParser} key separation (the tainted value is stored under one key and another key is read), which our analysis does not model;
-\item 4 take the attacker value from the first path segment, which the benchmark's routing always fixes to the constant \texttt{benchmark}.
-\end{itemize}
-The last group is safe because of routing, which no request-data threat model captures. All scores use the official labels. Leaving out the 8 ambiguous cases raises D's and E's FP removal from 0.36 to 0.48, and lowers the small model's L from 0.70 to 0.64 (seven of its removals are ambiguous cases). Part of that arm's apparent advantage therefore rests on disputed labels.
+With both models E retains the same OWASP units as D, and we found no OWASP case in which structured evidence let the model go beyond the recognizers. L with the primary model removes 11 false positives but wrongly dismisses one real vulnerability.
 
-\paragraph{OWASP: LLM arms.} With both models, E retains exactly the units D retains; we found no OWASP case where structured evidence let the model go beyond the recognizers. L removes 11 but wrongly dismisses one real vulnerability.
+The held-out diagnostic pairs are built to contain non-standard guards, and on them the differences between arms grow larger. D removes 13 of 19 false positives with full retention, while L removes 15 at the cost of 7 of 23 real vulnerabilities. E and EC remove the same 15 as L and lose only 2.
 
-\paragraph{Diagnostic pairs.} The held-out pairs are built to contain non-standard guards. D removes 13 of 19 false positives (0.684) with full retention. L removes 15 (0.789) but loses 7 of 23 real vulnerabilities (TP retention 0.696). E and EC remove the same 15 while losing 2 (0.913).
-
-\paragraph{Uncertainty.} The intervals are wide; for example D's FP removal on OWASP is [0.00, 0.67]. Differences of one or two cases between arms are therefore not evidence of a difference in general. A TP-retention interval of [1.00, 1.00] only says that no loss occurred in the sample; it does not bound future losses. The diagnostic intervals describe variation within our 12 constructed families, not within Python code at large. We also bootstrap paired differences between arms on the same resamples. On the held-out pairs, structured evidence reduces wrongful suppressions relative to ordinary prompting: E$-$L is $-5$ [$-10$, $-1$] with \texttt{qwen3-coder-next} and $-8$ [$-14$, $-3$] with \texttt{qwen3.5:9b}. On OWASP, every paired difference between arms has an interval that includes zero.
+\paragraph{Uncertainty.}
+The intervals are wide, and D's FP removal on OWASP, for example, spans [0.00, 0.67], so a difference of one or two cases between arms says little about behaviour in general. A TP-retention interval of [1.00, 1.00] records only that no loss occurred in the sample and places no bound on future losses, and the diagnostic intervals describe variation within our 12 constructed families alone. The artifact tables give the family-bootstrap interval of every cell in Table~\ref{tab:main}. We also bootstrap paired differences between arms on the same resamples. On the held-out pairs, structured evidence reduces wrongful suppressions relative to ordinary prompting, with E$-$L at $-5$ [$-10$, $-1$] for \texttt{qwen3-coder-next} and $-8$ [$-14$, $-3$] for \texttt{qwen3.5:9b}, whereas on OWASP every paired difference between arms has an interval that includes zero.
 
 \begin{table*}[t]
-\caption{Held-out results (unit level). TP ret.\ = share of baseline true positives kept; FP rem.\ = share of baseline false positives removed. 95\% family-bootstrap intervals are in the artifact tables.}
+\caption{Held-out results at unit level.}
 \label{tab:main}
 \small\input{tables/main}
 \end{table*}
@@ -58,71 +39,56 @@ The last group is safe because of routing, which no request-data threat model ca
 \subsection{RQ2: Do evidence and the gate help?}
 
 \paragraph{Evidence versus ordinary prompting.}
-With the same source and budget, the evidence-guided configuration cut wrongful suppressions on the held-out pairs from 7 to 2 at equal FP removal. On OWASP it turned L's 11 removals and 1 loss into 12 removals and 0 losses. L's seven mistakes include both decode-after-check programs, both prefix-confusion programs, a guard that only logs, and a \texttt{match} default branch that is reachable. In each, the model judged a nearby check or name rather than the value actually consumed. The evidence record states these facts explicitly. E differs from L in three things at once: the representation, the obligations, and the analysis conclusions it is given. The comparison does not separate their effects. One of E's retentions (a program without an evidence record) and one of L's (an invalid reply) are conservative fallbacks, not model judgments.
+With the same source and budget, the evidence-guided configuration reduced wrongful suppressions on the held-out pairs from 7 to 2 at equal FP removal, and on OWASP it turned L's 11 removals and one loss into 12 removals without a loss. L's seven mistakes on the pairs include both decode-after-check programs, both prefix-confusion programs, a guard that only logs and a reachable \texttt{match} default branch. In each of them the model judged a nearby check or a reassuring name when the value that mattered was the one consumed at the sink, and the evidence record states that fact explicitly. E differs from L in its representation, its obligations and the analysis conclusions it is given, and the comparison cannot separate the effects of these three changes. One of E's retentions, on a program without an evidence record, and one of L's, on an invalid reply, are conservative fallbacks that involve no model judgment.
 
 \paragraph{The gate.}
-The gate never rejected a wrongful E suppression on held-out data. On OWASP it rejected one \emph{correct} suppression with the primary model, and five with the smaller one (Table~\ref{tab:gate}). That case was safe because its value is constant, but E justified it with a guard that does not dominate the sink. EC therefore removed one fewer FP than E. Every EC suppression on OWASP is \texttt{structural\_check\_passed}, so EC is at best equal to D there.
+Table~\ref{tab:gate} sorts E's suppressions by gate category, and a rejection counts as a benefit when the alert is vulnerable and as a cost when it is safe. The gate never rejected a wrongful E suppression on held-out data, while on OWASP it rejected one \emph{correct} suppression with the primary model and five with the smaller one. With the primary model the rejected case was safe because its value is constant, although E justified the suppression with a guard that does not dominate the sink, so EC removed one false positive fewer than E. Every EC suppression on OWASP falls in the \texttt{structural\_check\_passed} category, so on that corpus EC can at best equal D.
 
-On the held-out pairs, EC goes beyond D in 4 programs, all \texttt{semantic\_judgment\_remaining}:
-\begin{itemize}
-\item two are correct: canonicalization with a check, and \texttt{basename} with rejection of \texttt{..};
-\item two are wrong: \texttt{startswith(ROOT)} without a separator, and a containment check that the attacker can switch off with a second parameter.
-\end{itemize}
-The gate checks that a guard dominates the sink and is consistent with the dependency structure. It cannot check that the predicate actually confines the path, and both wrong suppressions are of exactly that kind. In these runs the gate therefore improved no measured retention, and it cost precision.
+On the held-out pairs EC goes beyond D in four programs, all labelled \texttt{semantic\_judgment\_remaining}. Two of these suppressions are correct, covering canonicalization followed by a check and \texttt{basename} combined with rejection of \texttt{..}, and two are wrong, covering \texttt{startswith(ROOT)} without a separator and a containment check that the attacker can switch off with a second parameter. The gate verifies that a guard dominates the sink and fits the dependency structure, but it cannot verify that the predicate confines the path, and both wrong suppressions fail on that point. In these runs the gate improved no measured retention and cost some precision.
 
 \paragraph{Versus deterministic refinement.}
-On both held-out corpora D kept every benchmark-labelled true positive. On OWASP it removed 12 of 33 false positives, against 11 (primary model) and 7 (small model) for EC. On the pairs it removed 13 of 19, against 15 for E and EC with the primary model. Those two extra removals cost two real vulnerabilities.
+Against deterministic refinement the LLM arms gained little. D kept every benchmark-labelled true positive on both held-out corpora, and on OWASP it removed 12 of 33 false positives against 11 for EC with the primary model and 7 with the small one. On the pairs it removed 13 of 19 against 15 for E and EC with the primary model, and those two extra removals cost two real vulnerabilities.
 
 \begin{table}[t]
-\caption{E's suppressions under the EC gate. A rejection is a benefit if the alert is vulnerable and a cost if it is safe.}
+\caption{E's suppressions under the EC gate.}
 \label{tab:gate}
 \resizebox{\columnwidth}{!}{\input{tables/gate}}
 \end{table}
 
 \subsection{RQ3: Patterns}
-Table~\ref{tab:pairs} reports pair accuracy per family on the held-out diagnostics, and Table~\ref{tab:cases} shows representative cases. D, E and EC each solve 17 of 24 pairs and L solves 13, but D and E succeed on \emph{different} families.
+Table~\ref{tab:pairs} reports per family how many held-out pairs each arm solves, counting a pair as solved when both members are classified correctly, and its last column counts the wrongful suppressions of L, E and EC, while Table~\ref{tab:cases} walks through representative cases. D, E and EC each solve 17 of the 24 pairs and L solves 13, although D and E succeed on \emph{different} families.
 
-D solves every pair whose safety it can prove: overwrites, unreachable flows, \texttt{realpath}/\texttt{abspath} containment, and checks on the wrong value or exits that only log. It fails where safety rests on a block-list or \texttt{basename}, where containment follows \texttt{normpath} (which D's recognizer does not accept), or where two definitions reach the sink.
+D solves every pair whose safety it can prove, which covers overwrites, unreachable flows, \texttt{realpath} and \texttt{abspath} containment, and checks on the wrong value or exits that only log. It fails where safety rests on a block-list or on \texttt{basename}, where containment follows \texttt{normpath}, which its recognizer does not accept, or where two definitions reach the sink. E and EC recover the pairs built on \texttt{normpath} canonicalization and on \texttt{basename} with rejection, but they lose the prefix-confusion and attacker-switchable guard pairs that D gets right.
 
-E and EC recover \texttt{normpath} canonicalization and \texttt{basename}-plus-rejection. They lose the prefix-confusion and attacker-switchable guard pairs that D gets right.
-
-Two pairs fail for every arm, for reasons outside triage:
-\begin{itemize}
-\item In the first named-sanitizer pair the helper body lives in another function, so no arm sees it.
-\item In the first aliasing pair Semgrep itself misses the vulnerable member: its \texttt{append} propagator taints the alias, not the list. This is S's only false negative on the pairs.
-\end{itemize}
+Two pairs defeat every arm for reasons outside triage. In the first named-sanitizer pair the helper body lives in another function, so no arm sees it, and in the first aliasing pair Semgrep misses the vulnerable member because its \texttt{append} propagator taints the alias and leaves the list itself untainted, which is the baseline's only false negative on the pairs.
 
 \begin{table}[t]
-\caption{Held-out diagnostic pair accuracy (both members correct) and wrongful suppressions.}
+\caption{Held-out diagnostic pair accuracy and wrongful suppressions.}
 \label{tab:pairs}
 \resizebox{\columnwidth}{!}{\input{tables/diagnostic_pairs}}
 \end{table}
 
 \begin{table*}[t]
-\caption{Representative cases (primary model; \textsf{k} = kept, \textsf{s} = suppressed).}
+\caption{Representative cases with the primary model, where k means kept and s suppressed.}
 \label{tab:cases}
 \small
 \begin{tabular}{lcccccl}
 \toprule
 Case (truth) & D & L & E & EC & Gate & What happened \\
 \midrule
-checked\_vs\_original1 (vuln) & k & s & k & k & -- & L trusts the check on \texttt{candidate}; E notes \texttt{open} uses the decoded \texttt{name} \\
-unreachable\_flow2 (vuln) & k & s & k & k & -- & L argues the \texttt{match} default rarely applies; it is reachable \\
-canonicalize\_only2 (safe) & k & s & s & s & semantic & \texttt{normpath}+\texttt{startswith(ROOT+sep)}: correct, beyond D \\
-prefix\_confusion1 (vuln) & k & s & s & s & semantic & \texttt{startswith(ROOT)} accepted as containment: wrong \\
-OWASP 00091 (safe) & s & s & s & k & rejected & E: value constant, but claim labelled as a guard \\
+checked\_vs\_original1 (vuln) & k & s & k & k & -- & L trusts the check on \texttt{candidate}, E sees \texttt{open} use the decoded \texttt{name} \\
+unreachable\_flow2 (vuln) & k & s & k & k & -- & L calls the reachable \texttt{match} default rare \\
+canonicalize\_only2 (safe) & k & s & s & s & semantic & \texttt{normpath} with \texttt{startswith(ROOT+sep)}, correct beyond D \\
+prefix\_confusion1 (vuln) & k & s & s & s & semantic & \texttt{startswith(ROOT)} wrongly accepted as containment \\
+OWASP 00091 (safe) & s & s & s & k & rejected & E labels a constant value as guarded \\
 \bottomrule
 \end{tabular}
 \end{table*}
 
 \paragraph{Real-world case study.}
-We read every fix diff and mapped each warning to the documented defect after the runs, without looking at arm decisions (\texttt{data/realworld/*\_adjudication.csv}). Two of the six candidate targets are outside the task: a CORS path-matching flaw with no filesystem operation, and a Windows drive-letter check. Of the four applicable targets:
-\begin{itemize}
-\item \textbf{whoogle-search:} S reports the documented flow, a request name joined to the configuration directory and opened (3 warnings). Every arm keeps all three. The fourth warning in the changed functions is \texttt{send\_file(io.BytesIO())}, which is not a path and belongs to an SSRF fix in the same commit; we count it as unrelated.
-\item \textbf{mlflow \texttt{5044878da0}:} S reports 2 warnings on the raw request path that the fix replaces with its validated form. Whether these local sinks were exploitable before the fix is not established, so we count them only as fix-related. D, E and EC keep both, and L drops both.
-\item \textbf{opendiamond} and \textbf{mlflow \texttt{ac4b697bb0}:} S reports nothing. The attacker value is a route variable (not a declared source), or the filesystem operation is in another function.
-\end{itemize}
-At the fixed revisions, the defect sites are still reported, because the fixes are an allow-list regex and a validator Semgrep CE does not model. D, E and EC keep all five such warnings; L keeps one. This is a small case study of changed functions, not a measure of real-world detection or retention rates.
+For the real-world targets we read every fix diff after the runs and mapped each warning to the documented defect without looking at arm decisions, storing the mapping in \texttt{data/realworld/*\_adjudication.csv}. Two of the six candidate targets fall outside the task, one being a CORS path-matching flaw with no filesystem operation and the other a Windows drive-letter check. Among the four applicable targets, whoogle-search is the clearest, since S reports the documented flow, in which a request name is joined to the configuration directory and opened, through three warnings that every arm keeps. A fourth warning in its changed functions is \texttt{send\_file(io.BytesIO())}, which takes no path and belongs to an SSRF fix in the same commit, so we count it as unrelated. In mlflow \texttt{5044878da0}, S reports two warnings on the raw request path that the fix replaces with its validated form. Whether these local sinks were exploitable before the fix remains open, so we count them only as fix-related, and D, E and EC keep both while L drops both. For opendiamond and mlflow \texttt{ac4b697bb0} S reports nothing, because the attacker value is a route variable, which is not a declared source, or the filesystem operation lies in another function.
+
+At the fixed revisions the defect sites are still reported, since the fixes rely on an allow-list regex and a validator that Semgrep CE does not model, and D, E and EC keep all five such warnings whereas L keeps one. With so few changed functions, the case study illustrates behaviour on real code and gives no estimate of real-world detection or retention rates.
 
 \subsection{RQ4: Stability, model size and cost}
 \input{sections/rq4}
@@ -133,21 +99,10 @@ At the fixed revisions, the defect sites are still reported, because the fixes a
 \resizebox{\columnwidth}{!}{\input{tables/resources}}
 \end{table}
 
-\subsection{Post-hoc extension (exploratory)}
-After seeing the two wrongful EC suppressions, we tried \textbf{EC+}. EC+ adds two checks before deferring to the model on a guard: it rejects containment-shaped guards that fail the sound recognizer, and guards whose truth depends on other attacker input. Replaying the frozen E responses with no new model calls gives these results:
-\begin{itemize}
-\item \textbf{Held-out pairs:} TP retention 1.000 and FP removal 0.737, compared with EC's 0.913 and 0.789.
-\item \textbf{OWASP test:} unchanged.
-\item \textbf{OWASP development:} EC+ \emph{loses} three correct suppressions, where E gave an unsound prefix guard as the reason for values that were in fact constant.
-\end{itemize}
-EC+ was designed after inspecting these failures and is not a held-out result.
+\subsection{Post-hoc extension}
+After seeing the two wrongful EC suppressions we tried a variant, \textbf{EC+}, which adds two checks before deferring to the model on a guard. It rejects containment-shaped guards that fail the sound recognizer as well as guards whose truth depends on other attacker input. Replaying the frozen E responses without new model calls, EC+ reaches TP retention 1.000 and FP removal 0.737 on the held-out pairs, against 0.913 and 0.789 for EC, and it leaves the OWASP test results unchanged. On OWASP development data it \emph{loses} three correct suppressions in which E cited an unsound prefix guard for values that were constant. Since EC+ was designed after inspecting these failures, its numbers are exploratory and do not count as held-out results.
 
 \subsection{Threats to validity}
-\begin{itemize}
-\item \textbf{OWASP labels.} OWASP Python is a preliminary release whose cases are generated from templates. We score against its labels as given. Five of its ``safe'' cases are safe only because their check always fails at runtime, and eight block-list cases are ambiguous (sensitivity above).
-\item \textbf{Diagnostic programs.} We wrote them ourselves, and their families reflect our view of what is hard. Labels rest on finite execution witnesses plus short static arguments.
-\item \textbf{Analyzer correctness.} The review in Section~\ref{sec:correction} found real soundness bugs in the frozen extractor. The corrected version changes no held-out result, but further bugs of other kinds may remain.
-\item \textbf{Small numbers.} Samples are small, clusters are few for some error types, and the two models differ in family, size, serving stack and reasoning mode, so the model comparison isolates none of these.
-\item \textbf{Model drift.} SoCLaaS model names may change behind the service. We record served models and fingerprints, and all calls of the primary model were served by one fingerprint.
-\item \textbf{Memorisation.} Public benchmark code may appear in model training data.
-\end{itemize}
+The OWASP Python benchmark is a preliminary release whose cases are generated from templates, and we score against its labels as given, even though five of its ``safe'' cases are safe only because their check always fails at runtime and eight block-list cases are ambiguous, as the sensitivity analysis in RQ1 shows. We wrote the diagnostic programs ourselves, so their families reflect our view of what is hard, and their labels rest on finite execution witnesses plus short static arguments. The review in Section~\ref{sec:correction} found real soundness bugs in the frozen extractor, and although the corrected version changes no held-out result, bugs of other kinds may remain.
+
+Samples are small and some error types have few clusters. The two models also differ in family, size, serving stack and reasoning mode, so the model comparison cannot isolate any one of these factors. SoCLaaS may change the model behind a name, which we mitigate by recording the served model and backend fingerprint of every call, and all calls to the primary model were served under one fingerprint. Finally, public benchmark code may appear in the training data of the models.
